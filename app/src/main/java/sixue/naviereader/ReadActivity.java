@@ -28,7 +28,10 @@ public class ReadActivity extends AppCompatActivity {
             lines.add("Can't open file.");
         }
 
-        attachTextArea();
+        ReaderView readerView = (ReaderView) findViewById(R.id.textArea);
+        readerView.setLines(lines);
+
+        //attachTextArea();
     }
 
     private void attachTextArea() {

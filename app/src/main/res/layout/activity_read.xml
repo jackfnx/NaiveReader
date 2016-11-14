@@ -40,12 +40,12 @@
             android:layout_alignParentRight="true"
             android:text="1/313"/>
     </RelativeLayout>
-    <TextView
-        android:id="@+id/readerView"
+    <sixue.naviereader.ReaderView
+        android:id="@+id/textArea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/_header"
         android:layout_above="@id/_footer"
         android:orientation="vertical">
-    </TextView>
+    </sixue.naviereader.ReaderView>
 </RelativeLayout>
