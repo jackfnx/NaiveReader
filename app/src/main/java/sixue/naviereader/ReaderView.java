@@ -2,6 +2,7 @@ package sixue.naviereader;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -11,35 +12,62 @@ import android.view.View;
 import java.util.List;
 
 public class ReaderView extends View {
-    private List<String> lines;
-    private int startLine = 0;
+    private TextPaint textPaint;
+    private float fontTop;
+    private float fontHeight;
     private int startChar = 0;
+    private String text;
+
+    private void initTextPaint() {
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setARGB(0xFF, 0, 0, 0);
+        textPaint.setTextSize(50.0f);
+
+        Paint.FontMetrics fm = textPaint.getFontMetrics();
+        fontTop = Math.abs(fm.top);
+        fontHeight = Math.abs(fm.ascent) + Math.abs(fm.descent) + Math.abs(fm.leading);
+    }
 
     public ReaderView(Context context) {
         super(context);
+
+        initTextPaint();
     }
 
     public ReaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        initTextPaint();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        TextPaint textPaint = new TextPaint();
-        textPaint.setARGB(0xFF, 0, 0, 0);
-        textPaint.setTextSize(36.0f);
+        float maxWidth = canvas.getWidth();
+        float maxHeight = canvas.getHeight();
+        int i = startChar;
+        for (float y = fontTop; y < maxHeight; y += fontHeight) {
+            int len = textPaint.breakText(text, i, i + 80, true, maxWidth, null);
+            if (len <= 0) {
+                break;
+            }
 
-        int h = 0;
-        for (int i = startLine; i < lines.size() && h < 1000; i++) {
-            String s = lines.get(i).substring(startChar);
-            canvas.drawText(s, 0, h, textPaint);
-            h += 72;
+            String s = text.substring(i, i + len);
+            while (s.indexOf('\n') != -1) {
+                int j = s.indexOf('\n');
+                String s1 = s.substring(0, j);
+                canvas.drawText(s1, 0, y, textPaint);
+                s = s.substring(j + 1);
+                y += fontHeight;
+            }
+
+            canvas.drawText(s, 0, y, textPaint);
+
+            i += len;
         }
-
         super.onDraw(canvas);
     }
 
-    public void setLines(List<String> lines) {
-        this.lines = lines;
+    public void setText(String text) {
+        this.text = text;
     }
 }

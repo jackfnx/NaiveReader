@@ -24,7 +24,7 @@ import java.util.List;
 public class Utils {
     private static String SDCARD = Environment.getExternalStorageDirectory().getPath();
 
-    public static List<String> readText(String s) {
+    public static String readText(String s) {
         File file = new File(SDCARD + "/" + s);
         try {
             String encoding = guessFileEncoding(file);
@@ -32,13 +32,14 @@ public class Utils {
             InputStreamReader isr = new InputStreamReader(is, encoding);
             BufferedReader br = new BufferedReader(isr);
 
-            List<String> lines = new ArrayList<String>();
+            StringBuilder sb = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
-                lines.add(line);
+                sb.append(line);
+                sb.append("\n");
             }
             is.close();
-            return lines;
+            return sb.toString();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
