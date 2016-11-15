@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -19,7 +20,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private static final String TAG = "ReadActivity";
     private GestureDetector detector;
     private ReaderView readerView;
-    private TextView progress;
     private BroadcastReceiver batteryReceiver;
 
     @Override
@@ -41,24 +41,18 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
 
-        progress = (TextView) findViewById(R.id.progress);
+        final TextView progress = (TextView) findViewById(R.id.progress);
         readerView.setOnPageChangeListener(new ReaderView.OnPageChangeListener() {
             @Override
             public void onPageChanged(ReaderView v) {
                 int textLength = readerView.getTextLength();
-                int charCount = readerView.getCharCount();
                 int startChart = readerView.getStartChar();
                 if (textLength <= 0) {
                     progress.setText("0");
                     return;
                 }
 
-                if (charCount <= 0) {
-                    progress.setText("?");
-                    return;
-                }
-
-                progress.setText(String.format(Locale.CHINA, "%d/%d", (startChart + 1) / charCount + 1, textLength / charCount + 1));
+                progress.setText(String.format(Locale.CHINA, "%d/%d", startChart + 1, textLength));
             }
         });
 
@@ -76,8 +70,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         };
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryReceiver, filter);
-
-        progress.setText(readerView.generateProgress());
     }
 
     @Override
@@ -89,7 +81,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         Log.i(TAG, "onDown");
-        readerView.turnPage(1);
         return true;
     }
 
@@ -101,7 +92,21 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
         Log.i(TAG, "onSingleTapUp");
-        return false;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int widthPixels = metrics.widthPixels;
+        int heightPixels = metrics.heightPixels;
+        float x = motionEvent.getRawX();
+        float y = motionEvent.getRawY();
+        Log.d(TAG, "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
+        
+        if ((x < (widthPixels / 2)) && (y < (heightPixels / 2))) {
+            readerView.turnPage(-1);
+        } else {
+            readerView.turnPage(1);
+        }
+        return true;
     }
 
     @Override
@@ -116,8 +121,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
         Log.i(TAG, "onFling");
+        if (vX > 0) {
+            readerView.turnPage(-1);
+        } else {
+            readerView.turnPage(1);
+        }
         return false;
     }
 

@@ -3,10 +3,8 @@ package sixue.naviereader;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Bundle;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.view.SurfaceView;
 import android.view.View;
 
 import java.util.Locale;
@@ -16,7 +14,7 @@ public class ReaderView extends View {
     private float fontTop;
     private float fontHeight;
     private int startChar = 0;
-    private int charCount = 0;
+    private int endChar = 0;
     private String text;
     public static final int MAX_LINE_LENGTH = 80;
     private OnPageChangeListener onPageChangeListener;
@@ -64,7 +62,7 @@ public class ReaderView extends View {
 
             canvas.drawText(s, 0, y, textPaint);
         }
-        charCount = i - startChar;
+        endChar = i;
 
         if (onPageChangeListener != null) {
             onPageChangeListener.onPageChanged(this);
@@ -76,23 +74,15 @@ public class ReaderView extends View {
     }
 
     public void turnPage(int step) {
-        startChar += charCount;
+        if (step > 0) {
+            startChar = endChar;
+        } else {
+            startChar -= (endChar - startChar);
+            if (startChar < 0) {
+                startChar = 0;
+            }
+        }
         invalidate();
-    }
-
-    public String generateProgress() {
-        if (text.length() == 0) {
-            return "0";
-        }
-        if (charCount == 0) {
-            return "?";
-        }
-
-        return String.format(Locale.CHINA, "%d/%d", startChar / charCount + 1, text.length() / charCount + 1);
-    }
-
-    public String getTextTitle() {
-        return "hehe";
     }
 
     public void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
@@ -103,14 +93,9 @@ public class ReaderView extends View {
         return text.length();
     }
 
-    public int getCharCount() {
-        return charCount;
-    }
-
     public int getStartChar() {
         return startChar;
     }
-
 
     public static abstract class OnPageChangeListener {
         public abstract void onPageChanged(ReaderView v);
