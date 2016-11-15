@@ -1,5 +1,9 @@
 package sixue.naviereader;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,6 +20,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private GestureDetector detector;
     private ReaderView readerView;
     private TextView progress;
+    private BroadcastReceiver batteryReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
 
+        progress = (TextView) findViewById(R.id.progress);
         readerView.setOnPageChangeListener(new ReaderView.OnPageChangeListener() {
             @Override
             public void onPageChanged(ReaderView v) {
@@ -52,15 +58,32 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                     return;
                 }
 
-                progress.setText(String.format(Locale.CHINA, "%d/%d", startChart / charCount + 1, textLength / charCount + 1));
+                progress.setText(String.format(Locale.CHINA, "%d/%d", (startChart + 1) / charCount + 1, textLength / charCount + 1));
             }
         });
 
-        TextView title = (TextView) findViewById(R.id.title);
-        title.setText(readerView.getTextTitle());
+        final TextView battery = (TextView) findViewById(R.id.battery);
+        battery.setText("?");
+        batteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                    int level = intent.getIntExtra("level", 0);
+                    int scale = intent.getIntExtra("scale", 100);
+                    battery.setText((level * 100 / scale) + "%");
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryReceiver, filter);
 
-        progress = (TextView) findViewById(R.id.progress);
         progress.setText(readerView.generateProgress());
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(batteryReceiver);
+        super.onDestroy();
     }
 
     @Override
