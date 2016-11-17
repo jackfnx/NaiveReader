@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,6 +40,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
         readerView.importText(text);
         readerView.setOnTouchListener(this);
+
+        readerView.setMask(mask);
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
@@ -107,9 +107,9 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         Log.d(TAG, "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
 
         if ((x < (widthPixels / 2)) && (y < (heightPixels / 2))) {
-            turnPage(-1);
+            readerView.turnPage(-1);
         } else {
-            turnPage(1);
+            readerView.turnPage(1);
         }
         return true;
     }
@@ -130,40 +130,16 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         Log.i(TAG, "onFling");
         Log.d(TAG, "Fling:vX=" + vX + ",vY=" + vY);
         if (vX > 0) {
-            turnPage(-1);
+            readerView.turnPage(-1);
         } else {
-            turnPage(1);
+            readerView.turnPage(1);
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         Log.i(TAG, "onTouch");
         return detector.onTouchEvent(motionEvent);
-    }
-
-    private void turnPage(final int step) {
-        final Animation anim = new TranslateAnimation(readerView.getRight() * step, 0, 0, 0);
-        anim.setDuration(1000);
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                mask.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                readerView.turnPage(step);
-                mask.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mask.setImageBitmap(readerView.generateMask(step));
-        mask.startAnimation(anim);
     }
 }

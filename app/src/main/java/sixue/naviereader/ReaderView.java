@@ -9,8 +9,9 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-
-import java.util.Locale;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 
 public class ReaderView extends View {
     private static final String TAG = "ReaderView";
@@ -22,6 +23,7 @@ public class ReaderView extends View {
     private String text;
     public static final int MAX_LINE_LENGTH = 80;
     private OnPageChangeListener onPageChangeListener;
+    private ImageView mask;
 
     private void initTextPaint() {
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -89,16 +91,49 @@ public class ReaderView extends View {
     }
 
     public void turnPage(int step) {
+        int i;
         if (step > 0) {
-            startChar = endChar;
+            i = endChar;
         } else {
-            startChar -= (endChar - startChar);
-            if (startChar < 0) {
-                startChar = 0;
+            i = startChar - (endChar - startChar);
+            if (i < 0) {
+                i = 0;
             }
         }
-        Log.d(TAG, "Turn:startChar=" + startChar + ",endChar=" + endChar);
-        invalidate();
+        final int newStartChar = i;
+        Log.d(TAG, "Mask:newStartChar=" + newStartChar + ",startChar=" + startChar + ",endChar=" + endChar);
+
+        if (mask != null) {
+            final Animation anim = new TranslateAnimation(getRight() * step, 0, 0, 0);
+            anim.setDuration(500);
+            anim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    mask.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    startChar = newStartChar;
+                    invalidate();
+                    mask.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bm);
+            drawPage(canvas, newStartChar);
+            mask.setImageBitmap(bm);
+            mask.startAnimation(anim);
+        } else {
+            startChar = newStartChar;
+            invalidate();
+        }
     }
 
     public void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
@@ -113,21 +148,8 @@ public class ReaderView extends View {
         return startChar;
     }
 
-    public Bitmap generateMask(int step) {
-        int i;
-        if (step > 0) {
-            i = endChar;
-        } else {
-            i = startChar - (endChar - startChar);
-            if (i < 0) {
-                i = 0;
-            }
-        }
-        Log.d(TAG, "Mask:newStartChar=" + i + ",startChar=" + startChar + ",endChar=" + endChar);
-        Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bm);
-        drawPage(canvas, i);
-        return bm;
+    public void setMask(ImageView mask) {
+        this.mask = mask;
     }
 
     public static abstract class OnPageChangeListener {
