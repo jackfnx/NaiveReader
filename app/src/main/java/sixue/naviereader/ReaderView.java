@@ -1,15 +1,19 @@
 package sixue.naviereader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Locale;
 
 public class ReaderView extends View {
+    private static final String TAG = "ReaderView";
     private TextPaint textPaint;
     private float fontTop;
     private float fontHeight;
@@ -44,9 +48,16 @@ public class ReaderView extends View {
         super.onDraw(canvas);
         float maxWidth = canvas.getWidth();
         float maxHeight = canvas.getHeight();
+
+        float horizontalPadding = 16.0f;
+
+        canvas.drawColor(Color.WHITE);
+        canvas.drawLine(0, 0, 0, maxHeight, textPaint);
+        canvas.drawLine(maxWidth, 0, maxWidth, maxHeight, textPaint);
+
         int i = startChar;
         for (float y = fontTop; y < maxHeight; y += fontHeight) {
-            int len = textPaint.breakText(text, i, i + MAX_LINE_LENGTH, true, maxWidth, null);
+            int len = textPaint.breakText(text, i, i + MAX_LINE_LENGTH, true, maxWidth - horizontalPadding * 2, null);
             if (len <= 0) {
                 break;
             }
@@ -60,7 +71,7 @@ public class ReaderView extends View {
                 i += len;
             }
 
-            canvas.drawText(s, 0, y, textPaint);
+            canvas.drawText(s, horizontalPadding, y, textPaint);
         }
         endChar = i;
 
@@ -82,6 +93,7 @@ public class ReaderView extends View {
                 startChar = 0;
             }
         }
+        Log.d(TAG, "Turn:startChar=" + startChar + ",endChar=" + endChar);
         invalidate();
     }
 
@@ -95,6 +107,27 @@ public class ReaderView extends View {
 
     public int getStartChar() {
         return startChar;
+    }
+
+    public Bitmap generateMask(int step) {
+        int startCharBackup = startChar;
+        int endCharBackup = endChar;
+        if (step > 0) {
+            startChar = endChar;
+        } else {
+            startChar -= (endChar - startChar);
+            if (startChar < 0) {
+                startChar = 0;
+            }
+        }
+        Log.d(TAG, "Mask:startCharBackup=" + startCharBackup + "endCharBackup=" + endCharBackup + ",startChar=" + startChar + ",endChar=" + endChar);
+        buildDrawingCache();
+        Bitmap bm = Bitmap.createBitmap(getDrawingCache());
+        destroyDrawingCache();
+        startChar = startCharBackup;
+        endChar = endCharBackup;
+        Log.d(TAG, "Mask(restored):startCharBackup=" + startCharBackup + "endCharBackup=" + endCharBackup + ",startChar=" + startChar + ",endChar=" + endChar);
+        return bm;
     }
 
     public static abstract class OnPageChangeListener {

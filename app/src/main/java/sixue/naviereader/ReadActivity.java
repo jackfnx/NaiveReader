@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -21,6 +24,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private GestureDetector detector;
     private ReaderView readerView;
     private BroadcastReceiver batteryReceiver;
+    private ImageView mask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +38,9 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         }
 
         readerView = (ReaderView) findViewById(R.id.textArea);
-        readerView.importText(text);
+        mask = (ImageView) findViewById(R.id.mask);
 
+        readerView.importText(text);
         readerView.setOnTouchListener(this);
 
         detector = new GestureDetector(this, this);
@@ -100,17 +105,17 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         float x = motionEvent.getRawX();
         float y = motionEvent.getRawY();
         Log.d(TAG, "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
-        
+
         if ((x < (widthPixels / 2)) && (y < (heightPixels / 2))) {
-            readerView.turnPage(-1);
+            turnPage(-1);
         } else {
-            readerView.turnPage(1);
+            turnPage(1);
         }
         return true;
     }
 
     @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
         Log.i(TAG, "onScroll");
         return false;
     }
@@ -123,10 +128,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
         Log.i(TAG, "onFling");
+        Log.d(TAG, "Fling:vX=" + vX + ",vY=" + vY);
         if (vX > 0) {
-            readerView.turnPage(-1);
+            turnPage(-1);
         } else {
-            readerView.turnPage(1);
+            turnPage(1);
         }
         return false;
     }
@@ -135,5 +141,29 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     public boolean onTouch(View view, MotionEvent motionEvent) {
         Log.i(TAG, "onTouch");
         return detector.onTouchEvent(motionEvent);
+    }
+
+    private void turnPage(final int step) {
+        final Animation anim = new TranslateAnimation(readerView.getRight() * step, 0, 0, 0);
+        anim.setDuration(1000);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mask.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                readerView.turnPage(step);
+                mask.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mask.setImageBitmap(readerView.generateMask(step));
+        mask.startAnimation(anim);
     }
 }

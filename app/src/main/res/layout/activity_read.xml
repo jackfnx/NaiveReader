@@ -13,37 +13,52 @@
         android:id="@+id/_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="header"/>
+            android:text="header" />
+
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
+
         <TextView
             android:id="@+id/battery"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
-    <sixue.naviereader.ReaderView
-        android:id="@+id/textArea"
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/_header"
         android:layout_above="@id/_footer"
-        android:orientation="vertical">
-    </sixue.naviereader.ReaderView>
+        android:layout_below="@id/_header">
+
+        <sixue.naviereader.ReaderView
+            android:id="@+id/textArea"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"/>
+    </FrameLayout>
 </RelativeLayout>
