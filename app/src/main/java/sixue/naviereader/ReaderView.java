@@ -46,6 +46,15 @@ public class ReaderView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        endChar = drawPage(canvas, startChar);
+
+        if (onPageChangeListener != null) {
+            onPageChangeListener.onPageChanged(this);
+        }
+    }
+
+    private int drawPage(Canvas canvas, int i) {
         float maxWidth = canvas.getWidth();
         float maxHeight = canvas.getHeight();
 
@@ -55,7 +64,6 @@ public class ReaderView extends View {
         canvas.drawLine(0, 0, 0, maxHeight, textPaint);
         canvas.drawLine(maxWidth, 0, maxWidth, maxHeight, textPaint);
 
-        int i = startChar;
         for (float y = fontTop; y < maxHeight; y += fontHeight) {
             int len = textPaint.breakText(text, i, i + MAX_LINE_LENGTH, true, maxWidth - horizontalPadding * 2, null);
             if (len <= 0) {
@@ -73,11 +81,7 @@ public class ReaderView extends View {
 
             canvas.drawText(s, horizontalPadding, y, textPaint);
         }
-        endChar = i;
-
-        if (onPageChangeListener != null) {
-            onPageChangeListener.onPageChanged(this);
-        }
+        return i;
     }
 
     public void importText(String text) {
@@ -110,23 +114,19 @@ public class ReaderView extends View {
     }
 
     public Bitmap generateMask(int step) {
-        int startCharBackup = startChar;
-        int endCharBackup = endChar;
+        int i;
         if (step > 0) {
-            startChar = endChar;
+            i = endChar;
         } else {
-            startChar -= (endChar - startChar);
-            if (startChar < 0) {
-                startChar = 0;
+            i = startChar - (endChar - startChar);
+            if (i < 0) {
+                i = 0;
             }
         }
-        Log.d(TAG, "Mask:startCharBackup=" + startCharBackup + "endCharBackup=" + endCharBackup + ",startChar=" + startChar + ",endChar=" + endChar);
-        buildDrawingCache();
-        Bitmap bm = Bitmap.createBitmap(getDrawingCache());
-        destroyDrawingCache();
-        startChar = startCharBackup;
-        endChar = endCharBackup;
-        Log.d(TAG, "Mask(restored):startCharBackup=" + startCharBackup + "endCharBackup=" + endCharBackup + ",startChar=" + startChar + ",endChar=" + endChar);
+        Log.d(TAG, "Mask:newStartChar=" + i + ",startChar=" + startChar + ",endChar=" + endChar);
+        Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bm);
+        drawPage(canvas, i);
         return bm;
     }
 
