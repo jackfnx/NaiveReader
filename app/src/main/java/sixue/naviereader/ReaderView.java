@@ -67,7 +67,11 @@ public class ReaderView extends View {
         canvas.drawLine(maxWidth, 0, maxWidth, maxHeight, textPaint);
 
         for (float y = fontTop; y < maxHeight; y += fontHeight) {
-            int len = textPaint.breakText(text, i, i + MAX_LINE_LENGTH, true, maxWidth - horizontalPadding * 2, null);
+            int k = i + MAX_LINE_LENGTH;
+            if (k > text.length()) {
+                k = text.length();
+            }
+            int len = textPaint.breakText(text, i, k, true, maxWidth - horizontalPadding * 2, null);
             if (len <= 0) {
                 break;
             }

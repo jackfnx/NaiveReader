@@ -3,7 +3,6 @@ package sixue.naviereader;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 
 import org.mozilla.universalchardet.UniversalDetector;
@@ -15,17 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by sixue on 2016-05-25.
- */
-public class Utils {
-    private static String SDCARD = Environment.getExternalStorageDirectory().getPath();
-
-    public static String readText(String s) {
-        File file = new File(SDCARD + "/" + s);
+class Utils {
+    static String readText(String s) {
+        File file = new File(s);
         try {
             String encoding = guessFileEncoding(file);
             InputStream is = new FileInputStream(file);
@@ -49,7 +41,7 @@ public class Utils {
         }
     }
 
-    public static String guessFileEncoding(File file) throws IOException {
+    private static String guessFileEncoding(File file) throws IOException {
         InputStream is = new FileInputStream(file);
         UniversalDetector detector = new UniversalDetector(null);
         byte[] buf = new byte[1024];
@@ -75,9 +67,9 @@ public class Utils {
      * If the app does not has permission then the user will be prompted to
      * grant permissions
      *
-     * @param activity
+     * @param activity context activity
      */
-    public static void verifyStoragePermissions(Activity activity) {
+    static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);

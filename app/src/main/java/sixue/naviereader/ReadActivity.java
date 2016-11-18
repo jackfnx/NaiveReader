@@ -29,8 +29,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
+        int position = getIntent().getIntExtra("position", 0);
+        BookList.Book book = BookList.getInstance().getBook(position);
+
         Utils.verifyStoragePermissions(this);
-        String text = Utils.readText("test.txt");
+        String text = Utils.readText(book.getLocalPath());
         if (text == null) {
             text = "Can't open file.";
         }
