@@ -22,15 +22,14 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private GestureDetector detector;
     private ReaderView readerView;
     private BroadcastReceiver batteryReceiver;
-    private ImageView mask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
-        int position = getIntent().getIntExtra("position", 0);
-        BookList.Book book = BookList.getInstance().getBook(position);
+        int position = getIntent().getIntExtra(Utils.INTENT_PARA_POSITION, 0);
+        Book book = BookList.getInstance().getBook(position);
 
         Utils.verifyStoragePermissions(this);
         String text = Utils.readText(book.getLocalPath());
@@ -39,12 +38,12 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         }
 
         readerView = (ReaderView) findViewById(R.id.textArea);
-        mask = (ImageView) findViewById(R.id.mask);
+        ImageView maskView = (ImageView) findViewById(R.id.mask);
 
         readerView.importText(text);
         readerView.setOnTouchListener(this);
 
-        readerView.setMask(mask);
+        readerView.setMask(maskView);
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
@@ -72,7 +71,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
                     int level = intent.getIntExtra("level", 0);
                     int scale = intent.getIntExtra("scale", 100);
-                    battery.setText((level * 100 / scale) + "%");
+                    battery.setText(String.format(Locale.CHINA, "%d%%", level * 100 / scale));
                 }
             }
         };

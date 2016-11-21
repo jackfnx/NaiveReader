@@ -27,7 +27,7 @@ public class BookList {
     }
 
     public void reload(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("BookList", Context.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences(Utils.PREFERENCE_BOOK_LIST, Context.MODE_PRIVATE);
         String json = sp.getString("s", "");
         ObjectMapper mapper = new ObjectMapper();
         JavaType listType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Book.class);
@@ -66,59 +66,11 @@ public class BookList {
         try {
             String s = mapper.writeValueAsString(bookList);
 
-            SharedPreferences.Editor editor = context.getSharedPreferences("BookList", Context.MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = context.getSharedPreferences(Utils.PREFERENCE_BOOK_LIST, Context.MODE_PRIVATE).edit();
             editor.putString("s", s);
             editor.apply();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-        }
-    }
-
-    public class Book {
-        private String title;
-        private boolean isLocal;
-        private String localPath;
-        private String url;
-        private int current;
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public boolean isLocal() {
-            return isLocal;
-        }
-
-        public void setLocal(boolean local) {
-            isLocal = local;
-        }
-
-        public String getLocalPath() {
-            return localPath;
-        }
-
-        public void setLocalPath(String localPath) {
-            this.localPath = localPath;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public int getCurrent() {
-            return current;
-        }
-
-        public void setCurrent(int current) {
-            this.current = current;
         }
     }
 }

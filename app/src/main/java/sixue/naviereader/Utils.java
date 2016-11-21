@@ -16,6 +16,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 class Utils {
+    static final String PREFERENCE_BOOK_LIST = "PREFERENCE_BOOK_LIST";
+    static final String INTENT_PARA_POSITION = "INTENT_PARA_POSITION";
+    static final String INTENT_PARA_BOOKNAME = "name";
+    static final String INTENT_PARA_BOOKPATH = "path";
+
     static String readText(String s) {
         File file = new File(s);
         try {

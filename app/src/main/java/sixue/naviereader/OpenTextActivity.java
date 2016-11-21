@@ -39,8 +39,8 @@ public class OpenTextActivity extends AppCompatActivity {
                         myAdapter.setCurrentDir(file);
                     } else {
                         Intent data = new Intent();
-                        data.putExtra("name", file.getName());
-                        data.putExtra("path", file.getAbsolutePath());
+                        data.putExtra(Utils.INTENT_PARA_BOOKNAME, file.getName());
+                        data.putExtra(Utils.INTENT_PARA_BOOKPATH, file.getAbsolutePath());
                         setResult(RESULT_OK, data);
                         finish();
                     }
@@ -101,13 +101,7 @@ public class OpenTextActivity extends AppCompatActivity {
                         return false;
                     }
                     File f = new File(file.getAbsoluteFile() + "/" + s);
-                    if (f.isDirectory()) {
-                        return true;
-                    }
-                    if (s.endsWith(".txt")) {
-                        return true;
-                    }
-                    return false;
+                    return f.isDirectory() || s.endsWith(".txt");
                 }
             });
             Arrays.sort(this.files, new Comparator<File>() {

@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GridView gv;
-    private FloatingActionButton fab;
     private BaseAdapter gvAdapter;
 
     @Override
@@ -25,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
         BookList.getInstance().reload(this);
 
-        gv = (GridView) findViewById(R.id.list_books);
-        fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        GridView gv = (GridView) findViewById(R.id.list_books);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
         gvAdapter = new BaseAdapter() {
             @Override
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 if (view == null) {
                     view = LayoutInflater.from(MainActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
                 }
-                BookList.Book book = BookList.getInstance().getBook(i);
+                Book book = BookList.getInstance().getBook(i);
                 view.setTag(i);
                 TextView tv = (TextView) view.findViewById(R.id.book);
                 tv.setText(book.getTitle());
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(MainActivity.this, ReadActivity.class);
-                intent.putExtra("position", i);
+                intent.putExtra(Utils.INTENT_PARA_POSITION, i);
                 startActivity(intent);
             }
         });
@@ -79,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int responseCode, Intent data) {
         if (requestCode == 0) {
             if (responseCode == RESULT_OK) {
-                String name = data.getStringExtra("name");
-                String path = data.getStringExtra("path");
+                String name = data.getStringExtra(Utils.INTENT_PARA_BOOKNAME);
+                String path = data.getStringExtra(Utils.INTENT_PARA_BOOKPATH);
                 BookList.getInstance().addBook(name, path, this);
                 gvAdapter.notifyDataSetChanged();
             }
