@@ -5,7 +5,7 @@ public class Book {
     private boolean isLocal;
     private String localPath;
     private String url;
-    private int current;
+    private int currentPosition;
 
     public Book() {
 
@@ -43,11 +43,11 @@ public class Book {
         this.url = url;
     }
 
-    public int getCurrent() {
-        return current;
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 
-    public void setCurrent(int current) {
-        this.current = current;
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
     }
 }

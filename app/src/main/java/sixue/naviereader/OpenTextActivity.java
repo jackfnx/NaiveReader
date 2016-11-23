@@ -35,7 +35,7 @@ public class OpenTextActivity extends AppCompatActivity {
                 if (file != null) {
                     Intent data = new Intent();
                     data.putExtra(Utils.INTENT_PARA_BOOKNAME, file.getName());
-                    data.putExtra(Utils.INTENT_PARA_BOOKPATH, file.getAbsolutePath().substring(sdcard.length()));
+                    data.putExtra(Utils.INTENT_PARA_BOOKPATH, file.getAbsolutePath());
                     setResult(RESULT_OK, data);
                     finish();
                 }
@@ -60,16 +60,17 @@ public class OpenTextActivity extends AppCompatActivity {
             }).start();
         }
 
-        private void loadFiles(File dir) {
-            for (File file : dir.listFiles()) {
-                if (file.isDirectory()) {
-                    loadFiles(file);
-                } else if (file.getName().endsWith(".txt")) {
-                    final File f = file;
+        private void loadFiles(final File file) {
+            if (file.isDirectory()) {
+                for (File subFile : file.listFiles()) {
+                    loadFiles(subFile);
+                }
+            } else {
+                if (file.getName().endsWith(".txt")) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            files.add(f);
+                            files.add(file);
                             notifyDataSetChanged();
                         }
                     });

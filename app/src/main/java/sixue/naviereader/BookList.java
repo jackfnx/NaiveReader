@@ -38,6 +38,19 @@ public class BookList {
         }
     }
 
+    public void save(Context context) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String s = mapper.writeValueAsString(bookList);
+
+            SharedPreferences.Editor editor = context.getSharedPreferences(Utils.PREFERENCE_BOOK_LIST, Context.MODE_PRIVATE).edit();
+            editor.putString("s", s);
+            editor.apply();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getBookNum() {
         return bookList.size();
     }
@@ -62,15 +75,12 @@ public class BookList {
         book.setLocalPath(path);
         bookList.add(book);
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String s = mapper.writeValueAsString(bookList);
+        save(context);
+    }
 
-            SharedPreferences.Editor editor = context.getSharedPreferences(Utils.PREFERENCE_BOOK_LIST, Context.MODE_PRIVATE).edit();
-            editor.putString("s", s);
-            editor.apply();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+    public void updateBookPosition(Book book, int position, Context context) {
+        book.setCurrentPosition(position);
+
+        save(context);
     }
 }

@@ -28,8 +28,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
-        int position = getIntent().getIntExtra(Utils.INTENT_PARA_POSITION, 0);
-        Book book = BookList.getInstance().getBook(position);
+        final int position = getIntent().getIntExtra(Utils.INTENT_PARA_POSITION, 0);
+        final Book book = BookList.getInstance().getBook(position);
 
         Utils.verifyStoragePermissions(this);
         String text = Utils.readText(book.getLocalPath());
@@ -39,11 +39,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
         readerView = (ReaderView) findViewById(R.id.textArea);
         ImageView maskView = (ImageView) findViewById(R.id.mask);
+        View loading = findViewById(R.id.loading);
 
-        readerView.importText(text);
+        readerView.importText(text, book.getCurrentPosition());
         readerView.setOnTouchListener(this);
 
         readerView.setMask(maskView);
+        readerView.setLoading(loading);
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
@@ -52,14 +54,10 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         readerView.setOnPageChangeListener(new ReaderView.OnPageChangeListener() {
             @Override
             public void onPageChanged(ReaderView v) {
-                int textLength = readerView.getTextLength();
-                int startChart = readerView.getStartChar();
-                if (textLength <= 0) {
-                    progress.setText("0");
-                    return;
-                }
-
-                progress.setText(String.format(Locale.CHINA, "%d/%d", startChart + 1, textLength));
+                String maxPages = readerView.getMaxPages();
+                int currentPage = readerView.getCurrentPage();
+                progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
+                BookList.getInstance().updateBookPosition(book, readerView.getCurrentPosition(), ReadActivity.this);
             }
         });
 

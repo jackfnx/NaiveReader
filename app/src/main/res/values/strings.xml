@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Navie Reader</string>
+    <string name="cd_null">null</string>
+    <string name="msg_first_page">It was the first page.</string>
+    <string name="msg_last_page">It was the last page.</string>
 </resources>
