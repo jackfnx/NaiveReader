@@ -21,7 +21,8 @@
         <activity
             android:name=".ReadActivity"
             android:theme="@style/AppTheme.NoTitleBar" />
-        <activity android:name=".OpenTextActivity"></activity>
+        <activity android:name=".OpenTextActivity" />
+        <activity android:name=".ContentActivity"></activity>
     </application>
 
 </manifest>

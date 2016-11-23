@@ -105,6 +105,9 @@ public class ReaderView extends View {
                                     public void run() {
                                         loading.setVisibility(GONE);
                                         ReaderView.this.setVisibility(VISIBLE);
+                                        if (onPageChangeListener != null) {
+                                            onPageChangeListener.onPageChanged(ReaderView.this);
+                                        }
                                     }
                                 });
                             }
