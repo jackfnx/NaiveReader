@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naviereader.data;
 
 public class Book {
     private String title;

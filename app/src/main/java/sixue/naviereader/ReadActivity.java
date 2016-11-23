@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import sixue.naviereader.data.Book;
+import sixue.naviereader.data.BookList;
+
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
     private static final String TAG = "ReadActivity";
@@ -38,14 +41,16 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         }
 
         readerView = (ReaderView) findViewById(R.id.textArea);
-        ImageView maskView = (ImageView) findViewById(R.id.mask);
-        View loading = findViewById(R.id.loading);
+        ImageView maskView = (ImageView) findViewById(R.id.pageMask);
+        View loading = findViewById(R.id.loadingMask);
 
         readerView.importText(text, book.getCurrentPosition());
         readerView.setOnTouchListener(this);
 
-        readerView.setMask(maskView);
-        readerView.setLoading(loading);
+        readerView.setPageMask(maskView);
+        readerView.setLoadingMask(loading);
+
+        readerView.startTypesetThread();
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
@@ -80,6 +85,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public void onDestroy() {
         unregisterReceiver(batteryReceiver);
+        readerView.stopTypesetThread();
         super.onDestroy();
     }
 

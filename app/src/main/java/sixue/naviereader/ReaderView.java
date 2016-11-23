@@ -30,13 +30,14 @@ public class ReaderView extends View {
     private float fontHeight;
     private int maxWidth;
     private int maxHeight;
-    private ImageView mask;
-    private View loading;
+    private ImageView pageMask;
+    private View loadingMask;
     private List<Integer> pageBreaks;
     private int currentPage;
     private boolean typesetFinished;
     private int currentPosition;
     private OnPageChangeListener onPageChangeListener;
+    private boolean isRunning;
 
     public ReaderView(Context context) {
         super(context);
@@ -63,16 +64,15 @@ public class ReaderView extends View {
         typesetFinished = false;
         maxWidth = -1;
         maxHeight = -1;
-
-        startTypesetThread();
     }
 
-    private void startTypesetThread() {
+    public void startTypesetThread() {
+        isRunning = true;
         final Handler handler = new Handler();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (!isRunning) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -85,8 +85,7 @@ public class ReaderView extends View {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                loading.setVisibility(VISIBLE);
-                                ReaderView.this.setVisibility(INVISIBLE);
+                                setLoading(true);
                             }
                         });
 
@@ -99,12 +98,11 @@ public class ReaderView extends View {
                             // 当前页排版完毕
                             if (i > currentPosition && currentPage < 0) {
                                 currentPage = pageBreaks.size() - 1;
-                                // 取消loading
+                                // 取消loading，更新当前页码
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        loading.setVisibility(GONE);
-                                        ReaderView.this.setVisibility(VISIBLE);
+                                        setLoading(false);
                                         if (onPageChangeListener != null) {
                                             onPageChangeListener.onPageChanged(ReaderView.this);
                                         }
@@ -129,6 +127,10 @@ public class ReaderView extends View {
                 }
             }
         }).start();
+    }
+
+    public void stopTypesetThread() {
+        isRunning = false;
     }
 
     private int getPage(int i, List<String> lines, List<Float> ys) {
@@ -195,6 +197,16 @@ public class ReaderView extends View {
         return i;
     }
 
+    private void setLoading(boolean isLoading) {
+        if (isLoading) {
+            loadingMask.setVisibility(VISIBLE);
+            setVisibility(INVISIBLE);
+        } else {
+            loadingMask.setVisibility(GONE);
+            setVisibility(VISIBLE);
+        }
+    }
+
     public void turnPage(int step) {
         int i = currentPage + step;
         if (i < 0) {
@@ -214,13 +226,13 @@ public class ReaderView extends View {
         final int newPage = i;
         Log.d(TAG, "Mask:newPage=" + newPage + ",currentPage=" + currentPage + ",pagesNum=" + pageBreaks.size());
 
-        if (mask != null) {
+        if (pageMask != null) {
             final Animation anim = new TranslateAnimation(getRight() * step, 0, 0, 0);
             anim.setDuration(500);
             anim.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                    mask.setVisibility(View.VISIBLE);
+                    pageMask.setVisibility(View.VISIBLE);
                 }
 
                 @Override
@@ -228,7 +240,7 @@ public class ReaderView extends View {
                     currentPage = newPage;
                     currentPosition = pageBreaks.get(currentPage);
                     invalidate();
-                    mask.setVisibility(View.INVISIBLE);
+                    pageMask.setVisibility(View.INVISIBLE);
                     if (onPageChangeListener != null) {
                         onPageChangeListener.onPageChanged(ReaderView.this);
                     }
@@ -243,8 +255,8 @@ public class ReaderView extends View {
             Bitmap bm = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bm);
             drawPage(canvas, newPage);
-            mask.setImageBitmap(bm);
-            mask.startAnimation(anim);
+            pageMask.setImageBitmap(bm);
+            pageMask.startAnimation(anim);
         } else {
             currentPage = newPage;
             currentPosition = pageBreaks.get(currentPage);
@@ -274,12 +286,12 @@ public class ReaderView extends View {
         return currentPosition;
     }
 
-    public void setMask(ImageView mask) {
-        this.mask = mask;
+    public void setPageMask(ImageView pageMask) {
+        this.pageMask = pageMask;
     }
 
-    public void setLoading(View loading) {
-        this.loading = loading;
+    public void setLoadingMask(View loadingMask) {
+        this.loadingMask = loadingMask;
     }
 
     public void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {

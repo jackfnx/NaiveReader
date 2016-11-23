@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naviereader.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import sixue.naviereader.Utils;
 
 public class BookList {
     private static BookList instance;

@@ -15,11 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-class Utils {
-    static final String PREFERENCE_BOOK_LIST = "PREFERENCE_BOOK_LIST";
+public class Utils {
+    public static final String PREFERENCE_BOOK_LIST = "PREFERENCE_BOOK_LIST";
     static final String INTENT_PARA_POSITION = "INTENT_PARA_POSITION";
-    static final String INTENT_PARA_BOOKNAME = "name";
-    static final String INTENT_PARA_BOOKPATH = "path";
+    static final String INTENT_PARA_BOOKNAME = "INTENT_PARA_BOOKNAME";
+    static final String INTENT_PARA_BOOKPATH = "INTENT_PARA_BOOKPATH";
 
     static String readText(String s) {
         File file = new File(s);

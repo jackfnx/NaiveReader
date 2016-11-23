@@ -12,6 +12,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import sixue.naviereader.data.Book;
+import sixue.naviereader.data.BookList;
+
 public class MainActivity extends AppCompatActivity {
 
     private BaseAdapter gvAdapter;
