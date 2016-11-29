@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -16,12 +17,8 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookList;
-
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
-    private static final String TAG = "ReadActivity";
     private GestureDetector detector;
     private ReaderView readerView;
     private BroadcastReceiver batteryReceiver;
@@ -31,11 +28,12 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
-        final int position = getIntent().getIntExtra(Utils.INTENT_PARA_POSITION, 0);
-        final Book book = BookList.getInstance().getBook(position);
+        String path = getIntent().getStringExtra(Utils.INTENT_PARA_PATH);
+        int currentPosition = getIntent().getIntExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
 
-        Utils.verifyStoragePermissions(this);
-        String text = Utils.readText(book.getLocalPath());
+        //Utils.verifyStoragePermissions(this);
+        //path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test.txt";
+        String text = Utils.readText(path);
         if (text == null) {
             text = "Can't open file.";
         }
@@ -44,7 +42,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         ImageView maskView = (ImageView) findViewById(R.id.pageMask);
         View loading = findViewById(R.id.loadingMask);
 
-        readerView.importText(text, book.getCurrentPosition());
+        readerView.importText(text, currentPosition);
         readerView.setOnTouchListener(this);
 
         readerView.setPageMask(maskView);
@@ -62,7 +60,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 String maxPages = readerView.getMaxPages();
                 int currentPage = readerView.getCurrentPage();
                 progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
-                BookList.getInstance().updateBookPosition(book, readerView.getCurrentPosition(), ReadActivity.this);
+                //BookLoader.getInstance().updateBookPosition(book, readerView.getCurrentPosition(), ReadActivity.this);
             }
         });
 
@@ -91,18 +89,18 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onDown(MotionEvent motionEvent) {
-        Log.i(TAG, "onDown");
+        Log.i(getClass().toString(), "onDown");
         return true;
     }
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-        Log.i(TAG, "onShowPress");
+        Log.i(getClass().toString(), "onShowPress");
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-        Log.i(TAG, "onSingleTapUp");
+        Log.i(getClass().toString(), "onSingleTapUp");
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -110,7 +108,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         int heightPixels = metrics.heightPixels;
         float x = motionEvent.getRawX();
         float y = motionEvent.getRawY();
-        Log.d(TAG, "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
+        Log.d(getClass().toString(), "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
 
         if ((x < (widthPixels / 2)) && (y < (heightPixels / 2))) {
             readerView.turnPage(-1);
@@ -122,19 +120,19 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
-        Log.i(TAG, "onScroll");
+        Log.i(getClass().toString(), "onScroll");
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
-        Log.i(TAG, "onLongPress");
+        Log.i(getClass().toString(), "onLongPress");
     }
 
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
-        Log.i(TAG, "onFling");
-        Log.d(TAG, "Fling:vX=" + vX + ",vY=" + vY);
+        Log.i(getClass().toString(), "onFling");
+        Log.d(getClass().toString(), "Fling:vX=" + vX + ",vY=" + vY);
         if (vX > 0) {
             readerView.turnPage(-1);
         } else {
@@ -145,7 +143,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        Log.i(TAG, "onTouch");
+        Log.i(getClass().toString(), "onTouch");
         return detector.onTouchEvent(motionEvent);
     }
 }

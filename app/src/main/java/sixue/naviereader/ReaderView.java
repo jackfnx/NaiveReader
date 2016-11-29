@@ -72,7 +72,7 @@ public class ReaderView extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!isRunning) {
+                while (isRunning) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {

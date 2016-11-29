@@ -1,9 +1,34 @@
 package sixue.naviereader.data;
 
-public class Chapter {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public class Chapter {
+    private String id;
+    private String bookId;
     private String title;
-    private String url;
+    private String para;
+    @JsonIgnore
+    private boolean downloaded;
+    private String savePath;
+
+    public Chapter() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
+    }
 
     public String getTitle() {
         return title;
@@ -13,11 +38,28 @@ public class Chapter {
         this.title = title;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public String getPara() {
+        return para;
     }
 
-    public String getUrl() {
-        return url;
+    public void setPara(String para) {
+        this.para = para;
+    }
+
+    public boolean isDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
+    }
+
+
+    public String getSavePath() {
+        return savePath;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
     }
 }

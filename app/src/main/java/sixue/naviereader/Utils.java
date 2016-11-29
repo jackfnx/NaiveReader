@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
@@ -11,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,11 +22,25 @@ public class Utils {
     static final String INTENT_PARA_POSITION = "INTENT_PARA_POSITION";
     static final String INTENT_PARA_BOOKNAME = "INTENT_PARA_BOOKNAME";
     static final String INTENT_PARA_BOOKPATH = "INTENT_PARA_BOOKPATH";
+    public static final String INTENT_PARA_NEXT_ACTION = "INTENT_PARA_NEXT_ACTION";
+    public static final String INTENT_PARA_BOOK_INDEX = "INTENT_PARA_BOOK_INDEX";
+    public static final String ACTION_CHAPTER_CHANGED = "ACTION_CHAPTER_CHANGED";
+    public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
+    public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
+    public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
+    public static final String INTENT_PARA_CHAPTER_ID = "INTENT_PARA_CHAPTER_ID";
+    public static final String INTENT_PARA_NEXT_ACTION_READ = "INTENT_PARA_NEXT_ACTION_READ";
+    public static final String INTENT_PARA_PATH = "INTENT_PARA_PATH";
+    public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
 
-    static String readText(String s) {
+    public static String readText(String s) {
         File file = new File(s);
         try {
             String encoding = guessFileEncoding(file);
+            if (encoding == null) {
+                return null;
+            }
+
             InputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is, encoding);
             BufferedReader br = new BufferedReader(isr);
@@ -43,6 +59,29 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void writeText(String s, String path) {
+        try {
+            File file = new File(path);
+            File dir = file.getParentFile();
+
+            if (!dir.exists()) {
+                boolean mk = dir.mkdir();
+                Log.i("Utils", "mkdir:" + dir + ", " + mk);
+            }
+
+            if (!file.exists()) {
+                boolean cr = file.createNewFile();
+                Log.i("Utils", "createNewFile:" + file + ", " + cr);
+            }
+
+            FileWriter fw = new FileWriter(file, false);
+            fw.write(s);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

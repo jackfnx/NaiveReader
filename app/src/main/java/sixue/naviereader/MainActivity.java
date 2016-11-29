@@ -1,10 +1,13 @@
 package sixue.naviereader;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,80 +15,187 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookList;
+import sixue.naviereader.data.BookLoader;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BaseAdapter gvAdapter;
+    private static final int REQUEST_CODE_IMPORT = 0;
+    private MyAdapter myAdapter;
+    private boolean isEditMode;
+    private List<Book> editList;
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BookList.getInstance().reload(this);
+        BookLoader.getInstance().reload(this);
+
+        isEditMode = false;
+        editList = new ArrayList<>();
+        actionBar = getSupportActionBar();
 
         GridView gv = (GridView) findViewById(R.id.list_books);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
-        gvAdapter = new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return BookList.getInstance().getBookNum();
-            }
-
-            @Override
-            public Object getItem(int i) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int i) {
-                return 0;
-            }
-
-            @Override
-            public View getView(int i, View view, ViewGroup viewGroup) {
-                if (view == null) {
-                    view = LayoutInflater.from(MainActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
-                }
-                Book book = BookList.getInstance().getBook(i);
-                view.setTag(i);
-                TextView tv = (TextView) view.findViewById(R.id.book);
-                tv.setText(book.getTitle());
-                tv.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.fm, 0, 0);
-                return view;
-            }
-        };
-
-        gv.setAdapter(gvAdapter);
+        myAdapter = new MyAdapter();
+        gv.setAdapter(myAdapter);
         gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(MainActivity.this, ReadActivity.class);
-                intent.putExtra(Utils.INTENT_PARA_POSITION, i);
-                startActivity(intent);
+                if (!isEditMode) {
+                    Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+                    intent.putExtra(Utils.INTENT_PARA_NEXT_ACTION, Utils.INTENT_PARA_NEXT_ACTION_READ);
+                    intent.putExtra(Utils.INTENT_PARA_BOOK_INDEX, i);
+                    startActivity(intent);
+                } else {
+                    View selectIcon = view.findViewById(R.id.select_icon);
+                    boolean checked = !selectIcon.isSelected();
+                    checkItem(selectIcon, i, checked);
+                }
+            }
+        });
+        gv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (!isEditMode) {
+                    setEditMode(true);
+                    View selectIcon = view.findViewById(R.id.select_icon);
+                    checkItem(selectIcon, i, true);
+                    return true;
+                }
+                return false;
             }
         });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, OpenTextActivity.class);
-                startActivityForResult(intent, 0);
+                if (!isEditMode) {
+                    Intent intent = new Intent(MainActivity.this, OpenTextActivity.class);
+                    startActivityForResult(intent, REQUEST_CODE_IMPORT);
+                }
             }
         });
     }
 
+    private void checkItem(View selectIcon, int i, boolean checked) {
+        selectIcon.setSelected(checked);
+        if (checked) {
+            editList.add(BookLoader.getInstance().getBook(i));
+        } else {
+            editList.remove(BookLoader.getInstance().getBook(i));
+        }
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_delete:
+                if (isEditMode) {
+                    BookLoader.getInstance().deleteBooks(editList);
+                    editList.clear();
+                    setEditMode(false);
+                    return true;
+                }
+            case R.id.menu_edit:
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem edit = menu.findItem(R.id.menu_edit);
+        MenuItem delete = menu.findItem(R.id.menu_delete);
+
+        edit.setVisible(isEditMode);
+        delete.setVisible(isEditMode);
+
+        edit.setEnabled(editList.size() == 1);
+        delete.setEnabled(editList.size() >= 1);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void setEditMode(boolean editMode) {
+        isEditMode = editMode;
+        myAdapter.notifyDataSetChanged();
+        actionBar.setDisplayShowTitleEnabled(!editMode);
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isEditMode) {
+            editList.clear();
+            setEditMode(false);
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
     protected void onActivityResult(int requestCode, int responseCode, Intent data) {
-        if (requestCode == 0) {
+        if (requestCode == REQUEST_CODE_IMPORT) {
             if (responseCode == RESULT_OK) {
                 String name = data.getStringExtra(Utils.INTENT_PARA_BOOKNAME);
                 String path = data.getStringExtra(Utils.INTENT_PARA_BOOKPATH);
-                BookList.getInstance().addBook(name, path, this);
-                gvAdapter.notifyDataSetChanged();
+                BookLoader.getInstance().addBook(name, path);
+                myAdapter.notifyDataSetChanged();
             }
         }
 
+    }
+
+    private class MyAdapter extends BaseAdapter {
+        public MyAdapter() {
+        }
+
+        @Override
+        public int getCount() {
+            return BookLoader.getInstance().getBookNum();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            if (view == null) {
+                view = LayoutInflater.from(MainActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
+            }
+            Book book = BookLoader.getInstance().getBook(i);
+            view.setTag(i);
+            TextView tv = (TextView) view.findViewById(R.id.title);
+            tv.setText(book.getTitle());
+            View selectIcon = view.findViewById(R.id.select_icon);
+            if (!isEditMode) {
+                selectIcon.setVisibility(View.INVISIBLE);
+            } else {
+                selectIcon.setVisibility(View.VISIBLE);
+            }
+            return view;
+        }
     }
 }

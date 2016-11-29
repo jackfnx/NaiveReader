@@ -3,4 +3,8 @@
     <string name="cd_null">null</string>
     <string name="msg_first_page">It was the first page.</string>
     <string name="msg_last_page">It was the last page.</string>
+    <string name="cd_book_cover">book cover</string>
+    <string name="cd_delete_icon">delete icon</string>
+    <string name="menu_edit">edit</string>
+    <string name="menu_delete">delete</string>
 </resources>
