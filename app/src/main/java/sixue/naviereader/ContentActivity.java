@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,22 +13,62 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookLoader;
 import sixue.naviereader.data.Chapter;
 
 public class ContentActivity extends AppCompatActivity {
 
-    private Book waitingBook;
-    private Chapter waitingChapter;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
+        final Book book = BookLoader.getInstance().getBook(0);
+        SmartDownloader downloader = new SmartDownloader(this, book);
+
+        ListView listView = (ListView) findViewById(R.id.content);
+        final MyAdapter myAdapter = new MyAdapter(book);
+
+        listView.setAdapter(myAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
+                intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
+                intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
+                startActivity(intent);
+            }
+        });
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ACTION_CHAPTER_CHANGED);
+        filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+        registerReceiver(receiver, filter);
+
+        if (downloader.reloadContent()) {
+            if (book.isLocal()) {
+                Intent intent = new Intent(this, ReadActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                sendBroadcast(intent);
+            }
+        } else {
+            downloader.downloadContent();
+        }
+        /*
         final Book book = new Book();
         book.setId("http://www.50zw.la/book_" + 3246);
         book.setTitle("xdzz");
@@ -39,47 +79,13 @@ public class ContentActivity extends AppCompatActivity {
         book.setChapterList(new ArrayList<Chapter>());
         book.setCurrentChapterId("");
         book.setCurrentChapterIndex(0);
+        */
+    }
 
-        ListView listView = (ListView) findViewById(R.id.content);
-        final MyAdapter myAdapter = new MyAdapter(book);
-
-        BookLoader.getInstance().pushContentQueue(book);
-        waitingBook = book;
-
-        IntentFilter filter = new IntentFilter();
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (waitingBook != null && waitingBook.getId().equals(intent.getStringExtra("bookId"))) {
-                    myAdapter.notifyDataSetChanged();
-                    waitingBook = null;
-                } else if (waitingChapter != null && waitingChapter.getId().equals(intent.getStringExtra("chapterId"))) {
-                    Intent i = new Intent(ContentActivity.this, ReadActivity.class);
-                    i.putExtra("path", waitingChapter.getSavePath());
-                    i.putExtra("currentPosition", 0);
-                    startActivity(i);
-                    waitingChapter = null;
-                }
-            }
-        };
-        registerReceiver(receiver, filter);
-
-        listView.setAdapter(myAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final Chapter chapter = (Chapter) view.getTag();
-                if (!chapter.isDownloaded()) {
-                    BookLoader.getInstance().pushChapterQueue(chapter);
-                    waitingChapter = chapter;
-                } else {
-                    Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
-                    intent.putExtra("path", chapter.getSavePath());
-                    intent.putExtra("currentPosition", 0);
-                    startActivity(intent);
-                }
-            }
-        });
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     private class MyAdapter extends BaseAdapter {

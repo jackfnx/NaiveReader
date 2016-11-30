@@ -23,15 +23,16 @@ public class Utils {
     static final String INTENT_PARA_BOOKNAME = "INTENT_PARA_BOOKNAME";
     static final String INTENT_PARA_BOOKPATH = "INTENT_PARA_BOOKPATH";
     public static final String INTENT_PARA_NEXT_ACTION = "INTENT_PARA_NEXT_ACTION";
-    public static final String INTENT_PARA_BOOK_INDEX = "INTENT_PARA_BOOK_INDEX";
     public static final String ACTION_CHAPTER_CHANGED = "ACTION_CHAPTER_CHANGED";
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
     public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
     public static final String INTENT_PARA_CHAPTER_ID = "INTENT_PARA_CHAPTER_ID";
     public static final String INTENT_PARA_NEXT_ACTION_READ = "INTENT_PARA_NEXT_ACTION_READ";
+    public static final String INTENT_PARA_NEXT_ACTION_CONTENT = "INTENT_PARA_NEXT_ACTION_CONTENT";
     public static final String INTENT_PARA_PATH = "INTENT_PARA_PATH";
     public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
+    public static final String INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX";
 
     public static String readText(String s) {
         File file = new File(s);

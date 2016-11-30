@@ -19,9 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookLoader;
 
-public class MainActivity extends AppCompatActivity {
+public class BookshelfActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_IMPORT = 0;
     private MyAdapter myAdapter;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_bookshelf);
 
         BookLoader.getInstance().reload(this);
 
@@ -49,9 +48,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!isEditMode) {
-                    Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-                    intent.putExtra(Utils.INTENT_PARA_NEXT_ACTION, Utils.INTENT_PARA_NEXT_ACTION_READ);
-                    intent.putExtra(Utils.INTENT_PARA_BOOK_INDEX, i);
+                    BookLoader.getInstance().bookBubble(i);
+                    myAdapter.notifyDataSetChanged();
+
+                    Intent intent = new Intent(BookshelfActivity.this, ContentActivity.class);
                     startActivity(intent);
                 } else {
                     View selectIcon = view.findViewById(R.id.select_icon);
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isEditMode) {
-                    Intent intent = new Intent(MainActivity.this, OpenTextActivity.class);
+                    Intent intent = new Intent(BookshelfActivity.this, OpenTextActivity.class);
                     startActivityForResult(intent, REQUEST_CODE_IMPORT);
                 }
             }
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.bookshelf, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
-                view = LayoutInflater.from(MainActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
+                view = LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
             }
             Book book = BookLoader.getInstance().getBook(i);
             view.setTag(i);

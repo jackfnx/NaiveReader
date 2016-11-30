@@ -1,4 +1,4 @@
-package sixue.naviereader.data;
+package sixue.naviereader;
 
 import android.content.Context;
 
@@ -6,17 +6,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.Utils;
+import sixue.naviereader.data.Book;
+import sixue.naviereader.data.Chapter;
 
 public class BookLoader {
     private static BookLoader instance;
     private List<Book> list;
     private final List<Book> contentQueue;
-    private final List<Chapter> chapterQueue;
+    private final List<ChapterTask> chapterQueue;
     private String saveRootPath;
 
     private BookLoader() {
@@ -33,8 +35,12 @@ public class BookLoader {
     }
 
     public void reload(Context context) {
-        saveRootPath = context.getExternalFilesDir("books").getAbsolutePath();
+        File saveRoot = context.getExternalFilesDir("books");
+        if (saveRoot == null) {
+            return;
+        }
 
+        saveRootPath = saveRoot.getAbsolutePath();
         String json = Utils.readText(saveRootPath + "/.DIR");
         if (json == null) {
             return;
@@ -49,7 +55,7 @@ public class BookLoader {
         }
     }
 
-    public void save() {
+    private void save() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(list);
@@ -64,6 +70,9 @@ public class BookLoader {
     }
 
     public Book getBook(int i) {
+        if (list.size() == 0) {
+            return null;
+        }
         if (i < 0) {
             i = 0;
         } else if (i >= list.size()) {
@@ -86,11 +95,6 @@ public class BookLoader {
         save();
     }
 
-    public void updateBookPosition(Book book, int position) {
-        save();
-    }
-
-
     public Book popContentQueue() {
         if (contentQueue.size() == 0) {
             return null;
@@ -101,33 +105,56 @@ public class BookLoader {
         return book;
     }
 
-    public Chapter popChapterQueue() {
+    public ChapterTask popChapterQueue() {
         if (chapterQueue.size() == 0) {
             return null;
         }
 
-        Chapter book = chapterQueue.get(0);
-        chapterQueue.remove(book);
-        return book;
+        ChapterTask task = chapterQueue.get(0);
+        chapterQueue.remove(task);
+        return task;
     }
 
     public void pushContentQueue(Book book) {
-        contentQueue.add(book);
+        if (!contentQueue.contains(book)) {
+            contentQueue.add(book);
+        }
     }
 
-    public void pushChapterQueue(Chapter chapter) {
-        chapterQueue.add(chapter);
-    }
-
-    public void deleteBook(int i) {
-        list.remove(i);
-
-        save();
+    public void pushChapterQueue(Book book, Chapter chapter) {
+        ChapterTask task = new ChapterTask(book, chapter);
+        if (chapterQueue.contains(task)) {
+            chapterQueue.add(task);
+        }
     }
 
     public void deleteBooks(List<Book> deleteList) {
         list.removeAll(deleteList);
 
         save();
+    }
+
+    public void bookBubble(int i) {
+        if (list.size() == 0) {
+            return;
+        }
+        if (i < 0) {
+            i = 0;
+        } else if (i >= list.size()) {
+            i = list.size() - 1;
+        }
+        Book book = list.get(i);
+        list.remove(i);
+        list.add(0, book);
+    }
+
+    public class ChapterTask {
+        public final Book book;
+        public final Chapter chapter;
+
+        public ChapterTask(Book book, Chapter chapter) {
+            this.book = book;
+            this.chapter = chapter;
+        }
     }
 }

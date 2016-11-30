@@ -4,11 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Chapter {
     private String id;
-    private String bookId;
     private String title;
     private String para;
-    @JsonIgnore
-    private boolean downloaded;
     private String savePath;
 
     public Chapter() {
@@ -20,14 +17,6 @@ public class Chapter {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
     }
 
     public String getTitle() {
@@ -45,15 +34,6 @@ public class Chapter {
     public void setPara(String para) {
         this.para = para;
     }
-
-    public boolean isDownloaded() {
-        return downloaded;
-    }
-
-    public void setDownloaded(boolean downloaded) {
-        this.downloaded = downloaded;
-    }
-
 
     public String getSavePath() {
         return savePath;

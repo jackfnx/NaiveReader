@@ -17,32 +17,72 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import sixue.naviereader.data.Book;
+import sixue.naviereader.data.Chapter;
+
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
     private GestureDetector detector;
     private ReaderView readerView;
     private BroadcastReceiver batteryReceiver;
+    private BroadcastReceiver receiver;
+    private String chapterId;
+    private Book book;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
-        String path = getIntent().getStringExtra(Utils.INTENT_PARA_PATH);
-        int currentPosition = getIntent().getIntExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
+        book = BookLoader.getInstance().getBook(0);
+        chapterId = "";
 
-        //Utils.verifyStoragePermissions(this);
-        //path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test.txt";
-        String text = Utils.readText(path);
-        if (text == null) {
-            text = "Can't open file.";
+        if (book.isLocal()) {
+            Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+            intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+            intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
+            sendBroadcast(intent);
+        } else {
+            int index = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
+            Chapter chapter = book.getChapterList().get(index);
+            chapterId = chapter.getId();
+            SmartDownloader smartDownloader = new SmartDownloader(this, book);
+            if (smartDownloader.isDownloaded(chapter)) {
+                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+                intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
+                sendBroadcast(intent);
+            } else {
+                smartDownloader.downloadChapter(chapter);
+            }
         }
 
         readerView = (ReaderView) findViewById(R.id.textArea);
         ImageView maskView = (ImageView) findViewById(R.id.pageMask);
         View loading = findViewById(R.id.loadingMask);
 
-        readerView.importText(text, currentPosition);
+        receiver = new BroadcastReceiver(){
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) &&
+                        chapterId.equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
+
+                    //Utils.verifyStoragePermissions(this);
+                    String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
+                    String text = Utils.readText(path);
+                    if (text == null) {
+                        text = "Can't open file.";
+                    }
+
+                    readerView.importText(text, 0);
+                }
+            }
+        };
+
         readerView.setOnTouchListener(this);
 
         readerView.setPageMask(maskView);
@@ -78,10 +118,14 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         };
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryReceiver, filter);
+
+        IntentFilter myFilter = new IntentFilter(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+        registerReceiver(receiver, myFilter);
     }
 
     @Override
     public void onDestroy() {
+        unregisterReceiver(receiver);
         unregisterReceiver(batteryReceiver);
         readerView.stopTypesetThread();
         super.onDestroy();

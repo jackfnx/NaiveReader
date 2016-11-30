@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookLoader;
 import sixue.naviereader.data.Chapter;
 
 public class LoadingActivity extends AppCompatActivity {
@@ -24,10 +23,30 @@ public class LoadingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_loading);
 
         nextAction = getIntent().getStringExtra(Utils.INTENT_PARA_NEXT_ACTION);
-        int bookIndex = getIntent().getIntExtra(Utils.INTENT_PARA_BOOK_INDEX, 0);
 
-        loadingBook = BookLoader.getInstance().getBook(bookIndex);
+        if (nextAction.equals(Utils.INTENT_PARA_NEXT_ACTION_CONTENT)) {
+            loadingBook = BookLoader.getInstance().getBook(0);
+            SmartDownloader downloader = new SmartDownloader(this, loadingBook);
+            if (downloader.reloadContent()) {
+                if (loadingBook.isLocal()) {
+                    Intent intent = new Intent(this, ReadActivity.class);
+                    intent.putExtra(Utils.INTENT_PARA_BOOK_ID, loadingBook.getId());
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent intent = new Intent(this, ContentActivity.class);
+                    intent.putExtra(Utils.INTENT_PARA_BOOK_ID, loadingBook.getId());
+                    startActivity(intent);
+                    finish();
+                }
+            } else {
+                downloader.downloadContent();
+            }
 
+        } else if (nextAction.equals(Utils.INTENT_PARA_NEXT_ACTION_READ)) {
+
+        }
+/*
         IntentFilter filter = new IntentFilter();
         filter.addAction(Utils.ACTION_CHAPTER_CHANGED);
         filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
@@ -57,7 +76,7 @@ public class LoadingActivity extends AppCompatActivity {
                 }
             }
         };
-        registerReceiver(receiver, filter);
+        registerReceiver(receiver, filter);*/
 
         if (loadingBook.isLocal()) {
             Intent i = new Intent(LoadingActivity.this, ReadActivity.class);
@@ -95,7 +114,7 @@ public class LoadingActivity extends AppCompatActivity {
                     finish();
                 } else {
                     loadingChapter = currentChapter;
-                    BookLoader.getInstance().pushChapterQueue(currentChapter);
+                    //BookLoader.getInstance().pushChapterQueue(currentChapter);
                 }
             } else {
                 BookLoader.getInstance().pushContentQueue(loadingBook);

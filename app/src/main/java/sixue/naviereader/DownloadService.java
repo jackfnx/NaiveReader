@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.BookLoader;
 import sixue.naviereader.data.Chapter;
 
 public class DownloadService extends Service {
@@ -31,40 +30,17 @@ public class DownloadService extends Service {
             public void run() {
                 try {
                     while (running) {
-                        final Book book = BookLoader.getInstance().popContentQueue();
+                        Book book = BookLoader.getInstance().popContentQueue();
                         if (book == null) {
                             Thread.sleep(1000);
                             continue;
                         }
 
-                        String bookSavePath = calcBookSavePath(book);
+                        SmartDownloader downloader = new SmartDownloader(DownloadService.this, book);
+                        downloader.downloadContent();
 
-                        Document doc = Jsoup.connect(book.getId()).timeout(5000).get();
-                        Elements list = doc.body().select(".chapterlist");
-                        for (Element ch : Jsoup.parse(list.toString()).select("li:not(.volume)")) {
-                            String title = ch.select("a").text();
-                            String url = ch.select("a").attr("href").replace("/", "").trim();
-                            if (url.length() == 0) {
-                                continue;
-                            }
-
-                            final Chapter chapter = new Chapter();
-                            chapter.setId(url);
-                            chapter.setTitle(title);
-                            chapter.setPara("");
-                            String chapterSavePath = calcChapterSavePath(chapter, bookSavePath);
-                            File file = new File(chapterSavePath);
-                            chapter.setSavePath(chapterSavePath);
-                            chapter.setDownloaded(file.exists());
-
-                            Intent intent = new Intent();
-                            sendBroadcast(intent);
-                        }
-
-                        Intent intent = new Intent();
-                        sendBroadcast(intent);
                     }
-                } catch (InterruptedException | IOException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -75,20 +51,16 @@ public class DownloadService extends Service {
             public void run() {
                 try {
                     while (running) {
-                        final Chapter chapter = BookLoader.getInstance().popChapterQueue();
-                        if (chapter == null) {
+                        BookLoader.ChapterTask task = BookLoader.getInstance().popChapterQueue();
+                        if (task == null) {
                             Thread.sleep(1000);
                             continue;
                         }
 
-                        Document doc = Jsoup.connect(chapter.getBookId() + "/" + chapter.getId()).timeout(5000).get();
-                        String text = doc.body().select("#htmlContent").text();
-                        Utils.writeText(text, chapter.getSavePath());
-
-                        Intent intent = new Intent();
-                        sendBroadcast(intent);
+                        SmartDownloader downloader = new SmartDownloader(DownloadService.this, task.book);
+                        downloader.downloadChapter(task.chapter);
                     }
-                } catch (IOException | InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -112,19 +84,4 @@ public class DownloadService extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
-    private String calcBookSavePath(Book book) {
-        String s = book.getId().replace("http://", "").replace("/", "_");
-        File fileDir = this.getExternalFilesDir("books");
-        if (fileDir == null) {
-            return "";
-        }
-
-        return fileDir.getAbsolutePath() + "/" + s;
-    }
-
-    private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
-        return bookSavePath + "/" + chapter.getId().replace(".html", ".txt");
-    }
-
 }
