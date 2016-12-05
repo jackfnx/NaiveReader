@@ -37,28 +37,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         book = BookLoader.getInstance().getBook(0);
         chapterId = "";
 
-        if (book.isLocal()) {
-            Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
-            intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
-            intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
-            sendBroadcast(intent);
-        } else {
-            int index = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
-            Chapter chapter = book.getChapterList().get(index);
-            chapterId = chapter.getId();
-            SmartDownloader smartDownloader = new SmartDownloader(this, book);
-            if (smartDownloader.isDownloaded(chapter)) {
-                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
-                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-                intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
-                intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
-                sendBroadcast(intent);
-            } else {
-                smartDownloader.startDownloadChapter(chapter);
-            }
-        }
-
         readerView = (ReaderView) findViewById(R.id.textArea);
         ImageView maskView = (ImageView) findViewById(R.id.pageMask);
         View loading = findViewById(R.id.loadingMask);
@@ -121,6 +99,28 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
         IntentFilter myFilter = new IntentFilter(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
         registerReceiver(receiver, myFilter);
+
+        if (book.isLocal()) {
+            Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+            intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+            intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
+            sendBroadcast(intent);
+        } else {
+            int index = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
+            Chapter chapter = book.getChapterList().get(index);
+            chapterId = chapter.getId();
+            SmartDownloader smartDownloader = new SmartDownloader(this, book);
+            if (smartDownloader.isDownloaded(chapter)) {
+                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+                intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
+                sendBroadcast(intent);
+            } else {
+                smartDownloader.startDownloadChapter(chapter);
+            }
+        }
     }
 
     @Override

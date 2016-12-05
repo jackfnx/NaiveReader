@@ -39,7 +39,7 @@ public class BookshelfActivity extends AppCompatActivity {
         editList = new ArrayList<>();
         actionBar = getSupportActionBar();
 
-        GridView gv = (GridView) findViewById(R.id.list_books);
+        GridView gv = (GridView) findViewById(R.id.gridview_books);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
         myAdapter = new MyAdapter();
@@ -76,7 +76,7 @@ public class BookshelfActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isEditMode) {
-                    Intent intent = new Intent(BookshelfActivity.this, AddNetBookActivity.class);
+                    Intent intent = new Intent(BookshelfActivity.this, AddActivity.class);
                     startActivityForResult(intent, REQUEST_CODE_IMPORT);
                 }
             }
@@ -151,15 +151,14 @@ public class BookshelfActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int responseCode, Intent data) {
         if (requestCode == REQUEST_CODE_IMPORT) {
-            if (responseCode == RESULT_OK) {
-                myAdapter.notifyDataSetChanged();
-            }
+            myAdapter.notifyDataSetChanged();
         }
-
     }
 
     private class MyAdapter extends BaseAdapter {
+
         public MyAdapter() {
+
         }
 
         @Override
@@ -183,7 +182,6 @@ public class BookshelfActivity extends AppCompatActivity {
                 view = LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
             }
             Book book = BookLoader.getInstance().getBook(i);
-            view.setTag(i);
             TextView tv = (TextView) view.findViewById(R.id.title);
             tv.setText(book.getTitle());
             View selectIcon = view.findViewById(R.id.select_icon);

@@ -2,8 +2,9 @@ package sixue.naviereader;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,23 +27,55 @@ import java.util.List;
 
 import sixue.naviereader.data.Book;
 
-public class AddNetBookActivity extends AppCompatActivity {
+public class AddNetBookFragment extends Fragment {
 
     private List<Book> list;
-    private BaseAdapter myAdapter;
+
+    public AddNetBookFragment() {
+        // Required empty public constructor
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_net_book);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_add_net_book, container, false);
 
         list = new ArrayList<>();
 
-        final Button search = (Button) findViewById(R.id.search);
-        final EditText searchText = (EditText) findViewById(R.id.search_text);
-        final ListView listBooks = (ListView) findViewById(R.id.list_books);
-        final Handler handler = new Handler();
+        final Button search = (Button) v.findViewById(R.id.search);
+        final EditText searchText = (EditText) v.findViewById(R.id.search_text);
+        final ListView listBooks = (ListView) v.findViewById(R.id.list_books);
 
+        final BaseAdapter myAdapter = new BaseAdapter() {
+            @Override
+            public int getCount() {
+                return list.size();
+            }
+
+            @Override
+            public Object getItem(int i) {
+                return null;
+            }
+
+            @Override
+            public long getItemId(int i) {
+                return 0;
+            }
+
+            @Override
+            public View getView(int i, View view, ViewGroup viewGroup) {
+                if (view == null) {
+                    view = getActivity().getLayoutInflater().inflate(R.layout.listviewitem_book, null);
+                }
+                TextView title = (TextView) view.findViewById(R.id.title);
+                TextView author = (TextView) view.findViewById(R.id.author);
+                Book book = list.get(i);
+                title.setText(book.getTitle());
+                author.setText(book.getAuthor());
+                return view;
+            }
+        };
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,13 +117,13 @@ public class AddNetBookActivity extends AppCompatActivity {
                                     list.add(book);
                                 }
                             }
-                            handler.post(new Runnable() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     myAdapter.notifyDataSetChanged();
                                 }
                             });
-                            Log.i(AddNetBookActivity.this.getClass().toString(), list.toString());
+                            Log.i(AddNetBookFragment.this.getClass().toString(), list.toString());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -98,43 +131,16 @@ public class AddNetBookActivity extends AppCompatActivity {
                 }).start();
             }
         });
-        myAdapter = new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return list.size();
-            }
-
-            @Override
-            public Object getItem(int i) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int i) {
-                return 0;
-            }
-
-            @Override
-            public View getView(int i, View view, ViewGroup viewGroup) {
-                if (view == null) {
-                    view = AddNetBookActivity.this.getLayoutInflater().inflate(R.layout.listviewitem_book, null);
-                }
-                TextView title = (TextView) view.findViewById(R.id.title);
-                TextView author = (TextView) view.findViewById(R.id.author);
-                Book book = list.get(i);
-                title.setText(book.getTitle());
-                author.setText(book.getAuthor());
-                return view;
-            }
-        };
         listBooks.setAdapter(myAdapter);
         listBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Book book = list.get(i);
                 BookLoader.getInstance().addBook(book);
-                finish();
+                getActivity().finish();
             }
         });
+
+        return v;
     }
 }

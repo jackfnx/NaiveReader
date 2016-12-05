@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naviereader.data.Book;
-import sixue.naviereader.data.Chapter;
 
 public class BookLoader {
     private static BookLoader instance;

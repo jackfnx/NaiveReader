@@ -1,9 +1,9 @@
 package sixue.naviereader;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,18 +17,22 @@ import java.util.List;
 
 import sixue.naviereader.data.Book;
 
-public class OpenTextActivity extends AppCompatActivity {
-
+public class AddLocalFlatFragment extends Fragment {
     private String sdcard;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_open_text);
+    public AddLocalFlatFragment() {
+        // Required empty public constructor
+    }
 
-        ListView lvFiles = (ListView) findViewById(R.id.lv_files);
-        MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_add_local_flat, container, false);
+
         sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        ListView lvFiles = (ListView) v.findViewById(R.id.lv_files);
+        MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
         lvFiles.setAdapter(myAdapter);
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -42,11 +46,12 @@ public class OpenTextActivity extends AppCompatActivity {
                     book.setLocal(true);
                     book.setLocalPath(file.getAbsolutePath());
                     BookLoader.getInstance().addBook(book);
-                    setResult(RESULT_OK, null);
-                    finish();
+                    getActivity().finish();
                 }
             }
         });
+
+        return v;
     }
 
     private class MyAdapter extends BaseAdapter {
@@ -73,7 +78,7 @@ public class OpenTextActivity extends AppCompatActivity {
                 }
             } else {
                 if (file.getName().endsWith(".txt")) {
-                    runOnUiThread(new Runnable() {
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             files.add(file);
@@ -102,7 +107,7 @@ public class OpenTextActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
-                view = new TextView(OpenTextActivity.this);
+                view = new TextView(getActivity());
                 view.setPadding(10, 10, 10, 10);
             }
             TextView tv = (TextView) view;
