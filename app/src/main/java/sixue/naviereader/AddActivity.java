@@ -33,6 +33,8 @@ public class AddActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return new AddLocalFlatFragment();
+            } else if (position == 1) {
+                return new AddLocalTreeFragment();
             } else {
                 return new AddNetBookFragment();
             }
@@ -40,13 +42,15 @@ public class AddActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
                 return "Import txt(Flat View)";
+            } else if (position == 1) {
+                return "Import txt(Tree View)";
             } else {
                 return "Add Book from Net";
             }
