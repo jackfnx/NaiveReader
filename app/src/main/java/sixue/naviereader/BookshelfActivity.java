@@ -76,7 +76,7 @@ public class BookshelfActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isEditMode) {
-                    Intent intent = new Intent(BookshelfActivity.this, OpenTextActivity.class);
+                    Intent intent = new Intent(BookshelfActivity.this, AddNetBookActivity.class);
                     startActivityForResult(intent, REQUEST_CODE_IMPORT);
                 }
             }
@@ -152,9 +152,6 @@ public class BookshelfActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int responseCode, Intent data) {
         if (requestCode == REQUEST_CODE_IMPORT) {
             if (responseCode == RESULT_OK) {
-                String name = data.getStringExtra(Utils.INTENT_PARA_BOOKNAME);
-                String path = data.getStringExtra(Utils.INTENT_PARA_BOOKPATH);
-                BookLoader.getInstance().addBook(name, path);
                 myAdapter.notifyDataSetChanged();
             }
         }

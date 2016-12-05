@@ -7,4 +7,6 @@
     <string name="cd_delete_icon">delete icon</string>
     <string name="menu_edit">edit</string>
     <string name="menu_delete">delete</string>
+    <string name="search">Search</string>
+    <string name="input_book_title">Input book title</string>
 </resources>

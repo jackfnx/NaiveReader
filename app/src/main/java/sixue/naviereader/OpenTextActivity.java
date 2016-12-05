@@ -15,6 +15,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import sixue.naviereader.data.Book;
+
 public class OpenTextActivity extends AppCompatActivity {
 
     private String sdcard;
@@ -33,10 +35,14 @@ public class OpenTextActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 File file = (File) view.getTag();
                 if (file != null) {
-                    Intent data = new Intent();
-                    data.putExtra(Utils.INTENT_PARA_BOOKNAME, file.getName());
-                    data.putExtra(Utils.INTENT_PARA_BOOKPATH, file.getAbsolutePath());
-                    setResult(RESULT_OK, data);
+                    Book book = new Book();
+                    book.setId("local");
+                    book.setTitle(file.getName());
+                    book.setAuthor("--");
+                    book.setLocal(true);
+                    book.setLocalPath(file.getAbsolutePath());
+                    BookLoader.getInstance().addBook(book);
+                    setResult(RESULT_OK, null);
                     finish();
                 }
             }

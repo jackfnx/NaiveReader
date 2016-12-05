@@ -53,6 +53,7 @@ public class SmartDownloader {
 
     public void downloadContent() {
         book.getChapterList().clear();
+
         String bookSavePath = calcBookSavePath(book);
 
         try {
@@ -73,11 +74,11 @@ public class SmartDownloader {
                 chapter.setSavePath(chapterSavePath);
 
                 book.getChapterList().add(chapter);
-
-                Intent intent = new Intent(Utils.ACTION_CHAPTER_CHANGED);
-                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-                context.sendBroadcast(intent);
             }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(book.getChapterList());
+            Utils.writeText(json, bookSavePath + "/.CONTENT");
 
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
@@ -95,7 +96,7 @@ public class SmartDownloader {
     public void downloadChapter(Chapter chapter) {
         try {
             Document doc = Jsoup.connect(book.getId() + "/" + chapter.getId()).timeout(5000).get();
-            String text = doc.body().select("#htmlContent").text();
+            String text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ");
             Utils.writeText(text, chapter.getSavePath());
 
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
@@ -115,10 +116,28 @@ public class SmartDownloader {
             return "";
         }
 
-        return fileDir.getAbsolutePath() + "/" + s;
+        return fileDir.getAbsolutePath() + "/" + book.getTitle() + "/" + s;
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
         return bookSavePath + "/" + chapter.getId().replace(".html", ".txt");
+    }
+
+    public void startDownloadContent() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                downloadContent();
+            }
+        }).start();
+    }
+
+    public void startDownloadChapter(final Chapter chapter) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                downloadChapter(chapter);
+            }
+        }).start();
     }
 }

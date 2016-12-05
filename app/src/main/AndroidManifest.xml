@@ -23,13 +23,7 @@
             android:theme="@style/AppTheme.NoTitleBar" />
         <activity android:name=".OpenTextActivity" />
         <activity android:name=".ContentActivity" />
-
-        <service
-            android:name=".DownloadService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <activity android:name=".LoadingActivity"></activity>
+        <activity android:name=".AddNetBookActivity" />
     </application>
 
 </manifest>

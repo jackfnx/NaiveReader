@@ -1,9 +1,5 @@
 package sixue.naviereader;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.mozilla.universalchardet.UniversalDetector;
@@ -18,12 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class Utils {
-    public static final String PREFERENCE_BOOK_LIST = "PREFERENCE_BOOK_LIST";
-    static final String INTENT_PARA_POSITION = "INTENT_PARA_POSITION";
-    static final String INTENT_PARA_BOOKNAME = "INTENT_PARA_BOOKNAME";
-    static final String INTENT_PARA_BOOKPATH = "INTENT_PARA_BOOKPATH";
     public static final String INTENT_PARA_NEXT_ACTION = "INTENT_PARA_NEXT_ACTION";
-    public static final String ACTION_CHAPTER_CHANGED = "ACTION_CHAPTER_CHANGED";
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
     public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
@@ -38,10 +29,6 @@ public class Utils {
         File file = new File(s);
         try {
             String encoding = guessFileEncoding(file);
-            if (encoding == null) {
-                return null;
-            }
-
             InputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is, encoding);
             BufferedReader br = new BufferedReader(isr);
@@ -69,7 +56,7 @@ public class Utils {
             File dir = file.getParentFile();
 
             if (!dir.exists()) {
-                boolean mk = dir.mkdir();
+                boolean mk = dir.mkdirs();
                 Log.i("Utils", "mkdir:" + dir + ", " + mk);
             }
 
@@ -100,11 +87,13 @@ public class Utils {
         return encoding;
     }
 
+    /*
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
+     */
 
     /**
      * Checks if the app has permission to write to device storage
@@ -114,6 +103,7 @@ public class Utils {
      *
      * @param activity context activity
      */
+    /*
     static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity,
@@ -125,4 +115,5 @@ public class Utils {
                     REQUEST_EXTERNAL_STORAGE);
         }
     }
+    */
 }

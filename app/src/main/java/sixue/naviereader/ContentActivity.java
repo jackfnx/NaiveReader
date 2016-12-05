@@ -13,6 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import sixue.naviereader.data.Book;
 import sixue.naviereader.data.Chapter;
 
@@ -51,7 +53,6 @@ public class ContentActivity extends AppCompatActivity {
             }
         };
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Utils.ACTION_CHAPTER_CHANGED);
         filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
         registerReceiver(receiver, filter);
 
@@ -66,20 +67,8 @@ public class ContentActivity extends AppCompatActivity {
                 sendBroadcast(intent);
             }
         } else {
-            downloader.downloadContent();
+            downloader.startDownloadContent();
         }
-        /*
-        final Book book = new Book();
-        book.setId("http://www.50zw.la/book_" + 3246);
-        book.setTitle("xdzz");
-        book.setLocal(false);
-        book.setLocalPath("");
-        book.setSiteId("http://www.50zw.la");
-        book.setSitePara("");
-        book.setChapterList(new ArrayList<Chapter>());
-        book.setCurrentChapterId("");
-        book.setCurrentChapterIndex(0);
-        */
     }
 
     @Override

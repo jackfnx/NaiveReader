@@ -55,7 +55,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
                 sendBroadcast(intent);
             } else {
-                smartDownloader.downloadChapter(chapter);
+                smartDownloader.startDownloadChapter(chapter);
             }
         }
 

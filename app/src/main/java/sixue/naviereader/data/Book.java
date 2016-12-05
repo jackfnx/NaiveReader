@@ -2,6 +2,7 @@ package sixue.naviereader.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Book {
@@ -15,9 +16,10 @@ public class Book {
     private List<Chapter> chapterList;
     private String currentChapterId;
     private int currentChapterIndex;
+    private String author;
 
     public Book() {
-
+        chapterList = new ArrayList<>();
     }
 
     public String getId() {
@@ -34,6 +36,14 @@ public class Book {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public boolean isLocal() {
@@ -90,5 +100,38 @@ public class Book {
 
     public void setCurrentChapterIndex(int currentChapterIndex) {
         this.currentChapterIndex = currentChapterIndex;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("id=");
+        sb.append(id);
+        sb.append(",");
+        sb.append("title=");
+        sb.append(title);
+        sb.append(",");
+        sb.append("author=");
+        sb.append(author);
+        sb.append(",");
+        sb.append("isLocal=");
+        sb.append(isLocal);
+        if (localPath != null) {
+            sb.append(",");
+            sb.append("localPath=");
+            sb.append(localPath);
+        }
+        if (siteId != null) {
+            sb.append(",");
+            sb.append("siteId=");
+            sb.append(siteId);
+        }
+        if (sitePara != null) {
+            sb.append(",");
+            sb.append("sitePara=");
+            sb.append(sitePara);
+        }
+        sb.append("}");
+        return sb.toString();
     }
 }

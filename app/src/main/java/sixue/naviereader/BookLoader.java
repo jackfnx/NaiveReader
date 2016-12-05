@@ -17,14 +17,10 @@ import sixue.naviereader.data.Chapter;
 public class BookLoader {
     private static BookLoader instance;
     private List<Book> list;
-    private final List<Book> contentQueue;
-    private final List<ChapterTask> chapterQueue;
     private String saveRootPath;
 
     private BookLoader() {
         list = new ArrayList<>();
-        contentQueue = new ArrayList<>();
-        chapterQueue = new ArrayList<>();
     }
 
     public static BookLoader getInstance() {
@@ -81,51 +77,10 @@ public class BookLoader {
         return list.get(i);
     }
 
-    public void addBook(String name, String path) {
-        if (name == null || path == null) {
-            return;
-        }
-
-        Book book = new Book();
-        book.setTitle(name);
-        book.setLocal(true);
-        book.setLocalPath(path);
+    public void addBook(Book book) {
         list.add(book);
 
         save();
-    }
-
-    public Book popContentQueue() {
-        if (contentQueue.size() == 0) {
-            return null;
-        }
-
-        Book book = contentQueue.get(0);
-        contentQueue.remove(book);
-        return book;
-    }
-
-    public ChapterTask popChapterQueue() {
-        if (chapterQueue.size() == 0) {
-            return null;
-        }
-
-        ChapterTask task = chapterQueue.get(0);
-        chapterQueue.remove(task);
-        return task;
-    }
-
-    public void pushContentQueue(Book book) {
-        if (!contentQueue.contains(book)) {
-            contentQueue.add(book);
-        }
-    }
-
-    public void pushChapterQueue(Book book, Chapter chapter) {
-        ChapterTask task = new ChapterTask(book, chapter);
-        if (chapterQueue.contains(task)) {
-            chapterQueue.add(task);
-        }
     }
 
     public void deleteBooks(List<Book> deleteList) {
@@ -146,15 +101,5 @@ public class BookLoader {
         Book book = list.get(i);
         list.remove(i);
         list.add(0, book);
-    }
-
-    public class ChapterTask {
-        public final Book book;
-        public final Chapter chapter;
-
-        public ChapterTask(Book book, Chapter chapter) {
-            this.book = book;
-            this.chapter = chapter;
-        }
     }
 }
