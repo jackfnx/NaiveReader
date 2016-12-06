@@ -13,8 +13,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import sixue.naviereader.data.Book;
 import sixue.naviereader.data.Chapter;
 
@@ -44,6 +42,8 @@ public class ContentActivity extends AppCompatActivity {
             }
         });
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -52,8 +52,6 @@ public class ContentActivity extends AppCompatActivity {
                 }
             }
         };
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
         registerReceiver(receiver, filter);
 
         if (downloader.reloadContent()) {
@@ -61,10 +59,6 @@ public class ContentActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, ReadActivity.class);
                 startActivity(intent);
                 finish();
-            } else {
-                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
-                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-                sendBroadcast(intent);
             }
         } else {
             downloader.startDownloadContent();
@@ -107,8 +101,6 @@ public class ContentActivity extends AppCompatActivity {
                 view.setPadding(10, 10, 10, 10);
             }
             Chapter chapter = book.getChapterList().get(i);
-            view.setTag(chapter);
-
             TextView tv = (TextView) view;
             tv.setText(chapter.getTitle());
             return view;

@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class ReaderView extends View {
     private boolean typesetFinished;
     private int currentPosition;
     private OnPageChangeListener onPageChangeListener;
-    private boolean isRunning;
+    private OnTurnPageOverListener onTurnPageOverListener;
 
     public ReaderView(Context context) {
         super(context);
@@ -66,71 +65,47 @@ public class ReaderView extends View {
         maxHeight = -1;
     }
 
-    public void startTypesetThread() {
-        isRunning = true;
+    private void startTypesetThread() {
         final Handler handler = new Handler();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (isRunning) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return;
-                    }
+                for (int pageBreak = 0; pageBreak < text.length(); ) {
+                    int i = pageBreak;
+                    pageBreaks.add(i);
 
-                    if (!typesetFinished && (maxWidth > 0 && maxHeight > 0)) {
-                        // 显示
+                    i = getPage(i, null, null);
+
+                    // 当前页排版完毕
+                    if (i > currentPosition && currentPage < 0) {
+                        currentPage = pageBreaks.size() - 1;
+                        // 取消loading，更新当前页码
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                setLoading(true);
-                            }
-                        });
-
-                        for (int pageBreak = 0; pageBreak < text.length(); ) {
-                            int i = pageBreak;
-                            pageBreaks.add(i);
-
-                            i = getPage(i, null, null);
-
-                            // 当前页排版完毕
-                            if (i > currentPosition && currentPage < 0) {
-                                currentPage = pageBreaks.size() - 1;
-                                // 取消loading，更新当前页码
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setLoading(false);
-                                        if (onPageChangeListener != null) {
-                                            onPageChangeListener.onPageChanged(ReaderView.this);
-                                        }
-                                    }
-                                });
-                            }
-
-                            pageBreak = i;
-                        }
-                        typesetFinished = true;
-
-                        // 排版完成，更新总页数
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
+                                setLoading(false);
                                 if (onPageChangeListener != null) {
                                     onPageChangeListener.onPageChanged(ReaderView.this);
                                 }
                             }
                         });
                     }
+
+                    pageBreak = i;
                 }
+                typesetFinished = true;
+
+                // 排版完成，更新总页数
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (onPageChangeListener != null) {
+                            onPageChangeListener.onPageChanged(ReaderView.this);
+                        }
+                    }
+                });
             }
         }).start();
-    }
-
-    public void stopTypesetThread() {
-        isRunning = false;
     }
 
     private int getPage(int i, List<String> lines, List<Float> ys) {
@@ -208,22 +183,13 @@ public class ReaderView extends View {
     }
 
     public void turnPage(int step) {
-        int i = currentPage + step;
-        if (i < 0) {
-            i = 0;
-            if (currentPage == 0) {
-                Toast.makeText(getContext(), R.string.msg_first_page, Toast.LENGTH_SHORT).show();
-                return;
+        final int newPage = currentPage + step;
+        if (newPage < 0 || newPage >= pageBreaks.size()) {
+            if (onTurnPageOverListener != null) {
+                onTurnPageOverListener.onTurnPageOver(step);
             }
-        } else if (i >= pageBreaks.size()) {
-            i = pageBreaks.size() - 1;
-            if (currentPage == pageBreaks.size() - 1) {
-                Toast.makeText(getContext(), R.string.msg_last_page, Toast.LENGTH_SHORT).show();
-                return;
-            }
+            return;
         }
-
-        final int newPage = i;
         Log.d(TAG, "Mask:newPage=" + newPage + ",currentPage=" + currentPage + ",pagesNum=" + pageBreaks.size());
 
         if (pageMask != null) {
@@ -268,6 +234,10 @@ public class ReaderView extends View {
         this.text = text;
         this.currentPosition = currentPosition;
         this.typesetFinished = false;
+        this.pageBreaks.clear();
+        this.currentPage = -1;
+        setLoading(true);
+        startTypesetThread();
     }
 
     public String getMaxPages() {
@@ -298,7 +268,15 @@ public class ReaderView extends View {
         this.onPageChangeListener = onPageChangeListener;
     }
 
+    public void setOnTurnPageOverListener(OnTurnPageOverListener onTurnPageOverListener) {
+        this.onTurnPageOverListener = onTurnPageOverListener;
+    }
+
     public static abstract class OnPageChangeListener {
         public abstract void onPageChanged(ReaderView v);
+    }
+
+    public static abstract class OnTurnPageOverListener {
+        public abstract void onTurnPageOver(int step);
     }
 }
