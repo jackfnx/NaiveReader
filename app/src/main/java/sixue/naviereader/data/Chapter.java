@@ -1,7 +1,5 @@
 package sixue.naviereader.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class Chapter {
     private String id;
     private String title;
@@ -9,6 +7,10 @@ public class Chapter {
     private String savePath;
 
     public Chapter() {
+        id = "";
+        title = "";
+        para = "";
+        savePath = "";
     }
 
     public String getId() {

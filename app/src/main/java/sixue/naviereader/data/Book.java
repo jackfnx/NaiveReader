@@ -8,17 +8,22 @@ import java.util.List;
 public class Book {
     private String id;
     private String title;
+    private String author;
     private boolean isLocal;
     private String localPath;
     private String siteId;
     private String sitePara;
     @JsonIgnore
     private List<Chapter> chapterList;
-    private String currentChapterId;
     private int currentChapterIndex;
-    private String author;
+    private int currentPosition;
 
     public Book() {
+        id = "";
+        title = "";
+        author = "";
+        siteId = "";
+        sitePara = "";
         chapterList = new ArrayList<>();
     }
 
@@ -86,14 +91,6 @@ public class Book {
         this.chapterList = chapterList;
     }
 
-    public String getCurrentChapterId() {
-        return currentChapterId;
-    }
-
-    public void setCurrentChapterId(String currentChapterId) {
-        this.currentChapterId = currentChapterId;
-    }
-
     public int getCurrentChapterIndex() {
         return currentChapterIndex;
     }
@@ -133,5 +130,13 @@ public class Book {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
     }
 }

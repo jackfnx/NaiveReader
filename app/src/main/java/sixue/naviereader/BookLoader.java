@@ -101,4 +101,8 @@ public class BookLoader {
         list.remove(i);
         list.add(0, book);
     }
+
+    public void updateBook(Book book) {
+        save();
+    }
 }

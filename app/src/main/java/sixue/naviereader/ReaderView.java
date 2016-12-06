@@ -70,6 +70,16 @@ public class ReaderView extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                typesetFinished = false;
+
+                while (maxWidth <= 0 || maxHeight <= 0) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 for (int pageBreak = 0; pageBreak < text.length(); ) {
                     int i = pageBreak;
                     pageBreaks.add(i);
@@ -83,6 +93,7 @@ public class ReaderView extends View {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
+                                Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
                                 setLoading(false);
                                 if (onPageChangeListener != null) {
                                     onPageChangeListener.onPageChanged(ReaderView.this);
@@ -99,6 +110,7 @@ public class ReaderView extends View {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d(TAG, "Typeset:pageNum=" + pageBreaks.size() + " finished.");
                         if (onPageChangeListener != null) {
                             onPageChangeListener.onPageChanged(ReaderView.this);
                         }
@@ -233,9 +245,8 @@ public class ReaderView extends View {
     public void importText(String text, int currentPosition) {
         this.text = text;
         this.currentPosition = currentPosition;
-        this.typesetFinished = false;
-        this.pageBreaks.clear();
-        this.currentPage = -1;
+        pageBreaks.clear();
+        currentPage = -1;
         setLoading(true);
         startTypesetThread();
     }

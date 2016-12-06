@@ -22,15 +22,13 @@ import sixue.naviereader.data.Chapter;
 
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
+    private static final Chapter emptyChapter = new Chapter();
     private GestureDetector detector;
     private ReaderView readerView;
     private BroadcastReceiver batteryReceiver;
     private BroadcastReceiver receiver;
     private Book book;
-    private TextView title;
-    private TextView subtitle;
-    private String chapterId;
-    private int chapterIndex;
+    private Chapter chapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +36,15 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         setContentView(R.layout.activity_read);
 
         book = BookLoader.getInstance().getBook(0);
+        chapter = emptyChapter;
 
         readerView = (ReaderView) findViewById(R.id.text_area);
         ImageView maskView = (ImageView) findViewById(R.id.page_mask);
         View loading = findViewById(R.id.loading_mask);
-        title = (TextView) findViewById(R.id.title);
-        subtitle = (TextView) findViewById(R.id.subtitle);
+        final TextView title = (TextView) findViewById(R.id.title);
+        final TextView subtitle = (TextView) findViewById(R.id.subtitle);
         final TextView progress = (TextView) findViewById(R.id.progress);
         final TextView battery = (TextView) findViewById(R.id.battery);
-
-        title.setText(book.getTitle());
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
@@ -62,7 +59,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 String maxPages = readerView.getMaxPages();
                 int currentPage = readerView.getCurrentPage();
                 progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
-                //BookLoader.getInstance().updateBookPosition(book, readerView.getCurrentPosition(), ReadActivity.this);
+                book.setCurrentPosition(readerView.getCurrentPosition());
+                BookLoader.getInstance().updateBook(book);
             }
         });
         readerView.setOnTurnPageOverListener(new ReaderView.OnTurnPageOverListener() {
@@ -70,7 +68,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onTurnPageOver(int step) {
                 if (!book.isLocal()) {
-                    int i = chapterIndex + (step > 0 ? 1 : -1);
+                    int i = book.getCurrentChapterIndex() + (step > 0 ? 1 : -1);
                     if (i >= 0 && i < book.getChapterList().size()) {
                         loadNetChapter(i);
                         return;
@@ -84,6 +82,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        title.setText("?");
+        subtitle.setText("?");
         IntentFilter myFilter = new IntentFilter(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
         receiver = new BroadcastReceiver() {
 
@@ -91,22 +91,23 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             public void onReceive(Context context, Intent intent) {
 
                 if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) &&
-                        chapterId.equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
+                        chapter.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
 
+                    title.setText(book.getTitle());
+                    subtitle.setText(chapter.getTitle());
                     String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
                     String text = Utils.readText(path);
                     if (text == null) {
                         text = "Can't open file.";
                     }
 
-                    readerView.importText(text, 0);
+                    readerView.importText(text, book.getCurrentPosition());
                 }
             }
         };
         registerReceiver(receiver, myFilter);
 
         battery.setText("?");
-
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryReceiver = new BroadcastReceiver() {
             @Override
@@ -120,38 +121,39 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         };
         registerReceiver(batteryReceiver, filter);
 
-        int chIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
+        int newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
         if (book.isLocal()) {
             loadLocalChapter();
         } else {
-            loadNetChapter(chIndex);
+            loadNetChapter(newIndex);
         }
     }
 
     private void loadLocalChapter() {
-        chapterIndex = -1;
-        chapterId = "";
-        subtitle.setText("--");
-
         Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "");
         intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
+        intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
         sendBroadcast(intent);
     }
 
-    private void loadNetChapter(int i) {
-        chapterIndex = i;
-        Chapter chapter = book.getChapterList().get(chapterIndex);
-        chapterId = chapter.getId();
-        subtitle.setText(chapter.getTitle());
+    private void loadNetChapter(int newIndex) {
+        if (newIndex >= 0 && newIndex < book.getChapterList().size()) {
+            if (book.getCurrentChapterIndex() != newIndex) {
+                book.setCurrentChapterIndex(newIndex);
+                book.setCurrentPosition(0);
+            }
+        }
 
+        chapter = book.getChapterList().get(book.getCurrentChapterIndex());
         SmartDownloader smartDownloader = new SmartDownloader(this, book);
         if (smartDownloader.isDownloaded(chapter)) {
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapterId);
+            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.getId());
             intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
+            intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
             sendBroadcast(intent);
         } else {
             smartDownloader.startDownloadChapter(chapter);
