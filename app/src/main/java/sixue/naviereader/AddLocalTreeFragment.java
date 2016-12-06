@@ -4,8 +4,6 @@ package sixue.naviereader;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +14,8 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import sixue.naviereader.data.Book;
 
@@ -66,7 +61,6 @@ public class AddLocalTreeFragment extends Fragment {
     }
 
     private class MyAdapter extends BaseAdapter {
-        private File currentDir;
         private File[] children;
 
         public MyAdapter(File root) {
@@ -102,22 +96,16 @@ public class AddLocalTreeFragment extends Fragment {
         }
 
         public void setCurrentDir(File currentDir) {
-            this.currentDir = currentDir;
             if (!currentDir.isDirectory()) {
                 this.children = new File[]{};
             } else {
                 this.children = currentDir.listFiles(new FileFilter() {
                     @Override
                     public boolean accept(File file) {
-                        if (file.getName().startsWith(".")) {
-                            return false;
-                        }
+                        return !file.getName().startsWith(".") &&
+                                (file.isDirectory() ||
+                                        file.getName().toLowerCase().endsWith(".txt"));
 
-                        if (file.isDirectory()) {
-                            return true;
-                        }
-
-                        return file.getName().toLowerCase().endsWith(".txt");
                     }
                 });
                 Arrays.sort(this.children, new Comparator<File>() {

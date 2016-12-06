@@ -1,7 +1,6 @@
 package sixue.naviereader;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,7 +65,7 @@ public class AddNetBookFragment extends Fragment {
             @Override
             public View getView(int i, View view, ViewGroup viewGroup) {
                 if (view == null) {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.listviewitem_book, null);
+                    view = getActivity().getLayoutInflater().inflate(R.layout.listviewitem_book, viewGroup, false);
                 }
                 TextView title = (TextView) view.findViewById(R.id.title);
                 TextView author = (TextView) view.findViewById(R.id.author);
