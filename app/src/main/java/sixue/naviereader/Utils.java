@@ -1,5 +1,9 @@
 package sixue.naviereader;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.mozilla.universalchardet.UniversalDetector;
@@ -87,13 +91,11 @@ public class Utils {
         return encoding;
     }
 
-    /*
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
-     */
 
     /**
      * Checks if the app has permission to write to device storage
@@ -103,7 +105,6 @@ public class Utils {
      *
      * @param activity context activity
      */
-    /*
     static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity,
@@ -115,5 +116,4 @@ public class Utils {
                     REQUEST_EXTERNAL_STORAGE);
         }
     }
-    */
 }

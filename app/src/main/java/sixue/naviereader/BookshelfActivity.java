@@ -33,6 +33,8 @@ public class BookshelfActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bookshelf);
 
+        Utils.verifyStoragePermissions(this);
+
         BookLoader.getInstance().reload(this);
 
         isEditMode = false;

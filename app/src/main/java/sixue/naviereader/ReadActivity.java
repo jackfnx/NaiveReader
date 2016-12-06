@@ -49,7 +49,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) &&
                         chapterId.equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
 
-                    //Utils.verifyStoragePermissions(this);
                     String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
                     String text = Utils.readText(path);
                     if (text == null) {
