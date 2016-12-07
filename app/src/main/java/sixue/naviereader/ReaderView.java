@@ -38,6 +38,7 @@ public class ReaderView extends View {
     private OnPageChangeListener onPageChangeListener;
     private OnTurnPageOverListener onTurnPageOverListener;
     private TranslateAnimation pageAnim;
+    private boolean switchAnim;
 
     public ReaderView(Context context) {
         super(context);
@@ -58,8 +59,8 @@ public class ReaderView extends View {
         fontTop = Math.abs(fm.top);
         fontHeight = Math.abs(fm.ascent) + Math.abs(fm.descent) + Math.abs(fm.leading);
 
-        pageBreaks = new ArrayList<>();
         currentPosition = 0;
+        pageBreaks = new ArrayList<>();
         currentPage = -1;
         typesetFinished = false;
         maxWidth = -1;
@@ -71,6 +72,8 @@ public class ReaderView extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                pageBreaks.clear();
+                currentPage = -1;
                 typesetFinished = false;
 
                 while (maxWidth <= 0 || maxHeight <= 0) {
@@ -95,7 +98,7 @@ public class ReaderView extends View {
                             @Override
                             public void run() {
                                 Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
-                                setLoading(false);
+                                setLoading(false, true);
                                 if (onPageChangeListener != null) {
                                     onPageChangeListener.onPageChanged(ReaderView.this);
                                 }
@@ -185,13 +188,18 @@ public class ReaderView extends View {
         return i;
     }
 
-    private void setLoading(boolean isLoading) {
+    private void setLoading(boolean isLoading, boolean anim) {
         if (isLoading) {
+            switchAnim = anim;
             loadingMask.setVisibility(VISIBLE);
             setVisibility(INVISIBLE);
         } else {
-            loadingMask.setVisibility(GONE);
-            setVisibility(VISIBLE);
+            if (!switchAnim) {
+                loadingMask.setVisibility(GONE);
+                setVisibility(VISIBLE);
+            } else {
+                turnPage(0);
+            }
         }
     }
 
@@ -224,6 +232,8 @@ public class ReaderView extends View {
                     currentPosition = pageBreaks.get(currentPage);
                     invalidate();
                     pageMask.setVisibility(View.INVISIBLE);
+                    loadingMask.setVisibility(GONE);
+                    setVisibility(VISIBLE);
                     if (onPageChangeListener != null) {
                         onPageChangeListener.onPageChanged(ReaderView.this);
                     }
@@ -249,11 +259,10 @@ public class ReaderView extends View {
     }
 
     public void importText(String text, int currentPosition) {
+        boolean init = (this.text == null) || (this.text.length() == 0);
         this.text = text;
         this.currentPosition = currentPosition;
-        pageBreaks.clear();
-        currentPage = -1;
-        setLoading(true);
+        setLoading(true, !init);
         startTypesetThread();
     }
 
