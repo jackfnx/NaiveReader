@@ -70,7 +70,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 if (!book.isLocal()) {
                     int i = book.getCurrentChapterIndex() + (step > 0 ? 1 : -1);
                     if (i >= 0 && i < book.getChapterList().size()) {
-                        loadNetChapter(i);
+                        loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
                         return;
                     }
                 }
@@ -125,7 +125,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         if (book.isLocal()) {
             loadLocalChapter();
         } else {
-            loadNetChapter(newIndex);
+            loadNetChapter(newIndex, 0);
         }
     }
 
@@ -138,11 +138,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         sendBroadcast(intent);
     }
 
-    private void loadNetChapter(int newIndex) {
+    private void loadNetChapter(int newIndex, int newPosition) {
         if (newIndex >= 0 && newIndex < book.getChapterList().size()) {
             if (book.getCurrentChapterIndex() != newIndex) {
                 book.setCurrentChapterIndex(newIndex);
-                book.setCurrentPosition(0);
+                book.setCurrentPosition(newPosition);
             }
         }
 

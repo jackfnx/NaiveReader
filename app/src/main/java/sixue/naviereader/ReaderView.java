@@ -91,37 +91,52 @@ public class ReaderView extends View {
                     i = getPage(i, null, null);
 
                     // 当前页排版完毕
-                    if (i > currentPosition && currentPage < 0) {
+                    if (currentPosition != Integer.MAX_VALUE && i > currentPosition && currentPage < 0) {
                         currentPage = pageBreaks.size() - 1;
-                        // 取消loading，更新当前页码
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
-                                setLoading(false, true);
-                                if (onPageChangeListener != null) {
-                                    onPageChangeListener.onPageChanged(ReaderView.this);
-                                }
-                            }
-                        });
+                        currentPageTypesetFinish(handler);
                     }
 
                     pageBreak = i;
                 }
                 typesetFinished = true;
 
-                // 排版完成，更新总页数
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "Typeset:pageNum=" + pageBreaks.size() + " finished.");
-                        if (onPageChangeListener != null) {
-                            onPageChangeListener.onPageChanged(ReaderView.this);
-                        }
-                    }
-                });
+                // 当前页是最后一页
+                if (currentPage < 0) {
+                    currentPage = pageBreaks.size() - 1;
+                    currentPageTypesetFinish(handler);
+                }
+
+                // 排版完成
+                allPagesTypesetFinish(handler);
             }
         }).start();
+    }
+
+    // 更新总页数
+    private void allPagesTypesetFinish(Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Typeset:pageNum=" + pageBreaks.size() + " finished.");
+                if (onPageChangeListener != null) {
+                    onPageChangeListener.onPageChanged(ReaderView.this);
+                }
+            }
+        });
+    }
+
+    // 取消loading，更新当前页码
+    private void currentPageTypesetFinish(Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
+                setLoading(false, true);
+                if (onPageChangeListener != null) {
+                    onPageChangeListener.onPageChanged(ReaderView.this);
+                }
+            }
+        });
     }
 
     private int getPage(int i, List<String> lines, List<Float> ys) {
@@ -217,7 +232,7 @@ public class ReaderView extends View {
             if (pageAnim != null) {
                 pageMask.clearAnimation();
             }
-            
+
             pageAnim = new TranslateAnimation(getRight() * step, 0, 0, 0);
             pageAnim.setDuration(500);
             pageAnim.setAnimationListener(new Animation.AnimationListener() {
