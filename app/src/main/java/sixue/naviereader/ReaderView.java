@@ -37,6 +37,7 @@ public class ReaderView extends View {
     private int currentPosition;
     private OnPageChangeListener onPageChangeListener;
     private OnTurnPageOverListener onTurnPageOverListener;
+    private TranslateAnimation pageAnim;
 
     public ReaderView(Context context) {
         super(context);
@@ -205,9 +206,13 @@ public class ReaderView extends View {
         Log.d(TAG, "Mask:newPage=" + newPage + ",currentPage=" + currentPage + ",pagesNum=" + pageBreaks.size());
 
         if (pageMask != null) {
-            final Animation anim = new TranslateAnimation(getRight() * step, 0, 0, 0);
-            anim.setDuration(500);
-            anim.setAnimationListener(new Animation.AnimationListener() {
+            if (pageAnim != null) {
+                pageMask.clearAnimation();
+            }
+            
+            pageAnim = new TranslateAnimation(getRight() * step, 0, 0, 0);
+            pageAnim.setDuration(500);
+            pageAnim.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
                     pageMask.setVisibility(View.VISIBLE);
@@ -222,6 +227,7 @@ public class ReaderView extends View {
                     if (onPageChangeListener != null) {
                         onPageChangeListener.onPageChanged(ReaderView.this);
                     }
+                    pageAnim = null;
                 }
 
                 @Override
@@ -234,7 +240,7 @@ public class ReaderView extends View {
             Canvas canvas = new Canvas(bm);
             drawPage(canvas, newPage);
             pageMask.setImageBitmap(bm);
-            pageMask.startAnimation(anim);
+            pageMask.startAnimation(pageAnim);
         } else {
             currentPage = newPage;
             currentPosition = pageBreaks.get(currentPage);
