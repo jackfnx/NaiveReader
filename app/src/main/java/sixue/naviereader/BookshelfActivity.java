@@ -185,7 +185,7 @@ public class BookshelfActivity extends AppCompatActivity {
             }
             Book book = BookLoader.getInstance().getBook(i);
             TextView tv = (TextView) view.findViewById(R.id.title);
-            tv.setText(book.getTitle());
+            tv.setText(book.getTitle() + " - " + book.getAuthor());
             View selectIcon = view.findViewById(R.id.select_icon);
             if (!isEditMode) {
                 selectIcon.setVisibility(View.INVISIBLE);

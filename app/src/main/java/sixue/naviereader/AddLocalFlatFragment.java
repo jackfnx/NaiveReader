@@ -15,10 +15,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.data.Book;
-
 public class AddLocalFlatFragment extends Fragment {
     private String sdcard;
+    private boolean running;
 
     public AddLocalFlatFragment() {
         // Required empty public constructor
@@ -39,13 +38,7 @@ public class AddLocalFlatFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 File file = (File) view.getTag();
                 if (file != null) {
-                    Book book = new Book();
-                    book.setId("local");
-                    book.setTitle(file.getName());
-                    book.setAuthor("--");
-                    book.setLocal(true);
-                    book.setLocalPath(file.getAbsolutePath());
-                    BookLoader.getInstance().addBook(book);
+                    BookLoader.getInstance().addBook(Utils.createBook(file));
                     getActivity().finish();
                 }
             }
@@ -54,11 +47,18 @@ public class AddLocalFlatFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        running = false;
+    }
+
     private class MyAdapter extends BaseAdapter {
         private List<File> files;
 
         public MyAdapter(File root) {
             this.files = new ArrayList<>();
+            running = true;
             startLoadFiles(root);
         }
 
@@ -72,19 +72,21 @@ public class AddLocalFlatFragment extends Fragment {
         }
 
         private void loadFiles(final File file) {
-            if (file.isDirectory()) {
-                for (File subFile : file.listFiles()) {
-                    loadFiles(subFile);
-                }
-            } else {
-                if (file.getName().endsWith(".txt")) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            files.add(file);
-                            notifyDataSetChanged();
-                        }
-                    });
+            if (running) {
+                if (file.isDirectory()) {
+                    for (File subFile : file.listFiles()) {
+                        loadFiles(subFile);
+                    }
+                } else {
+                    if (file.getName().endsWith(".txt")) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                files.add(file);
+                                notifyDataSetChanged();
+                            }
+                        });
+                    }
                 }
             }
         }

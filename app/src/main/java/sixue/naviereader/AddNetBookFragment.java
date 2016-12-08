@@ -92,7 +92,7 @@ public class AddNetBookFragment extends Fragment {
                                 Book book = new Book();
                                 book.setId(response.url().toString());
                                 book.setTitle(t);
-                                book.setAuthor("--");
+                                book.setAuthor("*");
                                 book.setLocal(false);
                                 list.add(book);
                             } else {
