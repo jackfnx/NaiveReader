@@ -2,22 +2,29 @@ package sixue.naviereader;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naviereader.data.Book;
 import sixue.naviereader.data.Chapter;
+import sixue.naviereader.provider.NetProvider;
+import sixue.naviereader.provider.NetProviderCollections;
 
 public class SmartDownloader {
     private final Book book;
@@ -51,30 +58,14 @@ public class SmartDownloader {
         }
     }
 
-    public void downloadContent() {
-        book.getChapterList().clear();
-
-        String bookSavePath = calcBookSavePath(book);
-
+    private void downloadContent() {
         try {
-            Document doc = Jsoup.connect(book.getId()).timeout(5000).get();
-            Elements elements = doc.body().select(".chapterlist");
-            for (Element ch : Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
-                String title = ch.select("a").text();
-                String url = ch.select("a").attr("href").replace("/", "").trim();
-                if (url.length() == 0) {
-                    continue;
-                }
+            book.getChapterList().clear();
 
-                final Chapter chapter = new Chapter();
-                chapter.setId(url);
-                chapter.setTitle(title);
-                chapter.setPara("");
-                String chapterSavePath = calcChapterSavePath(chapter, bookSavePath);
-                chapter.setSavePath(chapterSavePath);
+            String bookSavePath = calcBookSavePath(book);
 
-                book.getChapterList().add(chapter);
-            }
+            NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
+            provider.downloadContent(book, bookSavePath);
 
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(book.getChapterList());
@@ -83,7 +74,7 @@ public class SmartDownloader {
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
             context.sendBroadcast(intent);
-        } catch (IOException e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -93,20 +84,15 @@ public class SmartDownloader {
         return file.exists();
     }
 
-    public void downloadChapter(Chapter chapter) {
-        try {
-            Document doc = Jsoup.connect(book.getId() + "/" + chapter.getId()).timeout(5000).get();
-            String text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ");
-            Utils.writeText(text, chapter.getSavePath());
+    private void downloadChapter(Chapter chapter) {
+        NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
+        provider.downloadChapter(book, chapter);
 
-            Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
-            intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-            intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.getId());
-            intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
-            context.sendBroadcast(intent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.getId());
+        intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
+        context.sendBroadcast(intent);
     }
 
     private String calcBookSavePath(Book book) {
@@ -116,11 +102,7 @@ public class SmartDownloader {
             return "";
         }
 
-        return fileDir.getAbsolutePath() + "/" + book.getTitle() + "/" + s;
-    }
-
-    private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
-        return bookSavePath + "/" + chapter.getId().replace(".html", ".txt");
+        return fileDir.getAbsolutePath() + "/" + s;
     }
 
     public void startDownloadContent() {
@@ -139,5 +121,69 @@ public class SmartDownloader {
                 downloadChapter(chapter);
             }
         }).start();
+    }
+
+    public void startDownloadCover(final String coverUrl) {
+        String bookSavePath = calcBookSavePath(book);
+        File dir = new File(bookSavePath);
+        if (!dir.exists()) {
+            boolean mk = dir.mkdirs();
+            Log.i(getClass().toString(), "mkdir:" + dir + ", " + mk);
+        }
+
+        final String coverSavePath = bookSavePath + "/cover.jpg";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                downloadCover(coverUrl, coverSavePath);
+            }
+        }).start();
+    }
+
+    private void downloadCover(String coverUrl, String coverSavePath) {
+        try {
+            if ((new File(coverSavePath)).exists()) {
+                book.setCoverSavePath(coverSavePath);
+                return;
+            }
+
+            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverSavePath + "] startDownload.");
+            URL url = new URL(coverUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return;
+            }
+            InputStream is = conn.getInputStream();
+            byte[] buf = new byte[1024];
+            int len;
+            OutputStream os = new FileOutputStream(coverSavePath);
+            while ((len = is.read(buf)) != -1) {
+                os.write(buf, 0, len);
+            }
+            os.close();
+            is.close();
+            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverSavePath + "] download finished.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        book.setCoverSavePath(coverSavePath);
+
+        Intent intent = new Intent(Utils.ACTION_DOWNLOAD_COVER_FINISH);
+        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+        context.sendBroadcast(intent);
+    }
+
+    public boolean coverIsDownloaded() {
+        String coverSavePath = book.getCoverSavePath();
+        if (coverSavePath.length() == 0) {
+            return false;
+        }
+
+        File f = new File(coverSavePath);
+        return f.exists();
     }
 }

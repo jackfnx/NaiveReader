@@ -1,5 +1,11 @@
 package sixue.naviereader;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,25 +16,21 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naviereader.data.Book;
+import sixue.naviereader.provider.NetProvider;
+import sixue.naviereader.provider.NetProviderCollections;
 
 public class AddNetBookFragment extends Fragment {
 
     private List<Book> list;
+    private BroadcastReceiver receiver;
 
     public AddNetBookFragment() {
         // Required empty public constructor
@@ -67,11 +69,19 @@ public class AddNetBookFragment extends Fragment {
                 if (view == null) {
                     view = getActivity().getLayoutInflater().inflate(R.layout.listviewitem_book, viewGroup, false);
                 }
+                ImageView cover = (ImageView) view.findViewById(R.id.cover);
                 TextView title = (TextView) view.findViewById(R.id.title);
                 TextView author = (TextView) view.findViewById(R.id.author);
+                TextView source = (TextView) view.findViewById(R.id.source);
+
                 Book book = list.get(i);
+                if (book.getCoverSavePath().length() != 0) {
+                    Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
+                    cover.setImageBitmap(bm);
+                }
                 title.setText(book.getTitle());
                 author.setText(book.getAuthor());
+                source.setText(getString(R.string.source, book.getSources().size()));
                 return view;
             }
         };
@@ -80,39 +90,16 @@ public class AddNetBookFragment extends Fragment {
             public void onClick(View view) {
                 list.clear();
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String t = searchText.getText().toString();
-                            String key = URLEncoder.encode(t, "GB2312");
-                            String url = "http://www.50zw.la/modules/article/search.php?searchkey=" + key;
-                            Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
-                            if (!url.equals(response.url().toString())) {
-                                Book book = new Book();
-                                book.setId(response.url().toString());
-                                book.setTitle(t);
-                                book.setAuthor("*");
-                                book.setLocal(false);
-                                list.add(book);
-                            } else {
-                                Document doc = response.parse();
-
-                                Elements elements = doc.body().select("table.grid");
-                                for (Element tr : Jsoup.parse(elements.toString()).select("tr")) {
-                                    Elements tds = tr.select("td.odd");
-                                    Elements a = tds.select("a");
-                                    if (tds.size() == 0) {
-                                        continue;
-                                    }
-                                    Book book = new Book();
-                                    String title = a.text();
-                                    String id = a.attr("href").trim();
-                                    String author = tds.get(1).text();
-                                    book.setId(id);
-                                    book.setTitle(title);
-                                    book.setAuthor(author);
-                                    book.setLocal(false);
+                for (final NetProvider provider : NetProviderCollections.getProviders()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<Book> books = provider.search(searchText.getText().toString(), getContext());
+                            for (Book book : books) {
+                                Book b = findSameBook(book);
+                                if (b != null) {
+                                    b.getSources().addAll(book.getSources());
+                                } else {
                                     list.add(book);
                                 }
                             }
@@ -123,11 +110,9 @@ public class AddNetBookFragment extends Fragment {
                                 }
                             });
                             Log.i(AddNetBookFragment.this.getClass().toString(), list.toString());
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }).start();
+                    }).start();
+                }
             }
         });
         listBooks.setAdapter(myAdapter);
@@ -140,6 +125,38 @@ public class AddNetBookFragment extends Fragment {
             }
         });
 
+        receiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String bookId = intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID);
+                for (Book book : list) {
+                    if (book.getId().equals(bookId)) {
+                        myAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH);
+        getContext().registerReceiver(receiver, filter);
+
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getContext().unregisterReceiver(receiver);
+    }
+
+    private Book findSameBook(Book book) {
+        for (Book b : list) {
+            if (book.getTitle().equals(b.getTitle())) {
+                return book;
+            }
+        }
+        return null;
     }
 }

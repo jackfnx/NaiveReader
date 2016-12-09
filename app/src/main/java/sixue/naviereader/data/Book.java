@@ -15,8 +15,10 @@ public class Book {
     private String sitePara;
     @JsonIgnore
     private List<Chapter> chapterList;
+    private List<Source> sources;
     private int currentChapterIndex;
     private int currentPosition;
+    private String coverSavePath;
 
     public Book() {
         id = "";
@@ -25,6 +27,8 @@ public class Book {
         siteId = "";
         sitePara = "";
         chapterList = new ArrayList<>();
+        sources = new ArrayList<>();
+        coverSavePath = "";
     }
 
     public String getId() {
@@ -91,12 +95,36 @@ public class Book {
         this.chapterList = chapterList;
     }
 
+    public List<Source> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<Source> sources) {
+        this.sources = sources;
+    }
+
     public int getCurrentChapterIndex() {
         return currentChapterIndex;
     }
 
     public void setCurrentChapterIndex(int currentChapterIndex) {
         this.currentChapterIndex = currentChapterIndex;
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public String getCoverSavePath() {
+        return coverSavePath;
+    }
+
+    public void setCoverSavePath(String coverSavePath) {
+        this.coverSavePath = coverSavePath;
     }
 
     public String toString() {
@@ -130,13 +158,5 @@ public class Book {
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    public int getCurrentPosition() {
-        return currentPosition;
-    }
-
-    public void setCurrentPosition(int currentPosition) {
-        this.currentPosition = currentPosition;
     }
 }

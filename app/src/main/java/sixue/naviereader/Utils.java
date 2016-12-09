@@ -20,9 +20,9 @@ import java.io.InputStreamReader;
 import sixue.naviereader.data.Book;
 
 public class Utils {
-    public static final String INTENT_PARA_NEXT_ACTION = "INTENT_PARA_NEXT_ACTION";
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
+    public static final String ACTION_DOWNLOAD_COVER_FINISH = "ACTION_DOWNLOAD_COVER_FINISH";
     public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
     public static final String INTENT_PARA_CHAPTER_ID = "INTENT_PARA_CHAPTER_ID";
     public static final String INTENT_PARA_NEXT_ACTION_READ = "INTENT_PARA_NEXT_ACTION_READ";
@@ -35,6 +35,10 @@ public class Utils {
         File file = new File(s);
         try {
             String encoding = guessFileEncoding(file);
+            if (encoding == null) {
+                return null;
+            }
+
             InputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is, encoding);
             BufferedReader br = new BufferedReader(isr);

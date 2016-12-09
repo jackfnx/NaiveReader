@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -12,24 +12,25 @@
 
         <ImageView
             android:id="@+id/cover"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fm"
-            android:contentDescription="@string/cd_book_cover"/>
+            android:layout_width="90dp"
+            android:layout_height="120dp"
+            android:contentDescription="@string/cd_book_cover"
+            android:scaleType="centerInside"
+            android:src="@drawable/fm" />
 
         <ImageView
             android:id="@+id/select_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/checkbox"
-            android:contentDescription="@string/cd_delete_icon" />
+            android:contentDescription="@string/cd_delete_icon"
+            android:src="@drawable/checkbox" />
     </FrameLayout>
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"/>
+        android:gravity="center" />
 
 </LinearLayout>

@@ -1,6 +1,8 @@
 package sixue.naviereader;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -13,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,6 +195,13 @@ public class BookshelfActivity extends AppCompatActivity {
                 selectIcon.setVisibility(View.INVISIBLE);
             } else {
                 selectIcon.setVisibility(View.VISIBLE);
+            }
+            ImageView cover = (ImageView) view.findViewById(R.id.cover);
+            if (book.getCoverSavePath().length() != 0) {
+                Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
+                cover.setImageBitmap(bm);
+            } else {
+                cover.setImageResource(R.drawable.fm);
             }
             return view;
         }
