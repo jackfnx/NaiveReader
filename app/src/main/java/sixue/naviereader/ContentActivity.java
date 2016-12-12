@@ -28,7 +28,7 @@ public class ContentActivity extends AppCompatActivity {
         final Book book = BookLoader.getInstance().getBook(0);
         SmartDownloader downloader = new SmartDownloader(this, book);
 
-        ListView listView = (ListView) findViewById(R.id.content);
+        final ListView listView = (ListView) findViewById(R.id.content);
         final MyAdapter myAdapter = new MyAdapter(book);
 
         listView.setAdapter(myAdapter);
@@ -39,6 +39,7 @@ public class ContentActivity extends AppCompatActivity {
                 intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
                 intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -48,6 +49,7 @@ public class ContentActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                    listView.setSelection(book.getCurrentChapterIndex());
                     myAdapter.notifyDataSetChanged();
                 }
             }
@@ -60,6 +62,7 @@ public class ContentActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
+            listView.setSelection(book.getCurrentChapterIndex());
         } else {
             downloader.startDownloadContent();
         }

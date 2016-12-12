@@ -18,7 +18,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,10 +54,11 @@ public class BookshelfActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!isEditMode) {
                     BookLoader.getInstance().bookBubble(i);
-                    myAdapter.notifyDataSetChanged();
 
-                    Intent intent = new Intent(BookshelfActivity.this, ContentActivity.class);
+                    Intent intent = new Intent(BookshelfActivity.this, ReadActivity.class);
                     startActivity(intent);
+
+                    myAdapter.notifyDataSetChanged();
                 } else {
                     View selectIcon = view.findViewById(R.id.select_icon);
                     boolean checked = !selectIcon.isSelected();

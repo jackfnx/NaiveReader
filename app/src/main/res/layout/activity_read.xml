@@ -17,17 +17,19 @@
 
         <TextView
             android:id="@+id/subtitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="start" />
+            android:gravity="start"
+            android:padding="3dp" />
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end" />
+            android:gravity="end"
+            android:padding="3dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -42,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="start"/>
+            android:gravity="start" />
 
         <TextView
             android:id="@+id/progress"
@@ -61,14 +63,14 @@
         <sixue.naviereader.ReaderView
             android:id="@+id/text_area"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/page_mask"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"
-            android:contentDescription="@string/cd_null" />
+            android:contentDescription="@string/cd_null"
+            android:visibility="invisible" />
 
         <LinearLayout
             android:id="@+id/loading_mask"
@@ -76,9 +78,10 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:visibility="gone">
+
             <ProgressBar
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </FrameLayout>
 </RelativeLayout>

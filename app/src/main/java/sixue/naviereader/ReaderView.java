@@ -39,6 +39,8 @@ public class ReaderView extends View {
     private OnTurnPageOverListener onTurnPageOverListener;
     private TranslateAnimation pageAnim;
     private boolean switchAnim;
+    private Paint bgPaint1;
+    private Paint bgPaint2;
 
     public ReaderView(Context context) {
         super(context);
@@ -65,6 +67,11 @@ public class ReaderView extends View {
         typesetFinished = false;
         maxWidth = -1;
         maxHeight = -1;
+
+        bgPaint1 = new Paint();
+        bgPaint1.setARGB(0xFF, 0xAA, 0xAA, 0xAA);
+        bgPaint2 = new Paint();
+        bgPaint2.setARGB(0xFF, 0xCC, 0xCC, 0xCC);
     }
 
     private void startTypesetThread() {
@@ -190,6 +197,9 @@ public class ReaderView extends View {
         int i = pageBreaks.get(page);
 
         canvas.drawColor(Color.WHITE);
+//        canvas.drawRect(0, 0, maxWidth / 3, maxHeight / 2, bgPaint1);
+//        canvas.drawRect(maxWidth / 3, 0, maxWidth * 2 / 3, maxHeight / 2, bgPaint2);
+
         canvas.drawLine(0, 0, 0, maxHeight, textPaint);
         canvas.drawLine(maxWidth, 0, maxWidth, maxHeight, textPaint);
 

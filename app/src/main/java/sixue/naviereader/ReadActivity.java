@@ -29,6 +29,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private BroadcastReceiver receiver;
     private Book book;
     private Chapter chapter;
+    private SmartDownloader smartDownloader;
+    private int newIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,26 +84,41 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, -1);
+
         title.setText("?");
         subtitle.setText("?");
-        IntentFilter myFilter = new IntentFilter(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+        IntentFilter myFilter = new IntentFilter();
+        myFilter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+        myFilter.addAction(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
         receiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) &&
-                        chapter.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
+                switch (intent.getAction()) {
+                    case Utils.ACTION_DOWNLOAD_CONTENT_FINISH:
+                        if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                            loadNetChapter(newIndex, 0);
+                        }
+                        break;
+                    case Utils.ACTION_DOWNLOAD_CHAPTER_FINISH:
+                        if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) &&
+                                chapter.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID))) {
 
-                    title.setText(book.getTitle());
-                    subtitle.setText(chapter.getTitle());
-                    String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
-                    String text = Utils.readText(path);
-                    if (text == null) {
-                        text = "Can't open file.";
-                    }
+                            title.setText(book.getTitle());
+                            subtitle.setText(chapter.getTitle());
+                            String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
+                            String text = Utils.readText(path);
+                            if (text == null) {
+                                text = "Can't open file.";
+                            }
 
-                    readerView.importText(text, book.getCurrentPosition());
+                            readerView.importText(text, book.getCurrentPosition());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         };
@@ -121,21 +138,23 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         };
         registerReceiver(batteryReceiver, filter);
 
-        int newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
-        if (book.isLocal()) {
-            loadLocalChapter();
+        smartDownloader = new SmartDownloader(this, book);
+        if (smartDownloader.reloadContent()) {
+            if (book.isLocal()) {
+                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "");
+                intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
+                intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
+                sendBroadcast(intent);
+            } else {
+                Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+                intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                sendBroadcast(intent);
+            }
         } else {
-            loadNetChapter(newIndex, 0);
+            smartDownloader.startDownloadContent();
         }
-    }
-
-    private void loadLocalChapter() {
-        Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
-        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
-        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "");
-        intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
-        intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
-        sendBroadcast(intent);
     }
 
     private void loadNetChapter(int newIndex, int newPosition) {
@@ -147,7 +166,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         }
 
         chapter = book.getChapterList().get(book.getCurrentChapterIndex());
-        SmartDownloader smartDownloader = new SmartDownloader(this, book);
+
         if (smartDownloader.isDownloaded(chapter)) {
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
@@ -169,18 +188,18 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onDown(MotionEvent motionEvent) {
-        Log.i(getClass().toString(), "onDown");
+        //Log.i(getClass().toString(), "onDown");
         return true;
     }
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-        Log.i(getClass().toString(), "onShowPress");
+        //Log.i(getClass().toString(), "onShowPress");
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-        Log.i(getClass().toString(), "onSingleTapUp");
+        //Log.i(getClass().toString(), "onSingleTapUp");
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -190,8 +209,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         float y = motionEvent.getRawY();
         Log.d(getClass().toString(), "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
 
-        if ((x < (widthPixels / 2)) && (y < (heightPixels / 2))) {
+        if ((x < (widthPixels / 3)) && (y < (heightPixels / 2))) {
             readerView.turnPage(-1);
+        } else if ((x > (widthPixels / 3) && (x < widthPixels * 2 / 3)) && (y < (heightPixels / 2))) {
+            if (!book.isLocal()) {
+                Intent intent = new Intent(this, ContentActivity.class);
+                startActivity(intent);
+            }
         } else {
             readerView.turnPage(1);
         }
@@ -200,30 +224,39 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
-        Log.i(getClass().toString(), "onScroll");
+        //Log.i(getClass().toString(), "onScroll");
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
-        Log.i(getClass().toString(), "onLongPress");
+        //Log.i(getClass().toString(), "onLongPress");
     }
 
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float vX, float vY) {
-        Log.i(getClass().toString(), "onFling");
+        //Log.i(getClass().toString(), "onFling");
         Log.d(getClass().toString(), "Fling:vX=" + vX + ",vY=" + vY);
-        if (vX > 0) {
-            readerView.turnPage(-1);
+        if (vY < 2000 && vY > -2000) {
+            if (vX > 0) {
+                readerView.turnPage(-1);
+            } else {
+                readerView.turnPage(1);
+            }
         } else {
-            readerView.turnPage(1);
+            if (vX < 2000 && vX > -2000) {
+                if (!book.isLocal()) {
+                    Intent intent = new Intent(this, ContentActivity.class);
+                    startActivity(intent);
+                }
+            }
         }
         return true;
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        Log.i(getClass().toString(), "onTouch");
+        //Log.i(getClass().toString(), "onTouch");
         return detector.onTouchEvent(motionEvent);
     }
 }
