@@ -2,14 +2,16 @@ package sixue.naviereader;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -156,12 +158,10 @@ public class SmartDownloader {
                 return;
             }
             InputStream is = conn.getInputStream();
-            byte[] buf = new byte[1024];
-            int len;
+            Bitmap original = BitmapFactory.decodeStream(is);
+            Bitmap scaledBitmap = Utils.createCropBitmap(original, 120, 150);
             OutputStream os = new FileOutputStream(coverSavePath);
-            while ((len = is.read(buf)) != -1) {
-                os.write(buf, 0, len);
-            }
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, os);
             os.close();
             is.close();
             Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverSavePath + "] download finished.");

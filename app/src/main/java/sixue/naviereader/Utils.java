@@ -3,6 +3,10 @@ package sixue.naviereader;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -154,5 +158,28 @@ public class Utils {
         book.setLocal(true);
         book.setLocalPath(file.getAbsolutePath());
         return book;
+    }
+
+    public static Bitmap createCropBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight) {
+        Rect srcRect = calcSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight);
+        Rect dstRect = new Rect(0, 0, dstWidth, dstHeight);
+        Bitmap scaledBitmap = Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(scaledBitmap);
+        canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, new Paint(Paint.FILTER_BITMAP_FLAG));
+        return scaledBitmap;
+    }
+
+    private static Rect calcSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+        final float srcAspect = (float) srcWidth / (float) srcHeight;
+        final float dstAspect = (float) dstWidth / (float) dstHeight;
+        if (srcAspect > dstAspect) {
+            final int srcRectWidth = (int) (srcHeight * dstAspect);
+            final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
+            return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
+        } else {
+            final int srcRectHeight = (int) (srcWidth / dstAspect);
+            final int scrRectTop = (srcHeight - srcRectHeight) / 2;
+            return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
+        }
     }
 }

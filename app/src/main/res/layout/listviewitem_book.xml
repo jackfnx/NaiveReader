@@ -7,12 +7,11 @@
 
     <ImageView
         android:id="@+id/cover"
-        android:layout_width="120dp"
-        android:layout_height="160dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/cd_book_cover"
         android:padding="10dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/fm" />
+        android:scaleType="centerInside" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -188,8 +188,10 @@ public class BookshelfActivity extends AppCompatActivity {
                 view = LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
             }
             Book book = BookLoader.getInstance().getBook(i);
-            TextView tv = (TextView) view.findViewById(R.id.title);
-            tv.setText(book.getTitle() + " - " + book.getAuthor());
+            TextView title = (TextView) view.findViewById(R.id.title);
+            title.setText(book.getTitle());
+            TextView author = (TextView) view.findViewById(R.id.author);
+            author.setText(book.getAuthor());
             View selectIcon = view.findViewById(R.id.select_icon);
             if (!isEditMode) {
                 selectIcon.setVisibility(View.INVISIBLE);
@@ -197,11 +199,12 @@ public class BookshelfActivity extends AppCompatActivity {
                 selectIcon.setVisibility(View.VISIBLE);
             }
             ImageView cover = (ImageView) view.findViewById(R.id.cover);
-            if (book.getCoverSavePath().length() != 0) {
+            SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
+            if (downloader.coverIsDownloaded()) {
                 Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
                 cover.setImageBitmap(bm);
             } else {
-                cover.setImageResource(R.drawable.fm);
+                cover.setImageBitmap(BookLoader.getInstance().getNoCover());
             }
             return view;
         }

@@ -37,7 +37,7 @@ public class AddNetBookFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_net_book, container, false);
@@ -75,9 +75,12 @@ public class AddNetBookFragment extends Fragment {
                 TextView source = (TextView) view.findViewById(R.id.source);
 
                 Book book = list.get(i);
-                if (book.getCoverSavePath().length() != 0) {
+                SmartDownloader downloader = new SmartDownloader(getContext(), book);
+                if (downloader.coverIsDownloaded()) {
                     Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
                     cover.setImageBitmap(bm);
+                } else {
+                    cover.setImageBitmap(BookLoader.getInstance().getNoCover());
                 }
                 title.setText(book.getTitle());
                 author.setText(book.getAuthor());

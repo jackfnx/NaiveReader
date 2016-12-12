@@ -1,6 +1,9 @@
 package sixue.naviereader;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -8,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +21,7 @@ public class BookLoader {
     private static BookLoader instance;
     private List<Book> list;
     private String saveRootPath;
+    private Bitmap noCover;
 
     private BookLoader() {
         list = new ArrayList<>();
@@ -30,6 +35,14 @@ public class BookLoader {
     }
 
     public void reload(Context context) {
+        try {
+            InputStream is = context.getAssets().open("NoCover.jpg");
+            noCover = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         File saveRoot = context.getExternalFilesDir("books");
         if (saveRoot == null) {
             return;
@@ -104,5 +117,9 @@ public class BookLoader {
 
     public void updateBook(Book book) {
         save();
+    }
+
+    public Bitmap getNoCover() {
+        return noCover;
     }
 }
