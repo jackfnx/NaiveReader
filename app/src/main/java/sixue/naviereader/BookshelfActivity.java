@@ -57,8 +57,6 @@ public class BookshelfActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(BookshelfActivity.this, ReadActivity.class);
                     startActivity(intent);
-
-                    myAdapter.notifyDataSetChanged();
                 } else {
                     View selectIcon = view.findViewById(R.id.select_icon);
                     boolean checked = !selectIcon.isSelected();
@@ -83,10 +81,16 @@ public class BookshelfActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!isEditMode) {
                     Intent intent = new Intent(BookshelfActivity.this, AddActivity.class);
-                    startActivityForResult(intent, REQUEST_CODE_IMPORT);
+                    startActivity(intent);
                 }
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        myAdapter.notifyDataSetChanged();
     }
 
     private void checkItem(View selectIcon, int i, boolean checked) {
@@ -153,12 +157,6 @@ public class BookshelfActivity extends AppCompatActivity {
         }
 
         super.onBackPressed();
-    }
-
-    protected void onActivityResult(int requestCode, int responseCode, Intent data) {
-        if (requestCode == REQUEST_CODE_IMPORT) {
-            myAdapter.notifyDataSetChanged();
-        }
     }
 
     private class MyAdapter extends BaseAdapter {

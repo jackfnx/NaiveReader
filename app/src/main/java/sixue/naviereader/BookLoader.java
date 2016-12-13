@@ -1,7 +1,6 @@
 package sixue.naviereader;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
