@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +20,21 @@ import sixue.naviereader.data.Chapter;
 public class ContentActivity extends AppCompatActivity {
 
     private BroadcastReceiver receiver;
+    private SmartDownloader downloader;
+    private Book book;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
-        final Book book = BookLoader.getInstance().getBook(0);
-        SmartDownloader downloader = new SmartDownloader(this, book);
+        book = BookLoader.getInstance().getBook(0);
+        downloader = new SmartDownloader(this, book);
 
         final ListView listView = (ListView) findViewById(R.id.content);
         final MyAdapter myAdapter = new MyAdapter(book);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_refresh);
+        final View loadingCircle = findViewById(R.id.loading_circle);
 
         listView.setAdapter(myAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -50,12 +55,21 @@ public class ContentActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                    loadingCircle.setVisibility(View.GONE);
                     listView.setSelection(book.getCurrentChapterIndex());
                     myAdapter.notifyDataSetChanged();
                 }
             }
         };
         registerReceiver(receiver, filter);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadingCircle.setVisibility(View.VISIBLE);
+                downloader.startDownloadContent();
+            }
+        });
 
         if (downloader.reloadContent()) {
             if (book.isLocal()) {
@@ -66,6 +80,7 @@ public class ContentActivity extends AppCompatActivity {
             }
             listView.setSelection(book.getCurrentChapterIndex());
         } else {
+            loadingCircle.setVisibility(View.VISIBLE);
             downloader.startDownloadContent();
         }
     }
