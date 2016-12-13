@@ -15,13 +15,14 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ReaderView extends View {
     private static final String TAG = "ReaderView";
 
     private static final int MAX_LINE_LENGTH = 80;
-    private static final int H_PADDING = 16;
+    private static final int MIN_H_PADDING = 16;
 
     private String text;
     private TextPaint textPaint;
@@ -95,7 +96,7 @@ public class ReaderView extends View {
                     int i = pageBreak;
                     pageBreaks.add(i);
 
-                    i = getPage(i, null, null);
+                    i = getPage(i, null, null, null);
 
                     // 当前页排版完毕
                     if (currentPosition != Integer.MAX_VALUE && i > currentPosition && currentPage < 0) {
@@ -146,13 +147,13 @@ public class ReaderView extends View {
         });
     }
 
-    private int getPage(int i, List<String> lines, List<Float> ys) {
+    private int getPage(int i, List<String> lines, List<Float> ys, List<Float> hps) {
         for (float y = fontTop; y < maxHeight; y += fontHeight) {
             int k = i + MAX_LINE_LENGTH;
             if (k > text.length()) {
                 k = text.length();
             }
-            int len = textPaint.breakText(text, i, k, true, maxWidth - H_PADDING * 2, null);
+            int len = textPaint.breakText(text, i, k, true, maxWidth - MIN_H_PADDING * 2, null);
             if (len <= 0) {
                 break;
             }
@@ -166,9 +167,13 @@ public class ReaderView extends View {
                 i += len;
             }
 
-            if (lines != null && ys != null) {
+            if (lines != null && ys != null && hps != null) {
                 lines.add(s);
                 ys.add(y);
+
+                float length = textPaint.measureText(s, 0, s.length());
+                float hPadding = (maxWidth - length) / 2;
+                hps.add(hPadding);
             }
         }
         return i;
@@ -205,9 +210,12 @@ public class ReaderView extends View {
 
         List<String> lines = new ArrayList<>();
         List<Float> ys = new ArrayList<>();
-        i = getPage(i, lines, ys);
+        List<Float> hps = new ArrayList<>();
+        i = getPage(i, lines, ys, hps);
+        float hPadding = Collections.min(hps);
+        Log.d(TAG, "drawPage: hPadding=" + hPadding);
         for (int j = 0; j < lines.size(); j++) {
-            canvas.drawText(lines.get(j), H_PADDING, ys.get(j), textPaint);
+            canvas.drawText(lines.get(j), hPadding, ys.get(j), textPaint);
         }
 
         return i;
