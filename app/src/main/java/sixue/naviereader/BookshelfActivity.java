@@ -25,7 +25,6 @@ import sixue.naviereader.data.Book;
 
 public class BookshelfActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_IMPORT = 0;
     private MyAdapter myAdapter;
     private boolean isEditMode;
     private List<Book> editList;
@@ -56,6 +55,7 @@ public class BookshelfActivity extends AppCompatActivity {
                     BookLoader.getInstance().bookBubble(i);
 
                     Intent intent = new Intent(BookshelfActivity.this, ReadActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
                     View selectIcon = view.findViewById(R.id.select_icon);

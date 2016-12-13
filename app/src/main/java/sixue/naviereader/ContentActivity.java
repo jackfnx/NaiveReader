@@ -36,6 +36,7 @@ public class ContentActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
                 intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
                 startActivity(intent);
@@ -59,6 +60,7 @@ public class ContentActivity extends AppCompatActivity {
         if (downloader.reloadContent()) {
             if (book.isLocal()) {
                 Intent intent = new Intent(this, ReadActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
             }
@@ -105,7 +107,11 @@ public class ContentActivity extends AppCompatActivity {
             }
             Chapter chapter = book.getChapterList().get(i);
             TextView tv = (TextView) view;
-            tv.setText(chapter.getTitle());
+            String s = chapter.getTitle();
+            if (i == book.getCurrentChapterIndex()) {
+                s += "*";
+            }
+            tv.setText(s);
             return view;
         }
     }

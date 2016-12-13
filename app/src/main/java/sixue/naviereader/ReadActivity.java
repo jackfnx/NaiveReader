@@ -30,7 +30,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private Book book;
     private Chapter chapter;
     private SmartDownloader smartDownloader;
-    private int newIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +83,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-        newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, -1);
+        final int newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, -1);
 
         title.setText("?");
         subtitle.setText("?");
