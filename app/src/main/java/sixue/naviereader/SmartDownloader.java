@@ -98,13 +98,12 @@ public class SmartDownloader {
     }
 
     private String calcBookSavePath(Book book) {
-        String s = book.getId().replace("http://", "").replace("/", "_");
         File fileDir = context.getExternalFilesDir("books");
         if (fileDir == null) {
             return "";
         }
 
-        return fileDir.getAbsolutePath() + "/" + s;
+        return fileDir.getAbsolutePath() + "/" + book.getId() + "/" + book.getSiteId();
     }
 
     public void startDownloadContent() {
