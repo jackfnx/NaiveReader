@@ -32,11 +32,11 @@ public class AddActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return new AddLocalFlatFragment();
-            } else if (position == 1) {
-                return new AddLocalTreeFragment();
-            } else {
                 return new AddNetBookFragment();
+            } else if (position == 1) {
+                return new AddLocalFlatFragment();
+            } else {
+                return new AddLocalTreeFragment();
             }
         }
 
@@ -48,11 +48,11 @@ public class AddActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
-                return "Import txt(Flat View)";
-            } else if (position == 1) {
-                return "Import txt(Tree View)";
-            } else {
                 return "Add Book from Net";
+            } else if (position == 1) {
+                return "Import txt(Flat View)";
+            } else {
+                return "Import txt(Tree View)";
             }
         }
     }
