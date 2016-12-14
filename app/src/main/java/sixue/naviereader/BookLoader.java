@@ -89,7 +89,7 @@ public class BookLoader {
     }
 
     public void addBook(Book book) {
-        list.add(book);
+        list.add(0, book);
 
         save();
     }

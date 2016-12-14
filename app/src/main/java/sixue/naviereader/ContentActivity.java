@@ -118,7 +118,7 @@ public class ContentActivity extends AppCompatActivity {
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
                 view = new TextView(ContentActivity.this);
-                view.setPadding(10, 10, 10, 10);
+                view.setPadding(20, 20, 20, 20);
             }
             Chapter chapter = book.getChapterList().get(i);
             TextView tv = (TextView) view;
@@ -130,5 +130,4 @@ public class ContentActivity extends AppCompatActivity {
             return view;
         }
     }
-
 }

@@ -41,9 +41,12 @@ public class Utils {
             return null;
         }
 
-        try {
-            String encoding = guessFileEncoding(file);
+        String encoding = guessFileEncoding(file);
+        if (encoding == null) {
+            return null;
+        }
 
+        try {
             InputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is, encoding);
             BufferedReader br = new BufferedReader(isr);
@@ -88,18 +91,23 @@ public class Utils {
         }
     }
 
-    private static String guessFileEncoding(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
-        UniversalDetector detector = new UniversalDetector(null);
-        byte[] buf = new byte[1024];
-        int n;
-        while ((n = is.read(buf)) > 0 && !detector.isDone()) {
-            detector.handleData(buf, 0, n);
+    private static String guessFileEncoding(File file) {
+        try {
+            InputStream is = new FileInputStream(file);
+            UniversalDetector detector = new UniversalDetector(null);
+            byte[] buf = new byte[1024];
+            int n;
+            while ((n = is.read(buf)) > 0 && !detector.isDone()) {
+                detector.handleData(buf, 0, n);
+            }
+            detector.dataEnd();
+            String encoding = detector.getDetectedCharset();
+            detector.reset();
+            return encoding;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
-        detector.dataEnd();
-        String encoding = detector.getDetectedCharset();
-        detector.reset();
-        return encoding;
     }
 
     static void verifyPermissions(Activity activity) {

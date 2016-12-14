@@ -123,10 +123,12 @@ public class PtwxProvider extends NetProvider {
         try {
             Document doc = Jsoup.connect(calcBookUrl(book.getSitePara())).timeout(5000).get();
             Elements elements = doc.body().select(".centent");
-            for (Element ch : Jsoup.parse(elements.toString()).select("li:after(.list)")) {
+            for (Element ch : Jsoup.parse(elements.toString()).select("li")) {
                 String title = ch.select("a").text();
                 String url = ch.select("a").attr("href").replace("/", "").trim();
-                if (url.length() == 0) {
+                if (url.length() == 0 ||
+                        url.toLowerCase().startsWith("javascript:") ||
+                        url.toLowerCase().startsWith("window")) {
                     continue;
                 }
 
@@ -139,7 +141,7 @@ public class PtwxProvider extends NetProvider {
 
                 book.getChapterList().add(chapter);
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
     }
@@ -149,9 +151,15 @@ public class PtwxProvider extends NetProvider {
 
         try {
             Document doc = Jsoup.connect(calcBookUrl(book.getSitePara()) + "/" + chapter.getId()).timeout(5000).get();
-            String text = doc.body().select("#content").html().replace("<br>", "").replace("&nbsp;", " ");
+            String s = doc.body().toString()
+                    .replace("<script language=\"javascript\">GetFont();</script>", "<div id=\"content\" class=\"fonts_mesne\">")
+                    .replace("<!-- 翻页上AD开始 -->", "</div> <!-- 翻页上AD开始 -->");
+            Element content = Jsoup.parse(s).select("#content").first();
+            content.select("h1").remove();
+            content.select("table").remove();
+            String text = content.outerHtml().replace("<br>", "").replace("&nbsp;", " ");
             Utils.writeText(text, chapter.getSavePath());
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
     }
@@ -178,7 +186,7 @@ public class PtwxProvider extends NetProvider {
         int l = bookUrl.lastIndexOf('/');
         int r = bookUrl.lastIndexOf(".html");
         if (l != -1 && r != -1 && l < r) {
-            return bookUrl.substring(l + 1, r - 1);
+            return bookUrl.substring(l + 1, r);
         } else {
             return "";
         }

@@ -157,7 +157,7 @@ public class AddNetBookFragment extends Fragment {
     private Book findSameBook(Book book) {
         for (Book b : list) {
             if (book.getTitle().equals(b.getTitle())) {
-                return book;
+                return b;
             }
         }
         return null;
