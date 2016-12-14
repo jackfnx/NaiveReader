@@ -37,11 +37,12 @@ public class Utils {
 
     public static String readText(String s) {
         File file = new File(s);
+        if (!file.exists()) {
+            return null;
+        }
+
         try {
             String encoding = guessFileEncoding(file);
-            if (encoding == null) {
-                return null;
-            }
 
             InputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is, encoding);
@@ -101,29 +102,14 @@ public class Utils {
         return encoding;
     }
 
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    static void verifyPermissions(Activity activity) {
+        int permission1 = ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
 
-    /**
-     * Checks if the app has permission to write to device storage
-     * <p/>
-     * If the app does not has permission then the user will be prompted to
-     * grant permissions
-     *
-     * @param activity context activity
-     */
-    static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE);
+        if (permission1 != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    1);
         }
     }
 
