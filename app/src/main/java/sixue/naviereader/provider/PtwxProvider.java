@@ -28,6 +28,11 @@ public class PtwxProvider extends NetProvider {
     }
 
     @Override
+    public String getProviderName() {
+        return "飘天文学";
+    }
+
+    @Override
     public List<Book> search(String s, Context context) {
         List<Book> list = new ArrayList<>();
         try {

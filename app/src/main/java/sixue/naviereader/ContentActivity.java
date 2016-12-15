@@ -7,27 +7,39 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import sixue.naviereader.data.Book;
 import sixue.naviereader.data.Chapter;
+import sixue.naviereader.provider.NetProvider;
+import sixue.naviereader.provider.NetProviderCollections;
 
 public class ContentActivity extends AppCompatActivity {
 
     private BroadcastReceiver receiver;
     private SmartDownloader downloader;
     private Book book;
+    private List<String> providerIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
+        providerIds = new ArrayList<>();
         book = BookLoader.getInstance().getBook(0);
         downloader = new SmartDownloader(this, book);
 
@@ -129,5 +141,48 @@ public class ContentActivity extends AppCompatActivity {
             tv.setText(s);
             return view;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.content, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuProviders = menu.findItem(R.id.menu_providers);
+        SubMenu subMenu = menuProviders.getSubMenu();
+
+        providerIds.clear();
+        subMenu.clear();
+        for (NetProvider netProvider : NetProviderCollections.getProviders()) {
+            String id = netProvider.getProviderId();
+            String name = netProvider.getProviderName();
+            if (book.getSiteId().equals(netProvider.getProviderId())) {
+                name += "*";
+            }
+            providerIds.add(id);
+            subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size() - 1, providerIds.size(), name);
+        }
+
+        subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_manage_sources);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int i = menuItem.getItemId() - Menu.FIRST;
+        if (i < providerIds.size()) {
+            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+            Log.d(getClass().toString(), "MenuItem index:" + i + ", provider:" + providerIds.get(i));
+            return true;
+        } else if (i == providerIds.size()) {
+            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+            Log.d(getClass().toString(), "Manage sources.");
+            return true;
+        }
+        return false;
     }
 }

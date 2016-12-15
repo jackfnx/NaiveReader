@@ -17,6 +17,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +120,9 @@ public class BookshelfActivity extends AppCompatActivity {
                     setEditMode(false);
                     return true;
                 }
+                break;
             case R.id.menu_edit:
+                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 break;

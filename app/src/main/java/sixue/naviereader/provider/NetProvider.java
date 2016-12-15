@@ -10,6 +10,8 @@ import sixue.naviereader.data.Chapter;
 public abstract class NetProvider {
     public abstract String getProviderId();
 
+    public abstract String getProviderName();
+
     public abstract List<Book> search(String s, Context context);
 
     public abstract void downloadContent(Book book, String bookSavePath);

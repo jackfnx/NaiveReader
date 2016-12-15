@@ -1,7 +1,6 @@
 package sixue.naviereader.provider;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import org.jsoup.Connection;
@@ -25,6 +24,11 @@ public class WlzwProvider extends NetProvider {
     @Override
     public String getProviderId() {
         return "wwww.50zw.la";
+    }
+
+    @Override
+    public String getProviderName() {
+        return "武林中文";
     }
 
     @Override
