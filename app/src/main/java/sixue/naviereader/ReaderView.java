@@ -15,7 +15,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ReaderView extends View {
@@ -40,8 +39,6 @@ public class ReaderView extends View {
     private OnTurnPageOverListener onTurnPageOverListener;
     private TranslateAnimation pageAnim;
     private boolean switchAnim;
-//    private Paint bgPaint1;
-//    private Paint bgPaint2;
 
     public ReaderView(Context context) {
         super(context);
@@ -68,11 +65,6 @@ public class ReaderView extends View {
         typesetFinished = false;
         maxWidth = -1;
         maxHeight = -1;
-
-//        bgPaint1 = new Paint();
-//        bgPaint1.setARGB(0xFF, 0xAA, 0xAA, 0xAA);
-//        bgPaint2 = new Paint();
-//        bgPaint2.setARGB(0xFF, 0xCC, 0xCC, 0xCC);
     }
 
     private void startTypesetThread() {
@@ -147,33 +139,36 @@ public class ReaderView extends View {
         });
     }
 
-    private int getPage(int i, List<String> lines, List<Float> ys, List<Float> hps) {
+    private int getPage(int i, List<String> lines, List<Float> ys, List<Float> lss) {
         for (float y = fontTop; y < maxHeight; y += fontHeight) {
             int k = i + MAX_LINE_LENGTH;
             if (k > text.length()) {
                 k = text.length();
             }
+            textPaint.setLetterSpacing(0);
             int len = textPaint.breakText(text, i, k, true, maxWidth - MIN_H_PADDING * 2, null);
             if (len <= 0) {
                 break;
             }
 
             String s = text.substring(i, i + len);
+            float ls;
             if (s.indexOf('\n') != -1) {
                 int j = s.indexOf('\n');
                 s = s.substring(0, j);
                 i += j + 1;
+                ls = 0;
             } else {
                 i += len;
-            }
-
-            if (lines != null && ys != null && hps != null) {
-                lines.add(s);
-                ys.add(y);
 
                 float length = textPaint.measureText(s, 0, s.length());
-                float hPadding = (maxWidth - length) / 2;
-                hps.add(hPadding);
+                ls = (maxWidth - MIN_H_PADDING * 2 - length) / (s.length() - 1) / textPaint.getTextSize();
+            }
+
+            if (lines != null && ys != null && lss != null) {
+                lines.add(s);
+                ys.add(y);
+                lss.add(ls);
             }
         }
         return i;
@@ -202,20 +197,17 @@ public class ReaderView extends View {
         int i = pageBreaks.get(page);
 
         canvas.drawColor(Color.WHITE);
-//        canvas.drawRect(0, 0, maxWidth / 3, maxHeight / 2, bgPaint1);
-//        canvas.drawRect(maxWidth / 3, 0, maxWidth * 2 / 3, maxHeight / 2, bgPaint2);
 
         canvas.drawLine(0, 0, 0, maxHeight, textPaint);
         canvas.drawLine(maxWidth, 0, maxWidth, maxHeight, textPaint);
 
         List<String> lines = new ArrayList<>();
         List<Float> ys = new ArrayList<>();
-        List<Float> hps = new ArrayList<>();
-        i = getPage(i, lines, ys, hps);
-        float hPadding = Collections.min(hps);
-        Log.d(TAG, "drawPage: hPadding=" + hPadding);
+        List<Float> lss = new ArrayList<>();
+        i = getPage(i, lines, ys, lss);
         for (int j = 0; j < lines.size(); j++) {
-            canvas.drawText(lines.get(j), hPadding, ys.get(j), textPaint);
+            textPaint.setLetterSpacing(lss.get(j));
+            canvas.drawText(lines.get(j), MIN_H_PADDING, ys.get(j), textPaint);
         }
 
         return i;
