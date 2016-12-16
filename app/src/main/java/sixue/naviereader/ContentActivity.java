@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -17,13 +16,13 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naviereader.data.Book;
 import sixue.naviereader.data.Chapter;
+import sixue.naviereader.data.Source;
 import sixue.naviereader.provider.NetProvider;
 import sixue.naviereader.provider.NetProviderCollections;
 
@@ -156,7 +155,7 @@ public class ContentActivity extends AppCompatActivity {
 
         providerIds.clear();
         subMenu.clear();
-        for (NetProvider netProvider : NetProviderCollections.getProviders()) {
+        for (NetProvider netProvider : NetProviderCollections.getActiveProviders(this)) {
             String id = netProvider.getProviderId();
             String name = netProvider.getProviderName();
             if (book.getSiteId().equals(netProvider.getProviderId())) {
@@ -175,12 +174,20 @@ public class ContentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int i = menuItem.getItemId() - Menu.FIRST;
         if (i < providerIds.size()) {
-            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-            Log.d(getClass().toString(), "MenuItem index:" + i + ", provider:" + providerIds.get(i));
+            String providerId = providerIds.get(i);
+            for (Source source: book.getSources()){
+                if (source.getId().equals(providerId)){
+                    book.setSiteId(source.getId());
+                    book.setSitePara(source.getPara());
+                    BookLoader.getInstance().save();
+                    invalidateOptionsMenu();
+                    return true;
+                }
+            }
             return true;
         } else if (i == providerIds.size()) {
-            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-            Log.d(getClass().toString(), "Manage sources.");
+            Intent intent = new Intent(this, NetProviderManagerActivity.class);
+            startActivity(intent);
             return true;
         }
         return false;

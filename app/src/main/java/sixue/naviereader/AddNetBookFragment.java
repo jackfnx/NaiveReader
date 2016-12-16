@@ -93,7 +93,7 @@ public class AddNetBookFragment extends Fragment {
             public void onClick(View view) {
                 list.clear();
 
-                for (final NetProvider provider : NetProviderCollections.getProviders()) {
+                for (final NetProvider provider : NetProviderCollections.getActiveProviders(getContext())) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

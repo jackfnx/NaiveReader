@@ -61,7 +61,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 int currentPage = readerView.getCurrentPage();
                 progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
                 book.setCurrentPosition(readerView.getCurrentPosition());
-                BookLoader.getInstance().updateBook(book);
+                BookLoader.getInstance().save();
             }
         });
         readerView.setOnTurnPageOverListener(new ReaderView.OnTurnPageOverListener() {

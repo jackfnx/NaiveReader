@@ -10,6 +10,6 @@
     <string name="search">Search</string>
     <string name="input_book_title">Input book title</string>
     <string name="source">%d source</string>
-    <string name="menu_manage_sources">Manage sources</string>
+    <string name="menu_manage_sources">&lt;Manage sources&gt;</string>
     <string name="not_implemented">Not implemented</string>
 </resources>

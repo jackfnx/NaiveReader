@@ -9,6 +9,6 @@
     <string name="search">搜索</string>
     <string name="input_book_title">输入书标题</string>
     <string name="source">%d个来源</string>
-    <string name="menu_manage_sources">管理来源</string>
+    <string name="menu_manage_sources">&lt;管理来源&gt;</string>
     <string name="not_implemented">尚未实现</string>
 </resources>

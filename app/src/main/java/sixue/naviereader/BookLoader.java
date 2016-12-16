@@ -62,7 +62,7 @@ public class BookLoader {
         }
     }
 
-    private void save() {
+    public void save() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(list);
@@ -112,10 +112,6 @@ public class BookLoader {
         Book book = list.get(i);
         list.remove(i);
         list.add(0, book);
-    }
-
-    public void updateBook(Book book) {
-        save();
     }
 
     public Bitmap getNoCover() {
