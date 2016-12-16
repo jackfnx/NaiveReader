@@ -1,4 +1,4 @@
-package sixue.naviereader.data;
+package sixue.naivereader.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

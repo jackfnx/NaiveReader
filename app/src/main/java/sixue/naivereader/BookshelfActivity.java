@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,7 +22,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.data.Book;
+import sixue.naivereader.data.Book;
 
 public class BookshelfActivity extends AppCompatActivity {
 

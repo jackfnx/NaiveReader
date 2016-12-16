@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +13,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.provider.NetProvider;
-import sixue.naviereader.provider.NetProviderCollections;
+import sixue.naivereader.provider.NetProvider;
+import sixue.naivereader.provider.NetProviderCollections;
 
 public class NetProviderManagerActivity extends AppCompatActivity {
 

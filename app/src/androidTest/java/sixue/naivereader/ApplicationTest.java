@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

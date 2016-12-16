@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="sixue.naviereader.ReadActivity">
+    tools:context="sixue.naivereader.ReadActivity">
 
     <LinearLayout
         android:id="@+id/_header"
@@ -62,7 +62,7 @@
         android:layout_above="@id/_footer"
         android:layout_below="@id/_header">
 
-        <sixue.naviereader.ReaderView
+        <sixue.naivereader.ReaderView
             android:id="@+id/text_area"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

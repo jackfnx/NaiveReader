@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,10 +20,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.data.Book;
-import sixue.naviereader.data.Chapter;
-import sixue.naviereader.provider.NetProvider;
-import sixue.naviereader.provider.NetProviderCollections;
+import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Chapter;
+import sixue.naivereader.provider.NetProvider;
+import sixue.naivereader.provider.NetProviderCollections;
 
 public class SmartDownloader {
     private final Book book;

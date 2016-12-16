@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import sixue.naviereader.data.Book;
+import sixue.naivereader.data.Book;
 
 public class Utils {
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";

@@ -1,4 +1,4 @@
-package sixue.naviereader.data;
+package sixue.naivereader.data;
 
 public class Chapter {
     private String id;

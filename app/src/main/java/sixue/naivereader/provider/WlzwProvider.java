@@ -1,4 +1,4 @@
-package sixue.naviereader.provider;
+package sixue.naivereader.provider;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,11 +14,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.SmartDownloader;
-import sixue.naviereader.Utils;
-import sixue.naviereader.data.Book;
-import sixue.naviereader.data.Chapter;
-import sixue.naviereader.data.Source;
+import sixue.naivereader.SmartDownloader;
+import sixue.naivereader.Utils;
+import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Chapter;
+import sixue.naivereader.data.Source;
 
 public class WlzwProvider extends NetProvider {
     @Override

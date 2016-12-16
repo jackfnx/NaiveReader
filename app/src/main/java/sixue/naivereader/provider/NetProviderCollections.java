@@ -1,4 +1,4 @@
-package sixue.naviereader.provider;
+package sixue.naivereader.provider;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sixue.naviereader.Utils;
+import sixue.naivereader.Utils;
 
 public class NetProviderCollections {
     private static Map<String, NetProvider> providers;

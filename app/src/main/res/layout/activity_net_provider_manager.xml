@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="sixue.naviereader.NetProviderManagerActivity">
+    tools:context="sixue.naivereader.NetProviderManagerActivity">
 
     <ListView
         android:id="@+id/list_net_providers"

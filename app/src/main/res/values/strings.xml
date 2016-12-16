@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Navie Reader</string>
+    <string name="app_name" translatable="false">Naive Reader</string>
     <string name="cd_null" translatable="false">null</string>
     <string name="msg_first_page">It was the first page.</string>
     <string name="msg_last_page">It was the last page.</string>

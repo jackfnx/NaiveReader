@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-import sixue.naviereader.data.Book;
-import sixue.naviereader.data.Chapter;
+import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Chapter;
 
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 

@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,9 +23,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.data.Book;
-import sixue.naviereader.provider.NetProvider;
-import sixue.naviereader.provider.NetProviderCollections;
+import sixue.naivereader.data.Book;
+import sixue.naivereader.provider.NetProvider;
+import sixue.naivereader.provider.NetProviderCollections;
 
 public class AddNetBookFragment extends Fragment {
 

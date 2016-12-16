@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.Context;
 import android.graphics.Bitmap;

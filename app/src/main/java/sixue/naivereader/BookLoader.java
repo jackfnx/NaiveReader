@@ -1,4 +1,4 @@
-package sixue.naviereader;
+package sixue.naivereader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naviereader.data.Book;
+import sixue.naivereader.data.Book;
 
 public class BookLoader {
     private static BookLoader instance;

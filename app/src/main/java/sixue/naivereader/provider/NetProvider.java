@@ -1,11 +1,11 @@
-package sixue.naviereader.provider;
+package sixue.naivereader.provider;
 
 import android.content.Context;
 
 import java.util.List;
 
-import sixue.naviereader.data.Book;
-import sixue.naviereader.data.Chapter;
+import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Chapter;
 
 public abstract class NetProvider {
     private boolean active = true;

@@ -1,4 +1,4 @@
-package sixue.naviereader.data;
+package sixue.naivereader.data;
 
 public class Source {
     private String id;
