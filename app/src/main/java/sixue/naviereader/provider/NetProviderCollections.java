@@ -16,20 +16,23 @@ public class NetProviderCollections {
     private static Map<String, NetProvider> providers;
 
     public static Collection<NetProvider> getProviders() {
-        initProviders();
-        return providers.values();
+        return getProviders(null);
     }
 
-    public static Collection<NetProvider> getActiveProviders(Context context) {
+    public static Collection<NetProvider> getProviders(Context context) {
         initProviders();
-        loadSettings(context);
-        List<NetProvider> activeProviders = new ArrayList<>();
-        for (NetProvider netProvider : providers.values()) {
-            if (netProvider.isActive()) {
-                activeProviders.add(netProvider);
+        if (context == null) {
+            return providers.values();
+        } else {
+            loadSettings(context);
+            List<NetProvider> activeProviders = new ArrayList<>();
+            for (NetProvider netProvider : providers.values()) {
+                if (netProvider.isActive()) {
+                    activeProviders.add(netProvider);
+                }
             }
+            return activeProviders;
         }
-        return activeProviders;
     }
 
     private static void loadSettings(Context context) {
@@ -76,12 +79,26 @@ public class NetProviderCollections {
         }
     }
 
-    public static NetProvider findProviders(String providerId) {
-        initProviders();
-        return providers.get(providerId);
-    }
-
     private static void addProvider(NetProvider netProvider) {
         providers.put(netProvider.getProviderId(), netProvider);
+    }
+
+    public static NetProvider findProviders(String providerId) {
+        return findProviders(providerId, null);
+    }
+
+    public static NetProvider findProviders(String providerId, Context context) {
+        initProviders();
+        if (context == null) {
+            return providers.get(providerId);
+        } else {
+            loadSettings(context);
+            NetProvider netProvider = providers.get(providerId);
+            if (netProvider != null && netProvider.isActive()) {
+                return netProvider;
+            } else {
+                return null;
+            }
+        }
     }
 }

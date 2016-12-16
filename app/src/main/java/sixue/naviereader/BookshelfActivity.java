@@ -124,6 +124,10 @@ public class BookshelfActivity extends AppCompatActivity {
             case R.id.menu_edit:
                 Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.menu_settings:
+                Intent intent = new Intent(this, NetProviderManagerActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 break;
         }
@@ -134,9 +138,11 @@ public class BookshelfActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem edit = menu.findItem(R.id.menu_edit);
         MenuItem delete = menu.findItem(R.id.menu_delete);
+        MenuItem settings = menu.findItem(R.id.menu_settings);
 
         edit.setVisible(isEditMode);
         delete.setVisible(isEditMode);
+        settings.setVisible(!isEditMode);
 
         edit.setEnabled(editList.size() == 1);
         delete.setEnabled(editList.size() >= 1);

@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,17 +156,20 @@ public class ContentActivity extends AppCompatActivity {
 
         providerIds.clear();
         subMenu.clear();
-        for (NetProvider netProvider : NetProviderCollections.getActiveProviders(this)) {
-            String id = netProvider.getProviderId();
-            String name = netProvider.getProviderName();
-            if (book.getSiteId().equals(netProvider.getProviderId())) {
-                name += "*";
+        for (Source source : book.getSources()) {
+            NetProvider netProvider = NetProviderCollections.findProviders(source.getId(), this);
+            if (netProvider != null) {
+                String id = netProvider.getProviderId();
+                String name = netProvider.getProviderName();
+                if (book.getSiteId().equals(id)) {
+                    name += "*";
+                }
+                providerIds.add(id);
+                subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size() - 1, providerIds.size(), name);
             }
-            providerIds.add(id);
-            subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size() - 1, providerIds.size(), name);
         }
 
-        subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_manage_sources);
+        subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_search_again);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -186,8 +190,7 @@ public class ContentActivity extends AppCompatActivity {
             }
             return true;
         } else if (i == providerIds.size()) {
-            Intent intent = new Intent(this, NetProviderManagerActivity.class);
-            startActivity(intent);
+            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
             return true;
         }
         return false;
