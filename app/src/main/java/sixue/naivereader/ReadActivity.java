@@ -152,11 +152,14 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 sendBroadcast(intent);
             }
         } else {
+            readerView.setLoading(true, false);
             smartDownloader.startDownloadContent();
         }
     }
 
     private void loadNetChapter(int newIndex, int newPosition) {
+        readerView.setLoading(true, false);
+
         if (newIndex >= 0 && newIndex < book.getChapterList().size()) {
             if (book.getCurrentChapterIndex() != newIndex) {
                 book.setCurrentChapterIndex(newIndex);
@@ -244,7 +247,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         } else {
             if (vX < 2000 && vX > -2000) {
-                if (!book.isLocal()) {
+                if (vY < 0 && !book.isLocal()) {
                     Intent intent = new Intent(this, ContentActivity.class);
                     startActivity(intent);
                 }

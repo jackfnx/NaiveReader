@@ -213,7 +213,7 @@ public class ReaderView extends View {
         return i;
     }
 
-    private void setLoading(boolean isLoading, boolean anim) {
+    public void setLoading(boolean isLoading, boolean anim) {
         if (isLoading) {
             switchAnim = anim;
             loadingMask.setVisibility(VISIBLE);
