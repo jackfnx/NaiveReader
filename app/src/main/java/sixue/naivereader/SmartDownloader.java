@@ -155,7 +155,7 @@ public class SmartDownloader {
             }
             InputStream is = conn.getInputStream();
             Bitmap original = BitmapFactory.decodeStream(is);
-            Bitmap scaledBitmap = Utils.createCropBitmap(original, 120, 150);
+            Bitmap scaledBitmap = Utils.createCropBitmap(original, 160, 200);
             OutputStream os = new FileOutputStream(coverSavePath);
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, os);
             os.close();

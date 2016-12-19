@@ -16,7 +16,7 @@
         android:id="@+id/gridview_books"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="65dp"
+        android:columnWidth="90dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
         android:numColumns="auto_fit"
