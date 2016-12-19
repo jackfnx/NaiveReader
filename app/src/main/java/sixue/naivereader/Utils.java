@@ -43,7 +43,7 @@ public class Utils {
 
         String encoding = guessFileEncoding(file);
         if (encoding == null) {
-            return null;
+            encoding = "utf-8";
         }
 
         try {

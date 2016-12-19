@@ -25,7 +25,7 @@ public class NetProviderManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_net_provider_manager);
 
-        netProviders = new ArrayList<>(NetProviderCollections.getProviders());
+        netProviders = new ArrayList<>(NetProviderCollections.getProviders(this));
 
         ListView listView = (ListView) findViewById(R.id.list_net_providers);
         listView.setAdapter(new BaseAdapter() {

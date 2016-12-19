@@ -15,28 +15,14 @@ import sixue.naivereader.Utils;
 public class NetProviderCollections {
     private static Map<String, NetProvider> providers;
 
-    public static Collection<NetProvider> getProviders() {
-        return getProviders(null);
-    }
-
     public static Collection<NetProvider> getProviders(Context context) {
         initProviders();
-        if (context == null) {
-            return providers.values();
-        } else {
-            loadSettings(context);
-            List<NetProvider> activeProviders = new ArrayList<>();
-            for (NetProvider netProvider : providers.values()) {
-                if (netProvider.isActive()) {
-                    activeProviders.add(netProvider);
-                }
-            }
-            return activeProviders;
-        }
+        loadSettings(context);
+        return providers.values();
     }
 
     private static void loadSettings(Context context) {
-        File saveRoot = context.getExternalFilesDir("books");
+        File saveRoot = context.getExternalFilesDir("settings");
         if (saveRoot == null) {
             return;
         }
@@ -46,8 +32,8 @@ public class NetProviderCollections {
             return;
         }
 
-        for (String disabledProviderId : disabledProviders.split("::")) {
-            NetProvider netProvider = providers.get(disabledProviderId);
+        for (String disabledProviderId : disabledProviders.split("\n")) {
+            NetProvider netProvider = providers.get(disabledProviderId.trim());
             if (netProvider != null) {
                 netProvider.setActive(false);
             }
@@ -61,9 +47,9 @@ public class NetProviderCollections {
                 list.add(netProvider.getProviderId());
             }
         }
-        String s = TextUtils.join("::", list);
+        String s = TextUtils.join("\n", list);
 
-        File saveRoot = context.getExternalFilesDir("books");
+        File saveRoot = context.getExternalFilesDir("settings");
         if (saveRoot == null) {
             return;
         }

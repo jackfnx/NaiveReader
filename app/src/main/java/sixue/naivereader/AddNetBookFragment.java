@@ -94,6 +94,10 @@ public class AddNetBookFragment extends Fragment {
                 list.clear();
 
                 for (final NetProvider provider : NetProviderCollections.getProviders(getContext())) {
+                    if (!provider.isActive()) {
+                        continue;
+                    }
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
