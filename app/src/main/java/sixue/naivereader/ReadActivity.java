@@ -167,6 +167,10 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         }
 
+        if (book.getChapterList().size() == 0) {
+            return;
+        }
+
         chapter = book.getChapterList().get(book.getCurrentChapterIndex());
 
         if (smartDownloader.isDownloaded(chapter)) {
