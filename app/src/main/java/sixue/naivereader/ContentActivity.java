@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;
@@ -29,10 +32,13 @@ import sixue.naivereader.provider.NetProviderCollections;
 
 public class ContentActivity extends AppCompatActivity {
 
+    private static final int MAX_SUMMARY_LENGTH = 40;
     private BroadcastReceiver receiver;
     private SmartDownloader downloader;
     private Book book;
     private List<String> providerIds;
+    private String localText;
+    private List<Integer> localChapterNodes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,7 @@ public class ContentActivity extends AppCompatActivity {
         providerIds = new ArrayList<>();
         book = BookLoader.getInstance().getBook(0);
         downloader = new SmartDownloader(this, book);
+        localChapterNodes = new ArrayList<>();
 
         final ListView listView = (ListView) findViewById(R.id.content);
         final MyAdapter myAdapter = new MyAdapter(book);
@@ -54,8 +61,13 @@ public class ContentActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
-                intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
+                if (!book.isLocal()) {
+                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
+                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
+                } else {
+                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
+                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, localChapterNodes.get(i));
+                }
                 startActivity(intent);
                 finish();
             }
@@ -85,12 +97,10 @@ public class ContentActivity extends AppCompatActivity {
 
         if (downloader.reloadContent()) {
             if (book.isLocal()) {
-                Intent intent = new Intent(this, ReadActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
+                calcLocalChapterNodes();
+            } else {
+                listView.setSelection(book.getCurrentChapterIndex());
             }
-            listView.setSelection(book.getCurrentChapterIndex());
         } else {
             loadingCircle.setVisibility(View.VISIBLE);
             downloader.startDownloadContent();
@@ -113,7 +123,7 @@ public class ContentActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return book.getChapterList().size();
+            return book.isLocal() ? localChapterNodes.size() : book.getChapterList().size();
         }
 
         @Override
@@ -129,16 +139,43 @@ public class ContentActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
-                view = new TextView(ContentActivity.this);
+                view = LayoutInflater.from(ContentActivity.this).inflate(R.layout.listviewitem_content, viewGroup, false);
                 view.setPadding(20, 20, 20, 20);
             }
-            Chapter chapter = book.getChapterList().get(i);
-            TextView tv = (TextView) view;
-            String s = chapter.getTitle();
-            if (i == book.getCurrentChapterIndex()) {
-                s += "*";
+            TextView title = (TextView) view.findViewById(R.id.title);
+            TextView summary = (TextView) view.findViewById(R.id.summary);
+            String s;
+            if (book.isLocal()) {
+                int node = localChapterNodes.get(i);
+                int length = localText.length();
+                if (localText != null) {
+                    int end = localText.indexOf('\n', node);
+                    end = end < 0 ? length : end;
+                    s = localText.substring(node, end);
+                } else {
+                    s = "?";
+                }
+                int next = (node + 1) >= localChapterNodes.size() ? Integer.MAX_VALUE : localChapterNodes.get(node + 1);
+                int current = book.getCurrentPosition();
+                if (current >= node && current < next) {
+                    s += "*";
+                }
+
+
+                int sumStart = node + s.length();
+                int sumEnd = sumStart + MAX_SUMMARY_LENGTH > length ? length : sumStart + MAX_SUMMARY_LENGTH;
+                String sum = localText.substring(sumStart, sumEnd).trim().replace('\n', ' ');
+                summary.setText(sum);
+
+            } else {
+                Chapter chapter = book.getChapterList().get(i);
+                s = chapter.getTitle();
+                if (i == book.getCurrentChapterIndex()) {
+                    s += "*";
+                }
+                summary.setText("");
             }
-            tv.setText(s);
+            title.setText(s);
             return view;
         }
     }
@@ -152,24 +189,28 @@ public class ContentActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuProviders = menu.findItem(R.id.menu_providers);
-        SubMenu subMenu = menuProviders.getSubMenu();
+        if (book.isLocal()) {
+            menuProviders.setVisible(false);
+        } else {
+            SubMenu subMenu = menuProviders.getSubMenu();
 
-        providerIds.clear();
-        subMenu.clear();
-        for (Source source : book.getSources()) {
-            NetProvider netProvider = NetProviderCollections.findProviders(source.getId(), this);
-            if (netProvider != null) {
-                String id = netProvider.getProviderId();
-                String name = netProvider.getProviderName();
-                if (book.getSiteId().equals(id)) {
-                    name += "*";
+            providerIds.clear();
+            subMenu.clear();
+            for (Source source : book.getSources()) {
+                NetProvider netProvider = NetProviderCollections.findProviders(source.getId(), this);
+                if (netProvider != null) {
+                    String id = netProvider.getProviderId();
+                    String name = netProvider.getProviderName();
+                    if (book.getSiteId().equals(id)) {
+                        name += "*";
+                    }
+                    providerIds.add(id);
+                    subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size() - 1, providerIds.size(), name);
                 }
-                providerIds.add(id);
-                subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size() - 1, providerIds.size(), name);
             }
-        }
 
-        subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_search_again);
+            subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_search_again);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -179,8 +220,8 @@ public class ContentActivity extends AppCompatActivity {
         int i = menuItem.getItemId() - Menu.FIRST;
         if (i < providerIds.size()) {
             String providerId = providerIds.get(i);
-            for (Source source: book.getSources()){
-                if (source.getId().equals(providerId)){
+            for (Source source : book.getSources()) {
+                if (source.getId().equals(providerId)) {
                     book.setSiteId(source.getId());
                     book.setSitePara(source.getPara());
                     BookLoader.getInstance().save();
@@ -194,5 +235,28 @@ public class ContentActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    public void calcLocalChapterNodes() {
+        localText = Utils.readText(book.getLocalPath());
+        localChapterNodes = new ArrayList<>();
+        if (localText == null) {
+            return;
+        }
+
+        String[] patterns = new String[]{
+                "\\b第[一二三四五六七八九十百千零]+[章节篇]\\b",
+                "\\b[\\d\\uFF10-\\uFF19]+\\b"
+        };
+        for (String ps : patterns) {
+            Pattern pattern = Pattern.compile(ps);
+            Matcher matcher = pattern.matcher(localText);
+            while (matcher.find()) {
+                localChapterNodes.add(matcher.start());
+            }
+            if (localChapterNodes.size() != 0) {
+                break;
+            }
+        }
     }
 }

@@ -84,6 +84,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         });
 
         final int newIndex = getIntent().getIntExtra(Utils.INTENT_PARA_CHAPTER_INDEX, -1);
+        final int newPosition = getIntent().getIntExtra(Utils.INTENT_PARA_CURRENT_POSITION, -1);
+
+        if (newPosition >= 0) {
+            book.setCurrentPosition(newPosition);
+        }
 
         title.setText("?");
         subtitle.setText("?");
@@ -218,10 +223,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         if ((x < (widthPixels / 3)) && (y < (heightPixels / 2))) {
             readerView.turnPage(-1);
         } else if ((x > (widthPixels / 3) && (x < widthPixels * 2 / 3)) && (y < (heightPixels / 2))) {
-            if (!book.isLocal()) {
-                Intent intent = new Intent(this, ContentActivity.class);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(this, ContentActivity.class);
+            startActivity(intent);
         } else {
             readerView.turnPage(1);
         }
@@ -251,7 +254,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             }
         } else {
             if (vX < 2000 && vX > -2000) {
-                if (vY < 0 && !book.isLocal()) {
+                if (vY < 0) {
                     Intent intent = new Intent(this, ContentActivity.class);
                     startActivity(intent);
                 }
