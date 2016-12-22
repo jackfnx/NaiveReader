@@ -155,12 +155,11 @@ public class ContentActivity extends AppCompatActivity {
                 } else {
                     s = "?";
                 }
-                int next = (node + 1) >= localChapterNodes.size() ? Integer.MAX_VALUE : localChapterNodes.get(node + 1);
+                int next = (i + 1) >= localChapterNodes.size() ? Integer.MAX_VALUE : localChapterNodes.get(i + 1);
                 int current = book.getCurrentPosition();
                 if (current >= node && current < next) {
                     s += "*";
                 }
-
 
                 int sumStart = node + s.length();
                 int sumEnd = sumStart + MAX_SUMMARY_LENGTH > length ? length : sumStart + MAX_SUMMARY_LENGTH;
