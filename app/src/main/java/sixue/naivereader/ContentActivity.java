@@ -39,6 +39,7 @@ public class ContentActivity extends AppCompatActivity {
     private List<String> providerIds;
     private String localText;
     private List<Integer> localChapterNodes;
+    private int currentLocalChapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,16 @@ public class ContentActivity extends AppCompatActivity {
         if (downloader.reloadContent()) {
             if (book.isLocal()) {
                 calcLocalChapterNodes();
+                currentLocalChapter = 0;
+                for (int i = 0; i < localChapterNodes.size(); i++) {
+                    int node = localChapterNodes.get(i);
+                    int next = (i + 1) < localChapterNodes.size() ? localChapterNodes.get(i + 1) : Integer.MAX_VALUE;
+                    if (book.getCurrentPosition() >= node && book.getCurrentPosition() < next) {
+                        currentLocalChapter = i;
+                        break;
+                    }
+                }
+                listView.setSelection(currentLocalChapter);
             } else {
                 listView.setSelection(book.getCurrentChapterIndex());
             }
@@ -155,9 +166,7 @@ public class ContentActivity extends AppCompatActivity {
                 } else {
                     s = "?";
                 }
-                int next = (i + 1) >= localChapterNodes.size() ? Integer.MAX_VALUE : localChapterNodes.get(i + 1);
-                int current = book.getCurrentPosition();
-                if (current >= node && current < next) {
+                if (i == currentLocalChapter) {
                     s += "*";
                 }
 
@@ -236,7 +245,7 @@ public class ContentActivity extends AppCompatActivity {
         return false;
     }
 
-    public void calcLocalChapterNodes() {
+    private void calcLocalChapterNodes() {
         localText = Utils.readText(book.getLocalPath());
         localChapterNodes = new ArrayList<>();
         if (localText == null) {
