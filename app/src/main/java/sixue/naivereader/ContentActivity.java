@@ -244,7 +244,7 @@ public class ContentActivity extends AppCompatActivity {
         }
 
         String[] patterns = new String[]{
-                "\\b第[一二三四五六七八九十百千零]+[章节篇]\\b",
+                "\\b第[一二三四五六七八九十百千零]+[章节篇集卷]\\b",
                 "\\b[\\d\\uFF10-\\uFF19]+\\b"
         };
         for (String ps : patterns) {
