@@ -37,7 +37,7 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
         android:clickable="true"
-        android:src="@drawable/add"
+        android:src="@android:drawable/ic_menu_add"
         app:fabSize="normal" />
 
 </RelativeLayout>
