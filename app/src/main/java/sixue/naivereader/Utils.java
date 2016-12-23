@@ -29,8 +29,6 @@ public class Utils {
     public static final String ACTION_DOWNLOAD_COVER_FINISH = "ACTION_DOWNLOAD_COVER_FINISH";
     public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
     public static final String INTENT_PARA_CHAPTER_ID = "INTENT_PARA_CHAPTER_ID";
-    public static final String INTENT_PARA_NEXT_ACTION_READ = "INTENT_PARA_NEXT_ACTION_READ";
-    public static final String INTENT_PARA_NEXT_ACTION_CONTENT = "INTENT_PARA_NEXT_ACTION_CONTENT";
     public static final String INTENT_PARA_PATH = "INTENT_PARA_PATH";
     public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
     public static final String INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX";

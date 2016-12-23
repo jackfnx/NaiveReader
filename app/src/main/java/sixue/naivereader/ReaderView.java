@@ -21,7 +21,9 @@ public class ReaderView extends View {
     private static final String TAG = "ReaderView";
 
     private static final int MAX_LINE_LENGTH = 80;
-    private static final int MIN_H_PADDING = 16;
+    private static final int MIN_H_PADDING = 32;
+    private static final int LINE_SPACING = 5;
+    private static final float TEXT_SIZE = 50.0f;
 
     private String text;
     private TextPaint textPaint;
@@ -51,20 +53,20 @@ public class ReaderView extends View {
     }
 
     private void initialize() {
-        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setARGB(0xFF, 0, 0, 0);
-        textPaint.setTextSize(50.0f);
-
-        Paint.FontMetrics fm = textPaint.getFontMetrics();
-        fontTop = Math.abs(fm.top);
-        fontHeight = Math.abs(fm.ascent) + Math.abs(fm.descent) + Math.abs(fm.leading);
-
         currentPosition = 0;
         pageBreaks = new ArrayList<>();
         currentPage = -1;
         typesetFinished = false;
         maxWidth = -1;
         maxHeight = -1;
+
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setARGB(0xFF, 0, 0, 0);
+        textPaint.setTextSize(TEXT_SIZE);
+
+        Paint.FontMetrics fm = textPaint.getFontMetrics();
+        fontTop = Math.abs(fm.top) + LINE_SPACING;
+        fontHeight = Math.abs(fm.ascent) + Math.abs(fm.descent) + Math.abs(fm.leading) + LINE_SPACING;
     }
 
     private void startTypesetThread() {
