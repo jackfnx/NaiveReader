@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,8 +53,7 @@ public class ContentActivity extends AppCompatActivity {
 
         final ListView listView = (ListView) findViewById(R.id.content);
         final MyAdapter myAdapter = new MyAdapter(book);
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_refresh);
-        final View loadingCircle = findViewById(R.id.loading_circle);
+        final SwipeRefreshLayout srl = (SwipeRefreshLayout) findViewById(R.id.srl);
 
         listView.setAdapter(myAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,7 +62,8 @@ public class ContentActivity extends AppCompatActivity {
                 Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 if (!book.isLocal()) {
-                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
+                    int index = book.getChapterList().size() - i - 1;
+                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, index);
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
                 } else {
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
@@ -80,19 +80,20 @@ public class ContentActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
-                    loadingCircle.setVisibility(View.GONE);
-                    listView.setSelection(book.getCurrentChapterIndex());
+                    srl.setRefreshing(false);
+                    listView.setSelection(book.getChapterList().size() - book.getCurrentChapterIndex() - 1);
                     myAdapter.notifyDataSetChanged();
                 }
             }
         };
         registerReceiver(receiver, filter);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View view) {
-                loadingCircle.setVisibility(View.VISIBLE);
-                downloader.startDownloadContent();
+            public void onRefresh() {
+                if (!book.isLocal()) {
+                    downloader.startDownloadContent();
+                }
             }
         });
 
@@ -110,10 +111,10 @@ public class ContentActivity extends AppCompatActivity {
                 }
                 listView.setSelection(currentLocalChapter);
             } else {
-                listView.setSelection(book.getCurrentChapterIndex());
+                listView.setSelection(book.getChapterList().size() - book.getCurrentChapterIndex() - 1);
             }
         } else {
-            loadingCircle.setVisibility(View.VISIBLE);
+            srl.setRefreshing(true);
             downloader.startDownloadContent();
         }
     }
@@ -176,9 +177,10 @@ public class ContentActivity extends AppCompatActivity {
                 summary.setText(sum);
 
             } else {
-                Chapter chapter = book.getChapterList().get(i);
+                int index = book.getChapterList().size() - i - 1;
+                Chapter chapter = book.getChapterList().get(index);
                 s = chapter.getTitle();
-                if (i == book.getCurrentChapterIndex()) {
+                if (index == book.getCurrentChapterIndex()) {
                     s += "*";
                 }
                 summary.setText("");
