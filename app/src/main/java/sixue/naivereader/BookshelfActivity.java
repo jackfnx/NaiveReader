@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ public class BookshelfActivity extends AppCompatActivity {
 
         GridView gv = (GridView) findViewById(R.id.gridview_books);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        final SwipeRefreshLayout srl = (SwipeRefreshLayout) findViewById(R.id.srl);
 
         myAdapter = new MyAdapter();
         gv.setAdapter(myAdapter);
@@ -84,6 +86,18 @@ public class BookshelfActivity extends AppCompatActivity {
                     Intent intent = new Intent(BookshelfActivity.this, AddActivity.class);
                     startActivity(intent);
                 }
+            }
+        });
+        srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(BookshelfActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                        srl.setRefreshing(false);
+                    }
+                });
             }
         });
     }
