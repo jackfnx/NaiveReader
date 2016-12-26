@@ -39,13 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/secondary_text_dark" />
-
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:textSize="12sp"
         android:textColor="@android:color/secondary_text_dark" />
 
 </LinearLayout>

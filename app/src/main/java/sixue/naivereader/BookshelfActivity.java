@@ -1,6 +1,9 @@
 package sixue.naivereader;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -31,6 +34,7 @@ public class BookshelfActivity extends AppCompatActivity {
     private boolean isEditMode;
     private List<Book> editList;
     private ActionBar actionBar;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +98,52 @@ public class BookshelfActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(BookshelfActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                        refreshAllBooks();
                         srl.setRefreshing(false);
                     }
                 });
             }
         });
+
+        receiver = new BroadcastReceiver(){
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+        filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH);
+        registerReceiver(receiver, filter);
+
+        refreshAllBooks();
+    }
+
+    private void refreshAllBooks() {
+        for (int i = 0; i < BookLoader.getInstance().getBookNum(); i++) {
+            Book book = BookLoader.getInstance().getBook(i);
+            if (!book.isLocal()) {
+                SmartDownloader downloader = new SmartDownloader(this, book);
+                if (downloader.reloadContent()) {
+                    Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+                    intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+                    sendBroadcast(intent);
+                }
+
+                downloader.startDownloadContent();
+
+                if (!downloader.coverIsDownloaded()) {
+                    downloader.startDownloadContent();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -234,16 +278,13 @@ public class BookshelfActivity extends AppCompatActivity {
                 }
             }
 
-            TextView author = (TextView) view.findViewById(R.id.author);
-            author.setText(book.getAuthor());
-
             View selectIcon = view.findViewById(R.id.select_icon);
             if (!isEditMode) {
                 selectIcon.setVisibility(View.INVISIBLE);
             } else {
                 selectIcon.setVisibility(View.VISIBLE);
             }
-            
+
             ImageView cover = (ImageView) view.findViewById(R.id.cover);
             SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
             if (downloader.coverIsDownloaded()) {
