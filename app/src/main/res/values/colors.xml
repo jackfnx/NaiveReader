@@ -2,6 +2,8 @@
 <resources>
     <color name="colorPrimary">#03a9f4</color>
     <color name="colorPrimaryDark">#0288d1</color>
-    <color name="colorAccent">#e6ee9c</color>
-    <color name="textColorPrimary">#fefefe</color>
+    <color name="colorAccent">#80d8ff</color>
+    <color name="actionbarTextColor">#fefefe</color>
+    <color name="primaryTextColorLight">#323232</color>
+    <color name="secondaryTextColorLight">#bebebe</color>
 </resources>
