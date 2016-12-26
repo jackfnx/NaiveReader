@@ -116,6 +116,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                             String text = Utils.readText(path);
                             if (text == null) {
                                 text = "Can't open file.";
+                            } else {
+                                if (book.isLocal()) {
+                                    book.setWordCount(text.length());
+                                    BookLoader.getInstance().save();
+                                }
                             }
 
                             readerView.importText(text, book.getCurrentPosition());

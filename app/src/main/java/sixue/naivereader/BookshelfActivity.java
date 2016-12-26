@@ -209,16 +209,41 @@ public class BookshelfActivity extends AppCompatActivity {
                 view = LayoutInflater.from(BookshelfActivity.this).inflate(R.layout.gridviewitem_book, viewGroup, false);
             }
             Book book = BookLoader.getInstance().getBook(i);
+
             TextView title = (TextView) view.findViewById(R.id.title);
             title.setText(book.getTitle());
+
+            TextView progress = (TextView) view.findViewById(R.id.progress);
+            if (book.isLocal()) {
+                int cp = book.getCurrentPosition();
+                int wc = book.getWordCount();
+                if (wc <= 0) {
+                    progress.setText(R.string.read_progress_local_unread);
+                } else {
+                    progress.setText(getString(R.string.read_progress_local, (float) cp / (float) wc * 100f));
+                }
+            } else {
+                int size = book.getChapterList().size();
+                int cp = book.getCurrentChapterIndex();
+                if (size <= 0) {
+                    progress.setText(R.string.read_progress_net_predownload);
+                } else if (cp + 1 == size) {
+                    progress.setText(R.string.read_progress_net_allread);
+                } else {
+                    progress.setText(getString(R.string.read_progress_net, size - cp - 1));
+                }
+            }
+
             TextView author = (TextView) view.findViewById(R.id.author);
             author.setText(book.getAuthor());
+
             View selectIcon = view.findViewById(R.id.select_icon);
             if (!isEditMode) {
                 selectIcon.setVisibility(View.INVISIBLE);
             } else {
                 selectIcon.setVisibility(View.VISIBLE);
             }
+            
             ImageView cover = (ImageView) view.findViewById(R.id.cover);
             SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
             if (downloader.coverIsDownloaded()) {

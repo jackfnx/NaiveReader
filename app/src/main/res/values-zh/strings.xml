@@ -8,9 +8,14 @@
     <string name="menu_delete">删除</string>
     <string name="search">搜索</string>
     <string name="input_book_title">输入书标题</string>
-    <string name="source">%d个来源</string>
+    <string name="source">%1$d个来源</string>
     <string name="menu_switch_sources">&lt;切换来源&gt;</string>
     <string name="not_implemented">尚未实现</string>
     <string name="menu_settings">设置</string>
     <string name="menu_search_again">&lt;重新搜索&gt;</string>
+    <string name="read_progress_local">"已读: %1$.1f%%"</string>
+    <string name="read_progress_local_unread">未读</string>
+    <string name="read_progress_net_predownload">没有下载章节</string>
+    <string name="read_progress_net_allread">无更新</string>
+    <string name="read_progress_net">未读：%1$d</string>
 </resources>

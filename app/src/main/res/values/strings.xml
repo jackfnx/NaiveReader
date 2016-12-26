@@ -9,9 +9,14 @@
     <string name="menu_delete">Delete</string>
     <string name="search">Search</string>
     <string name="input_book_title">Input book title</string>
-    <string name="source">%d source</string>
+    <string name="source">%1$d source</string>
     <string name="menu_switch_sources">&lt;Switch sources&gt;</string>
     <string name="not_implemented">Not implemented</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_search_again">&lt;Search again&gt;</string>
+    <string name="read_progress_local">"Progress: %1$.1f%%"</string>
+    <string name="read_progress_local_unread">Unread</string>
+    <string name="read_progress_net_predownload">Not download</string>
+    <string name="read_progress_net_allread">no unread chapters</string>
+    <string name="read_progress_net">unread: %1$d</string>
 </resources>

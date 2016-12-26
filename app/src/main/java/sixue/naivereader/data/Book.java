@@ -18,6 +18,7 @@ public class Book {
     private List<Source> sources;
     private int currentChapterIndex;
     private int currentPosition;
+    private int wordCount;
     private String coverSavePath;
 
     public Book() {
@@ -117,6 +118,14 @@ public class Book {
 
     public void setCurrentPosition(int currentPosition) {
         this.currentPosition = currentPosition;
+    }
+
+    public int getWordCount() {
+        return wordCount;
+    }
+
+    public void setWordCount(int wordCount) {
+        this.wordCount = wordCount;
     }
 
     public String getCoverSavePath() {
