@@ -109,7 +109,7 @@ public class BookshelfActivity extends AppCompatActivity {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-
+                myAdapter.notifyDataSetChanged();
             }
         };
         IntentFilter filter = new IntentFilter();
