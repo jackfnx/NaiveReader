@@ -59,16 +59,18 @@ public class SmartDownloader {
 
     private void downloadContent() {
         try {
-            book.getChapterList().clear();
-
             String bookSavePath = calcBookSavePath(book);
 
             NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
-            provider.downloadContent(book, bookSavePath);
+            List<Chapter> content = provider.downloadContent(book, bookSavePath);
 
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(book.getChapterList());
-            Utils.writeText(json, bookSavePath + "/.CONTENT");
+            if (content.size() > 0) {
+                book.setChapterList(content);
+
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writeValueAsString(content);
+                Utils.writeText(json, bookSavePath + "/.CONTENT");
+            }
 
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());

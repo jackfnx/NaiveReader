@@ -121,8 +121,9 @@ public class WlzwProvider extends NetProvider {
     }
 
     @Override
-    public void downloadContent(Book book, String bookSavePath) {
+    public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
+        List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect("http://www.50zw.la/book_" + book.getSitePara()).timeout(5000).get();
             Elements elements = doc.body().select(".chapterlist");
@@ -140,11 +141,12 @@ public class WlzwProvider extends NetProvider {
                 String chapterSavePath = calcChapterSavePath(chapter, bookSavePath);
                 chapter.setSavePath(chapterSavePath);
 
-                book.getChapterList().add(chapter);
+                content.add(chapter);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return content;
     }
 
     @Override

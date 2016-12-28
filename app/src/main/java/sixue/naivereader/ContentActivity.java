@@ -156,10 +156,11 @@ public class ContentActivity extends AppCompatActivity {
             }
             TextView title = (TextView) view.findViewById(R.id.title);
             TextView summary = (TextView) view.findViewById(R.id.summary);
-            String s;
             if (book.isLocal()) {
                 int node = localChapterNodes.get(i);
                 int length = localText.length();
+
+                String s;
                 if (localText != null) {
                     int end = localText.indexOf('\n', node);
                     end = end < 0 ? length : end;
@@ -170,6 +171,7 @@ public class ContentActivity extends AppCompatActivity {
                 if (i == currentLocalChapter) {
                     s += "*";
                 }
+                title.setText(s);
 
                 int sumStart = node + s.length();
                 int sumEnd = sumStart + MAX_SUMMARY_LENGTH > length ? length : sumStart + MAX_SUMMARY_LENGTH;
@@ -179,13 +181,13 @@ public class ContentActivity extends AppCompatActivity {
             } else {
                 int index = book.getChapterList().size() - i - 1;
                 Chapter chapter = book.getChapterList().get(index);
-                s = chapter.getTitle();
+                String s = chapter.getTitle();
                 if (index == book.getCurrentChapterIndex()) {
                     s += "*";
                 }
+                title.setText(s);
                 summary.setText("");
             }
-            title.setText(s);
             return view;
         }
     }

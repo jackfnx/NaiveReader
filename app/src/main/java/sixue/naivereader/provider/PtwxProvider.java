@@ -124,7 +124,9 @@ public class PtwxProvider extends NetProvider {
     }
 
     @Override
-    public void downloadContent(Book book, String bookSavePath) {
+    public List<Chapter> downloadContent(Book book, String bookSavePath) {
+
+        List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(calcBookUrl(book.getSitePara())).timeout(5000).get();
             Elements elements = doc.body().select(".centent");
@@ -144,11 +146,12 @@ public class PtwxProvider extends NetProvider {
                 String chapterSavePath = calcChapterSavePath(chapter, bookSavePath);
                 chapter.setSavePath(chapterSavePath);
 
-                book.getChapterList().add(chapter);
+                content.add(chapter);
             }
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
+        return content;
     }
 
     @Override
