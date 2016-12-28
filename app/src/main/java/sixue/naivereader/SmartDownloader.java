@@ -184,4 +184,16 @@ public class SmartDownloader {
         File f = new File(coverSavePath);
         return f.exists();
     }
+
+    public Bitmap getNoCoverBitmap() {
+        try {
+            InputStream is = context.getAssets().open("NoCover.jpg");
+            Bitmap noCover = BitmapFactory.decodeStream(is);
+            is.close();
+            return noCover;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
