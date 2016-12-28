@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textColor="@color/primaryTextColorLight" />
+        android:textColor="@color/primaryTextColor" />
 
     <TextView
         android:id="@+id/progress"
@@ -40,6 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textSize="12sp"
-        android:textColor="@color/secondaryTextColorLight" />
+        android:textColor="@color/secondaryTextColor" />
 
 </LinearLayout>
