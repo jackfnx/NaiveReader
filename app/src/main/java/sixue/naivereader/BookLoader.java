@@ -88,6 +88,15 @@ public class BookLoader {
         save();
     }
 
+    public Book findBook(String id) {
+        for (Book book : list) {
+            if (book.getId().equals(id)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
     public void bookBubble(int i) {
         if (list.size() == 0) {
             return;
@@ -101,6 +110,15 @@ public class BookLoader {
         Book book = list.get(i);
         list.remove(i);
         list.add(0, book);
+
+        save();
+    }
+
+    public void bookBubble(Book book) {
+        if (list.contains(book)) {
+            list.remove(book);
+            list.add(0, book);
+        }
 
         save();
     }

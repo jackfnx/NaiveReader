@@ -127,7 +127,12 @@ public class AddNetBookFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Book book = list.get(i);
-                BookLoader.getInstance().addBook(book);
+                Book b = BookLoader.getInstance().findBook(book.getId());
+                if (b != null) {
+                    BookLoader.getInstance().bookBubble(b);
+                } else {
+                    BookLoader.getInstance().addBook(book);
+                }
                 getActivity().finish();
             }
         });
