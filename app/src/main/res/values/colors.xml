@@ -3,7 +3,6 @@
     <color name="colorPrimary">#673ab7</color>
     <color name="colorPrimaryDark">#512da8</color>
     <color name="colorAccent">#b388ff</color>
-    <color name="actionbarTextColor">#fefefe</color>
     <color name="primaryTextColor">#323232</color>
     <color name="secondaryTextColor">#bebebe</color>
 </resources>

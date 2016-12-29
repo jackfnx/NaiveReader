@@ -22,7 +22,9 @@
             android:name="sixue.naivereader.ReadActivity"
             android:theme="@style/AppTheme.NoTitleBar" />
         <activity android:name="sixue.naivereader.ContentActivity" />
-        <activity android:name="sixue.naivereader.AddActivity" />
+        <activity
+            android:name="sixue.naivereader.AddActivity"
+            android:parentActivityName=".BookshelfActivity" />
         <activity android:name="sixue.naivereader.NetProviderManagerActivity" />
     </application>
 
