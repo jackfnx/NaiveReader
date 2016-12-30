@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:contentDescription="@string/cd_delete_icon"
+            android:contentDescription="@string/cd_select_icon"
             android:src="@drawable/checkbox" />
     </FrameLayout>
 

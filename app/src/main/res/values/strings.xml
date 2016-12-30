@@ -4,7 +4,7 @@
     <string name="msg_first_page">It was the first page.</string>
     <string name="msg_last_page">It was the last page.</string>
     <string name="cd_book_cover">Book cover</string>
-    <string name="cd_delete_icon">Delete icon</string>
+    <string name="cd_select_icon">Select icon</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_delete">Delete</string>
     <string name="search">Search</string>
@@ -19,4 +19,7 @@
     <string name="read_progress_net_predownload">Not download</string>
     <string name="read_progress_net_allread">no unread chapters</string>
     <string name="read_progress_net">unread: %1$d</string>
+    <string name="tab_add_net_book">Add Book from Net</string>
+    <string name="tab_import_txt_flat">Import txt(Flat View)</string>
+    <string name="tab_import_txt_tree">Import txt(Tree View)</string>
 </resources>

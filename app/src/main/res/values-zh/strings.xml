@@ -3,7 +3,7 @@
     <string name="msg_first_page">已经是第一页</string>
     <string name="msg_last_page">已经是最后一页</string>
     <string name="cd_book_cover">封面</string>
-    <string name="cd_delete_icon">删除图标</string>
+    <string name="cd_select_icon">选择图标</string>
     <string name="menu_edit">编辑</string>
     <string name="menu_delete">删除</string>
     <string name="search">搜索</string>
@@ -18,4 +18,7 @@
     <string name="read_progress_net_predownload">没有下载章节</string>
     <string name="read_progress_net_allread">无更新</string>
     <string name="read_progress_net">未读：%1$d</string>
+    <string name="tab_add_net_book">添加网络小说</string>
+    <string name="tab_import_txt_flat">导入TXT(扁平查看)</string>
+    <string name="tab_import_txt_tree">导入TXT(树状查看)</string>
 </resources>

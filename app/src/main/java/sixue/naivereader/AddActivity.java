@@ -20,10 +20,10 @@ public class AddActivity extends AppCompatActivity {
         viewPager.setAdapter(myAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
-    private static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+    private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
         public MyFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -48,11 +48,11 @@ public class AddActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
-                return "Add Book from Net";
+                return getString(R.string.tab_add_net_book);
             } else if (position == 1) {
-                return "Import txt(Flat View)";
+                return getString(R.string.tab_import_txt_flat);
             } else {
-                return "Import txt(Tree View)";
+                return getString(R.string.tab_import_txt_tree);
             }
         }
     }
