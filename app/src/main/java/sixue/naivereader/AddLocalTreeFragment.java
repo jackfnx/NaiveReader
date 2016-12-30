@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.provider.LocalTextProvider;
 
 public class AddLocalTreeFragment extends Fragment {
 
@@ -49,7 +50,7 @@ public class AddLocalTreeFragment extends Fragment {
                         if (b != null) {
                             BookLoader.getInstance().bookBubble(b);
                         } else {
-                            BookLoader.getInstance().addBook(Utils.createBook(file));
+                            BookLoader.getInstance().addBook(LocalTextProvider.createBook(file));
                         }
                         getActivity().finish();
                     }

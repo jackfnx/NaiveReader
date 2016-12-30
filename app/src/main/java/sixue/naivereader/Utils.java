@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import sixue.naivereader.data.Book;
-
 public class Utils {
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
@@ -117,39 +115,6 @@ public class Utils {
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     1);
         }
-    }
-
-    public static Book createBook(File file) {
-        String name = file.getName().toLowerCase();
-        if (name.endsWith(".txt")) {
-            name = name.substring(0, name.length() - 4);
-        }
-
-        String title;
-        int l1 = name.indexOf("【");
-        int r1 = name.indexOf("】");
-        if (l1 != -1 && r1 != -1 && l1 < r1) {
-            title = name.substring(l1 + 1, r1);
-
-        } else {
-            title = name;
-        }
-
-        String author;
-        int a1 = name.indexOf("作者：");
-        if (a1 != -1) {
-            author = name.substring(a1 + "作者：".length());
-        } else {
-            author = "*";
-        }
-
-        Book book = new Book();
-        book.setId(file.getAbsolutePath());
-        book.setTitle(title);
-        book.setAuthor(author);
-        book.setLocal(true);
-        book.setLocalPath(file.getAbsolutePath());
-        return book;
     }
 
     public static Bitmap createCropBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight) {

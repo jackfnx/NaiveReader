@@ -21,12 +21,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
+import sixue.naivereader.provider.LocalTextProvider;
 import sixue.naivereader.provider.NetProvider;
 import sixue.naivereader.provider.NetProviderCollections;
 
@@ -99,7 +98,8 @@ public class ContentActivity extends AppCompatActivity {
 
         if (downloader.reloadContent()) {
             if (book.isLocal()) {
-                calcLocalChapterNodes();
+                localText = Utils.readText(book.getLocalPath());
+                localChapterNodes = LocalTextProvider.calcChapterNodes(localText);
                 currentLocalChapter = 0;
                 for (int i = 0; i < localChapterNodes.size(); i++) {
                     int node = localChapterNodes.get(i);
@@ -247,28 +247,5 @@ public class ContentActivity extends AppCompatActivity {
             return true;
         }
         return false;
-    }
-
-    private void calcLocalChapterNodes() {
-        localText = Utils.readText(book.getLocalPath());
-        localChapterNodes = new ArrayList<>();
-        if (localText == null) {
-            return;
-        }
-
-        String[] patterns = new String[]{
-                "\\b第[一二三四五六七八九十百千零]+[章节篇集卷]\\b",
-                "\\b[\\d\\uFF10-\\uFF19]+\\b"
-        };
-        for (String ps : patterns) {
-            Pattern pattern = Pattern.compile(ps);
-            Matcher matcher = pattern.matcher(localText);
-            while (matcher.find()) {
-                localChapterNodes.add(matcher.start());
-            }
-            if (localChapterNodes.size() != 0) {
-                break;
-            }
-        }
     }
 }

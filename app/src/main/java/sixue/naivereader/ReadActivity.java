@@ -15,10 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;
+import sixue.naivereader.provider.LocalTextProvider;
 
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
@@ -30,6 +33,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private Book book;
     private Chapter chapter;
     private SmartDownloader smartDownloader;
+    private List<Integer> localChapterNodes;
+    private String text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
         book = BookLoader.getInstance().getBook(0);
         chapter = emptyChapter;
+        text = "";
+        localChapterNodes = new ArrayList<>();
 
         readerView = (ReaderView) findViewById(R.id.text_area);
         ImageView maskView = (ImageView) findViewById(R.id.page_mask);
@@ -61,6 +68,19 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 int currentPage = readerView.getCurrentPage();
                 progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
                 book.setCurrentPosition(readerView.getCurrentPosition());
+                if (book.isLocal() && localChapterNodes.size() > 0) {
+                    for (int i = 0; i < localChapterNodes.size(); i++) {
+                        int node = localChapterNodes.get(i);
+                        int next = (i + 1) < localChapterNodes.size() ? localChapterNodes.get(i + 1) : Integer.MAX_VALUE;
+                        if (book.getCurrentPosition() >= node && book.getCurrentPosition() < next) {
+                            int end = text.indexOf('\n', node);
+                            end = end < 0 ? text.length() : end;
+                            String s = text.substring(node, end);
+                            subtitle.setText(s);
+                            break;
+                        }
+                    }
+                }
                 BookLoader.getInstance().save();
             }
         });
@@ -113,11 +133,12 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                             title.setText(book.getTitle());
                             subtitle.setText(chapter.getTitle());
                             String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
-                            String text = Utils.readText(path);
+                            text = Utils.readText(path);
                             if (text == null) {
                                 text = "Can't open file.";
                             } else {
                                 if (book.isLocal()) {
+                                    localChapterNodes = LocalTextProvider.calcChapterNodes(text);
                                     book.setWordCount(text.length());
                                     BookLoader.getInstance().save();
                                 }
