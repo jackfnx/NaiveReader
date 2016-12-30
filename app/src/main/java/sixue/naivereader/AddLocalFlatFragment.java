@@ -15,6 +15,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import sixue.naivereader.data.Book;
+
 public class AddLocalFlatFragment extends Fragment {
     private String sdcard;
     private boolean running;
@@ -38,7 +40,12 @@ public class AddLocalFlatFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 File file = (File) view.getTag();
                 if (file != null) {
-                    BookLoader.getInstance().addBook(Utils.createBook(file));
+                    Book b = BookLoader.getInstance().findBook(file.getAbsolutePath());
+                    if (b != null) {
+                        BookLoader.getInstance().bookBubble(b);
+                    } else {
+                        BookLoader.getInstance().addBook(Utils.createBook(file));
+                    }
                     getActivity().finish();
                 }
             }

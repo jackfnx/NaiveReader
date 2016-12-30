@@ -17,6 +17,8 @@ import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import sixue.naivereader.data.Book;
+
 public class AddLocalTreeFragment extends Fragment {
 
 
@@ -43,7 +45,12 @@ public class AddLocalTreeFragment extends Fragment {
                         myAdapter.setCurrentDir(file);
                         myAdapter.notifyDataSetChanged();
                     } else {
-                        BookLoader.getInstance().addBook(Utils.createBook(file));
+                        Book b = BookLoader.getInstance().findBook(file.getAbsolutePath());
+                        if (b != null) {
+                            BookLoader.getInstance().bookBubble(b);
+                        } else {
+                            BookLoader.getInstance().addBook(Utils.createBook(file));
+                        }
                         getActivity().finish();
                     }
                 }
