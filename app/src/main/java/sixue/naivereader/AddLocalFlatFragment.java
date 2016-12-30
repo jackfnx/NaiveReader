@@ -21,6 +21,7 @@ import sixue.naivereader.provider.LocalTextProvider;
 public class AddLocalFlatFragment extends Fragment {
     private String sdcard;
     private boolean running;
+    private List<String> excludes;
 
     public AddLocalFlatFragment() {
         // Required empty public constructor
@@ -32,6 +33,8 @@ public class AddLocalFlatFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_add_local_flat, container, false);
 
         sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
+        excludes = new ArrayList<>();
+        excludes.add(sdcard + "/Android/data");
 
         ListView lvFiles = (ListView) v.findViewById(R.id.lv_files);
         MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
@@ -82,6 +85,12 @@ public class AddLocalFlatFragment extends Fragment {
         private void loadFiles(final File file) {
             if (running) {
                 if (file.isDirectory()) {
+                    if (excludes.contains(file.getAbsolutePath())) {
+                        return;
+                    }
+                    if (file.getName().startsWith(".")) {
+                        return;
+                    }
                     for (File subFile : file.listFiles()) {
                         loadFiles(subFile);
                     }
