@@ -31,6 +31,7 @@ public class Utils {
     public static final String INTENT_PARA_PATH = "INTENT_PARA_PATH";
     public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
     public static final String INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX";
+    private static final String TAG = "Utils";
 
     public static String readText(String s) {
         File file = new File(s);
@@ -147,6 +148,21 @@ public class Utils {
             arr[i] = func.exec(list.get(i));
         }
         return arr;
+    }
+
+    public static void deleteFile(String path) {
+        File file = new File(path);
+        boolean dr = file.delete();
+        Log.i(TAG, "delete:" + path + ", " + dr);
+    }
+
+    public static void mkdir(String path) {
+        File dir = new File(path);
+        if (!dir.exists()) {
+            boolean mk = dir.mkdirs();
+            Log.i(TAG, "mkdir:" + dir + ", " + mk);
+        }
+
     }
 
     public interface Func<T> {

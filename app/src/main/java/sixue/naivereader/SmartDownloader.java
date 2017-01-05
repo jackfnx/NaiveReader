@@ -125,11 +125,7 @@ public class SmartDownloader {
 
     public void startDownloadCover(final String coverUrl) {
         String bookSavePath = calcBookSavePath(book);
-        File dir = new File(bookSavePath);
-        if (!dir.exists()) {
-            boolean mk = dir.mkdirs();
-            Log.i(getClass().toString(), "mkdir:" + dir + ", " + mk);
-        }
+        Utils.mkdir(bookSavePath);
 
         final String coverSavePath = bookSavePath + "/cover.jpg";
         new Thread(new Runnable() {

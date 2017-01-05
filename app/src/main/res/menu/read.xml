@@ -6,6 +6,10 @@
         android:title="@string/content"
         app:showAsAction="ifRoom|withText" />
     <item
+        android:id="@+id/refresh"
+        android:title="@string/re_download"
+        app:showAsAction="ifRoom|withText" />
+    <item
         android:id="@+id/browse_it"
         android:title="@string/browse_it"
         app:showAsAction="ifRoom|withText" />

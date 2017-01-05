@@ -243,6 +243,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.refresh).setEnabled(!book.isLocal());
+        menu.findItem(R.id.browse_it).setEnabled(!book.isLocal());
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.content: {
@@ -251,13 +258,22 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 actionBar.hide();
                 return true;
             }
+            case R.id.refresh: {
+                if (!book.isLocal()) {
+                    Utils.deleteFile(chapter.getSavePath());
+                    loadNetChapter(book.getCurrentChapterIndex(), 0);
+                    return true;
+                }
+            }
             case R.id.browse_it: {
-                String url = smartDownloader.getChapterUrl(chapter);
-                Intent intent = new Intent("android.intent.action.VIEW");
-                intent.setData(Uri.parse(url));
-                startActivity(intent);
-                actionBar.hide();
-                return true;
+                if (!book.isLocal()) {
+                    String url = smartDownloader.getChapterUrl(chapter);
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(url));
+                    startActivity(intent);
+                    actionBar.hide();
+                    return true;
+                }
             }
             default:
                 break;

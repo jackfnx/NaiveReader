@@ -28,5 +28,6 @@
     <string name="end">完结</string>
     <string name="local_path">本地保存路径</string>
     <string name="content">目录</string>
+    <string name="re_download">重新下载章节</string>
     <string name="browse_it">浏览器打开章节</string>
 </resources>
