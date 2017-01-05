@@ -28,4 +28,6 @@
     <string name="end">End</string>
     <string name="local_path">Local path</string>
     <string name="source">Source</string>
+    <string name="content">Content</string>
+    <string name="browse_it">Browse it</string>
 </resources>

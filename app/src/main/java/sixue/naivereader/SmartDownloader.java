@@ -196,4 +196,9 @@ public class SmartDownloader {
             return null;
         }
     }
+
+    public String getChapterUrl(Chapter chapter) {
+        NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
+        return provider.getChapterUrl(book, chapter);
+    }
 }

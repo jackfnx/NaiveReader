@@ -172,6 +172,11 @@ public class PtwxProvider extends NetProvider {
         }
     }
 
+    @Override
+    public String getChapterUrl(Book book, Chapter chapter) {
+        return calcBookUrl(book.getSitePara()) + "/" + chapter.getId();
+    }
+
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
         return bookSavePath + "/" + chapter.getId().replace(".html", ".txt");
     }

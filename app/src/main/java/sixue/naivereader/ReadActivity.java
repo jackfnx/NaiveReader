@@ -4,11 +4,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,11 +42,14 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     private SmartDownloader smartDownloader;
     private List<Integer> localChapterNodes;
     private String text;
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
+
+        actionBar = getSupportActionBar();
 
         book = BookLoader.getInstance().getBook(0);
         chapter = emptyChapter;
@@ -217,6 +227,45 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        actionBar.setDisplayShowTitleEnabled(false);
+        int color = ContextCompat.getColor(this, R.color.colorPrimary);
+        int transparentColor = Color.argb(0x99, Color.red(color), Color.green(color), Color.blue(color));
+        actionBar.setBackgroundDrawable(new ColorDrawable(transparentColor));
+        actionBar.hide();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.read, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.content: {
+                Intent intent = new Intent(this, ContentActivity.class);
+                startActivity(intent);
+                actionBar.hide();
+                return true;
+            }
+            case R.id.browse_it: {
+                String url = smartDownloader.getChapterUrl(chapter);
+                Intent intent = new Intent("android.intent.action.VIEW");
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+                actionBar.hide();
+                return true;
+            }
+            default:
+                break;
+        }
+        return onOptionsItemSelected(menuItem);
+    }
+
+    @Override
     public void onDestroy() {
         unregisterReceiver(receiver);
         unregisterReceiver(batteryReceiver);
@@ -237,7 +286,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
         //Log.i(getClass().toString(), "onSingleTapUp");
-
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int widthPixels = metrics.widthPixels;
@@ -247,11 +295,12 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         Log.d(getClass().toString(), "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
 
         if ((x < (widthPixels / 3)) && (y < (heightPixels / 2))) {
+            actionBar.hide();
             readerView.turnPage(-1);
         } else if ((x > (widthPixels / 3) && (x < widthPixels * 2 / 3)) && (y < (heightPixels / 2))) {
-            Intent intent = new Intent(this, ContentActivity.class);
-            startActivity(intent);
+            actionBar.show();
         } else {
+            actionBar.hide();
             readerView.turnPage(1);
         }
         return true;
@@ -266,6 +315,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public void onLongPress(MotionEvent motionEvent) {
         //Log.i(getClass().toString(), "onLongPress");
+        actionBar.show();
     }
 
     @Override
@@ -274,17 +324,19 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         Log.d(getClass().toString(), "Fling:vX=" + vX + ",vY=" + vY);
         if (vY < 2000 && vY > -2000) {
             if (vX > 0) {
+                actionBar.hide();
                 readerView.turnPage(-1);
             } else {
+                actionBar.hide();
                 readerView.turnPage(1);
             }
-        } else {
-            if (vX < 2000 && vX > -2000) {
-                if (vY < 0) {
-                    Intent intent = new Intent(this, ContentActivity.class);
-                    startActivity(intent);
-                }
-            }
+//        } else {
+//            if (vX < 2000 && vX > -2000) {
+//                if (vY < 0) {
+//                    Intent intent = new Intent(this, ContentActivity.class);
+//                    startActivity(intent);
+//                }
+//            }
         }
         return true;
     }

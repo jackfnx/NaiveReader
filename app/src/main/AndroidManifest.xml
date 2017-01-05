@@ -20,7 +20,7 @@
         </activity>
         <activity
             android:name="sixue.naivereader.ReadActivity"
-            android:theme="@style/AppTheme.NoTitleBar" />
+            android:theme="@style/AppTheme.Overlay" />
         <activity android:name="sixue.naivereader.ContentActivity" />
         <activity
             android:name="sixue.naivereader.AddActivity"

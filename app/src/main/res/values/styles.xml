@@ -9,6 +9,10 @@
         <item name="textAllCaps">false</item>
     </style>
 
+    <style name="AppTheme.Overlay" parent="AppTheme">
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
     <style name="AppTheme.NoTitleBar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here.-->
         <item name="colorPrimary">@color/colorPrimary</item>

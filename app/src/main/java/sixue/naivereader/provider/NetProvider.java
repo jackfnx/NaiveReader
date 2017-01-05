@@ -27,4 +27,6 @@ public abstract class NetProvider {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public abstract String getChapterUrl(Book book, Chapter chapter);
 }

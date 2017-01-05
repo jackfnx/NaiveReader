@@ -161,6 +161,11 @@ public class WlzwProvider extends NetProvider {
         }
     }
 
+    @Override
+    public String getChapterUrl(Book book, Chapter chapter) {
+        return "http://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId();
+    }
+
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
         return bookSavePath + "/" + chapter.getId().replace(".html", ".txt");
     }
