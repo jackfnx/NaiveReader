@@ -302,22 +302,24 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
         //Log.i(getClass().toString(), "onSingleTapUp");
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int widthPixels = metrics.widthPixels;
-        int heightPixels = metrics.heightPixels;
-        float x = motionEvent.getRawX();
-        float y = motionEvent.getRawY();
-        Log.d(getClass().toString(), "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
-
-        if ((x < (widthPixels / 3)) && (y < (heightPixels / 2))) {
+        if (actionBar.isShowing()) {
             actionBar.hide();
-            readerView.turnPage(-1);
-        } else if ((x > (widthPixels / 3) && (x < widthPixels * 2 / 3)) && (y < (heightPixels / 2))) {
-            actionBar.show();
         } else {
-            actionBar.hide();
-            readerView.turnPage(1);
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int widthPixels = metrics.widthPixels;
+            int heightPixels = metrics.heightPixels;
+            float x = motionEvent.getRawX();
+            float y = motionEvent.getRawY();
+            Log.d(getClass().toString(), "Display:width=" + widthPixels + ",height=" + heightPixels + "; Touch:x=" + x + ",y=" + y);
+
+            if ((x < (widthPixels / 3)) && (y < (heightPixels / 2))) {
+                readerView.turnPage(-1);
+            } else if ((x > (widthPixels / 3) && (x < widthPixels * 2 / 3)) && (y < (heightPixels / 2))) {
+                actionBar.show();
+            } else {
+                readerView.turnPage(1);
+            }
         }
         return true;
     }
