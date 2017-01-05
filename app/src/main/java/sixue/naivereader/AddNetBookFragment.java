@@ -84,7 +84,7 @@ public class AddNetBookFragment extends Fragment {
                 }
                 title.setText(book.getTitle());
                 author.setText(book.getAuthor());
-                source.setText(getString(R.string.source, book.getSources().size()));
+                source.setText(getString(R.string.sources, book.getSources().size()));
                 return view;
             }
         };

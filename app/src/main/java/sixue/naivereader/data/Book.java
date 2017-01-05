@@ -20,6 +20,7 @@ public class Book {
     private int currentPosition;
     private int wordCount;
     private String coverSavePath;
+    private boolean end;
 
     public Book() {
         id = "";
@@ -30,6 +31,7 @@ public class Book {
         chapterList = new ArrayList<>();
         sources = new ArrayList<>();
         coverSavePath = "";
+        end = false;
     }
 
     public String getId() {
@@ -134,6 +136,14 @@ public class Book {
 
     public void setCoverSavePath(String coverSavePath) {
         this.coverSavePath = coverSavePath;
+    }
+
+    public boolean isEnd() {
+        return end;
+    }
+
+    public void setEnd(boolean end) {
+        this.end = end;
     }
 
     public String toString() {

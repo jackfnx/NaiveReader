@@ -2,6 +2,7 @@ package sixue.naivereader;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,16 +19,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Source;
 
 public class BookshelfActivity extends AppCompatActivity {
 
@@ -105,7 +112,7 @@ public class BookshelfActivity extends AppCompatActivity {
             }
         });
 
-        receiver = new BroadcastReceiver(){
+        receiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -131,7 +138,9 @@ public class BookshelfActivity extends AppCompatActivity {
                     sendBroadcast(intent);
                 }
 
-                downloader.startDownloadContent();
+                if (!book.isEnd()) {
+                    downloader.startDownloadContent();
+                }
 
                 if (!downloader.coverIsDownloaded()) {
                     downloader.startDownloadContent();
@@ -180,8 +189,13 @@ public class BookshelfActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.menu_edit:
-                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                return true;
+                if (editList.size() == 1) {
+                    editItem(editList.get(0));
+                    editList.clear();
+                    setEditMode(false);
+                    return true;
+                }
+                break;
             case R.id.menu_settings:
                 Intent intent = new Intent(this, NetProviderManagerActivity.class);
                 startActivity(intent);
@@ -190,6 +204,78 @@ public class BookshelfActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    private void editItem(final Book book) {
+        if (book.isLocal()) {
+            View v = getLayoutInflater().inflate(R.layout.edit_dialog_local, null);
+
+            final EditText title = (EditText) v.findViewById(R.id.title);
+            title.setText(book.getTitle());
+            title.clearFocus();
+
+            final EditText author = (EditText) v.findViewById(R.id.author);
+            author.setText(book.getAuthor());
+            author.clearFocus();
+
+            EditText localPath = (EditText) v.findViewById(R.id.local_path);
+            localPath.setHint(book.getLocalPath());
+            localPath.clearFocus();
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Local book")
+                    .setView(v)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            book.setTitle(title.getText().toString());
+                            book.setAuthor(author.getText().toString());
+                            BookLoader.getInstance().save();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else {
+            View v = getLayoutInflater().inflate(R.layout.edit_dialog_net, null);
+
+            final EditText title = (EditText) v.findViewById(R.id.title);
+            title.setText(book.getTitle());
+            title.clearFocus();
+
+            final EditText author = (EditText) v.findViewById(R.id.author);
+            author.setText(book.getAuthor());
+            author.clearFocus();
+
+            Spinner sources = (Spinner) v.findViewById(R.id.sources);
+            String[] sourceNames = Utils.convert(book.getSources(), new Utils.Func<Source>() {
+                @Override
+                public String exec(Source source) {
+                    return source.getId();
+                }
+            });
+            SpinnerAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sourceNames);
+            sources.setAdapter(adapter);
+            sources.clearFocus();
+
+            final CheckBox end = (CheckBox) v.findViewById(R.id.end);
+            end.setChecked(book.isEnd());
+            end.clearFocus();
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Net book")
+                    .setView(v)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            book.setTitle(title.getText().toString());
+                            book.setAuthor(author.getText().toString());
+                            book.setEnd(end.isChecked());
+                            BookLoader.getInstance().save();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        }
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class Utils {
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
@@ -138,5 +139,17 @@ public class Utils {
             final int scrRectTop = (srcHeight - srcRectHeight) / 2;
             return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
         }
+    }
+
+    public static <T> String[] convert(List<T> list, Func<T> func) {
+        String[] arr = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = func.exec(list.get(i));
+        }
+        return arr;
+    }
+
+    public interface Func<T> {
+        String exec(T t);
     }
 }
