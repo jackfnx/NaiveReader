@@ -23,10 +23,8 @@
             android:layout_height="match_parent"
             android:columnWidth="90dp"
             android:gravity="center"
-            android:horizontalSpacing="10dp"
             android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="10dp" />
+            android:stretchMode="columnWidth" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton

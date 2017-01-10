@@ -370,6 +370,7 @@ public class BookshelfActivity extends AppCompatActivity {
             } else {
                 selectIcon.setVisibility(View.VISIBLE);
             }
+            selectIcon.setSelected(editList.contains(book));
 
             ImageView cover = (ImageView) view.findViewById(R.id.cover);
             SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
