@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,13 +76,31 @@ public class ContentActivity extends AppCompatActivity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
+        filter.addAction(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+        filter.addAction(Utils.ACTION_DOWNLOAD_ALL_CHAPTER_FINISH);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
-                    srl.setRefreshing(false);
-                    listView.setSelection(book.getChapterList().size() - book.getCurrentChapterIndex() - 1);
-                    myAdapter.notifyDataSetChanged();
+                switch (intent.getAction()) {
+                    case Utils.ACTION_DOWNLOAD_CONTENT_FINISH:
+                        if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                            srl.setRefreshing(false);
+                            listView.setSelection(book.getChapterList().size() - book.getCurrentChapterIndex() - 1);
+                            myAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                    case Utils.ACTION_DOWNLOAD_CHAPTER_FINISH:
+                        if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                            myAdapter.notifyDataSetChanged();
+                        }
+                        break;
+                    case Utils.ACTION_DOWNLOAD_ALL_CHAPTER_FINISH:
+                        if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
+                            Toast.makeText(ContentActivity.this, R.string.msg_batch_download_finish, Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         };
@@ -177,6 +196,7 @@ public class ContentActivity extends AppCompatActivity {
                 int sumEnd = sumStart + MAX_SUMMARY_LENGTH > length ? length : sumStart + MAX_SUMMARY_LENGTH;
                 String sum = localText.substring(sumStart, sumEnd).trim().replace('\n', ' ');
                 summary.setText(sum);
+                summary.setGravity(Gravity.START);
 
             } else {
                 int index = book.getChapterList().size() - i - 1;
@@ -186,7 +206,12 @@ public class ContentActivity extends AppCompatActivity {
                     s += "*";
                 }
                 title.setText(s);
-                summary.setText("");
+                if (downloader.isDownloaded(chapter)) {
+                    summary.setText(R.string.download);
+                } else {
+                    summary.setText("");
+                }
+                summary.setGravity(Gravity.END);
             }
             return view;
         }
@@ -229,6 +254,11 @@ public class ContentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.menu_batch_download) {
+            downloader.startDownloadAllChapter();
+            return true;
+        }
+
         int i = menuItem.getItemId() - Menu.FIRST;
         if (i < providerIds.size()) {
             String providerId = providerIds.get(i);
@@ -246,6 +276,7 @@ public class ContentActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
             return true;
         }
+
         return false;
     }
 }

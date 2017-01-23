@@ -31,4 +31,7 @@
     <string name="content">Content</string>
     <string name="re_download">Re-download</string>
     <string name="browse_it">Browse it</string>
+    <string name="menu_batch_download">Batch download</string>
+    <string name="msg_batch_download_finish">Batch download finish</string>
+    <string name="download"><![CDATA[<Download>]]></string>
 </resources>

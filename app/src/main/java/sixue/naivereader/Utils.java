@@ -25,6 +25,7 @@ import java.util.List;
 public class Utils {
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
+    public static final String ACTION_DOWNLOAD_ALL_CHAPTER_FINISH = "ACTION_DOWNLOAD_ALL_CHAPTER_FINISH";
     public static final String ACTION_DOWNLOAD_COVER_FINISH = "ACTION_DOWNLOAD_COVER_FINISH";
     public static final String INTENT_PARA_BOOK_ID = "INTENT_PARA_BOOK_ID";
     public static final String INTENT_PARA_CHAPTER_ID = "INTENT_PARA_CHAPTER_ID";

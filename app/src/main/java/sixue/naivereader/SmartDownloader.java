@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -196,5 +198,26 @@ public class SmartDownloader {
     public String getChapterUrl(Chapter chapter) {
         NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
         return provider.getChapterUrl(book, chapter);
+    }
+
+    public void startDownloadAllChapter() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                downloadAllChapter();
+            }
+        }).start();
+    }
+
+    private void downloadAllChapter() {
+        for (Chapter chapter : book.getChapterList()) {
+            if (!isDownloaded(chapter)) {
+                downloadChapter(chapter);
+            }
+        }
+
+        Intent intent = new Intent(Utils.ACTION_DOWNLOAD_ALL_CHAPTER_FINISH);
+        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+        context.sendBroadcast(intent);
     }
 }
