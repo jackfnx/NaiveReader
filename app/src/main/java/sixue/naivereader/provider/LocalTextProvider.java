@@ -51,14 +51,20 @@ public class LocalTextProvider {
         }
 
         String[] patterns = new String[]{
-                "\\b第[一二三四五六七八九十百千零]+[章节篇集卷]\\b",
+                "\\b第[\\d\\uFF10-\\uFF19一二三四五六七八九十百千零]+[部章节篇集卷]\\b",
                 "\\b[\\d\\uFF10-\\uFF19]+\\b"
         };
         for (String ps : patterns) {
             Pattern pattern = Pattern.compile(ps);
             Matcher matcher = pattern.matcher(text);
+            int last = -1;
             while (matcher.find()) {
-                chapterNodes.add(matcher.start());
+                int i = matcher.start();
+                if (last >= 0 && !text.substring(last, i).contains("\n")) {
+                    continue;
+                }
+                last = i;
+                chapterNodes.add(i);
             }
             if (chapterNodes.size() != 0) {
                 break;
