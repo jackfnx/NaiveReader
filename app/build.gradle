@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "sixue.naivereader"
@@ -41,5 +41,6 @@ dependencies {
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
     compile 'org.jsoup:jsoup:1.10.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }

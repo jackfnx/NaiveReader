@@ -35,14 +35,16 @@ public class AddActivity extends AppCompatActivity {
                 return new AddNetBookFragment();
             } else if (position == 1) {
                 return new AddLocalFlatFragment();
-            } else {
+            } else if (position == 2) {
                 return new AddLocalTreeFragment();
+            } else {
+                return new AddBrowserFragment();
             }
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -51,8 +53,10 @@ public class AddActivity extends AppCompatActivity {
                 return getString(R.string.tab_add_net_book);
             } else if (position == 1) {
                 return getString(R.string.tab_import_txt_flat);
-            } else {
+            } else if (position == 2) {
                 return getString(R.string.tab_import_txt_tree);
+            } else {
+                return getString(R.string.tab_add_browser_book);
             }
         }
     }

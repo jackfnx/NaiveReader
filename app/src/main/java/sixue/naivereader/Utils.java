@@ -33,6 +33,8 @@ public class Utils {
     public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
     public static final String INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX";
     private static final String TAG = "Utils";
+    public static final String ACTION_JYL_AUTHORS_DOWNLOAD_FINISH = "ACTION_JYL_AUTHORS_DOWNLOAD_FINISH";
+    public static final String ACTION_JYL_AUTHOR_BOOKS_DOWNLOAD_FINISH = "ACTION_JYL_AUTHOR_BOOKS_DOWNLOAD_FINISH";
 
     public static String readText(String s) {
         File file = new File(s);

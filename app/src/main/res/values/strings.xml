@@ -34,4 +34,7 @@
     <string name="menu_batch_download">Batch download</string>
     <string name="msg_batch_download_finish">Batch download finish</string>
     <string name="download"><![CDATA[<Download>]]></string>
+    <string name="browse_sis">SexInSex</string>
+    <string name="browse_oldrain">Old Rain</string>
+    <string name="tab_add_browser_book">Add book by Browser</string>
 </resources>
