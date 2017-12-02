@@ -37,7 +37,7 @@ public class PtwxProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "http://www.piaotian.net/modules/article/search.php?searchkey=" + key;
+            String url = "http://www.piaotian.com/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
@@ -187,12 +187,12 @@ public class PtwxProvider extends NetProvider {
 
     private String calcBookUrl(String para) {
         String prefix = calcPrefix(para);
-        return String.format("http://www.piaotian.net/html/%s/%s", prefix, para);
+        return String.format("http://www.piaotian.com/html/%s/%s", prefix, para);
     }
 
     private String calcCoverUrl(String para) {
         String prefix = calcPrefix(para);
-        return String.format("http://www.piaotian.net/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        return String.format("http://www.piaotian.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
