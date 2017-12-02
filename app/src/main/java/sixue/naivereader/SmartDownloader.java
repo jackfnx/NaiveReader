@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -99,12 +97,8 @@ public class SmartDownloader {
     }
 
     private String calcBookSavePath(Book book) {
-        File fileDir = context.getExternalFilesDir("books");
-        if (fileDir == null) {
-            return "";
-        }
-
-        return fileDir.getAbsolutePath() + "/" + book.getId() + "/" + book.getSiteId();
+        String saveRootPath = Utils.getSavePathRoot(context);
+        return saveRootPath + "/books/" + book.getId() + "/" + book.getSiteId();
     }
 
     public void startDownloadContent() {

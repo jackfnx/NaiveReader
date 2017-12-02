@@ -2,11 +2,13 @@ package sixue.naivereader;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -110,10 +112,10 @@ public class Utils {
     }
 
     static void verifyPermissions(Activity activity) {
-        int permission1 = ActivityCompat.checkSelfPermission(activity,
+        int permission = ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if (permission1 != PackageManager.PERMISSION_GRANTED) {
+        if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     1);
@@ -164,6 +166,11 @@ public class Utils {
             Log.i(TAG, "mkdir:" + dir + ", " + mk);
         }
 
+    }
+
+    public static String getSavePathRoot(Context context) {
+        String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
+        return sdcard + "/" + context.getPackageName();
     }
 
     public interface Func<T> {

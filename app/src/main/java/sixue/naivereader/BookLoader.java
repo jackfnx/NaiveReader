@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,8 @@ public class BookLoader {
     }
 
     public void reload(Context context) {
-        File saveRoot = context.getExternalFilesDir("books");
-        if (saveRoot == null) {
-            return;
-        }
-
-        saveRootPath = saveRoot.getAbsolutePath();
-        String json = Utils.readText(saveRootPath + "/.DIR");
+        saveRootPath = Utils.getSavePathRoot(context);
+        String json = Utils.readText(saveRootPath + "/books/.DIR");
         if (json == null) {
             return;
         }
@@ -54,7 +48,7 @@ public class BookLoader {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(list);
-            Utils.writeText(json, saveRootPath + "/.DIR");
+            Utils.writeText(json, saveRootPath + "/books/.DIR");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

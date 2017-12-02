@@ -3,7 +3,6 @@ package sixue.naivereader.provider;
 import android.content.Context;
 import android.text.TextUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,12 +21,8 @@ public class NetProviderCollections {
     }
 
     private static void loadSettings(Context context) {
-        File saveRoot = context.getExternalFilesDir("settings");
-        if (saveRoot == null) {
-            return;
-        }
-
-        String disabledProviders = Utils.readText(saveRoot.getAbsolutePath() + "/.PROVIDERS");
+        String saveRootPath = Utils.getSavePathRoot(context);
+        String disabledProviders = Utils.readText(saveRootPath + "/.PROVIDERS");
         if (disabledProviders == null) {
             return;
         }
@@ -49,12 +44,8 @@ public class NetProviderCollections {
         }
         String s = TextUtils.join("\n", list);
 
-        File saveRoot = context.getExternalFilesDir("settings");
-        if (saveRoot == null) {
-            return;
-        }
-
-        Utils.writeText(s, saveRoot.getAbsolutePath() + "/.PROVIDERS");
+        String saveRootPath = Utils.getSavePathRoot(context);
+        Utils.writeText(s, saveRootPath + "/.PROVIDERS");
     }
 
     private static void initProviders() {

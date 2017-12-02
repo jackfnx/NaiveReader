@@ -35,6 +35,7 @@ public class AddLocalFlatFragment extends Fragment {
         sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
         excludes = new ArrayList<>();
         excludes.add(sdcard + "/Android/data");
+        excludes.add(sdcard + "/" + getContext().getPackageName());
 
         ListView lvFiles = (ListView) v.findViewById(R.id.lv_files);
         MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
