@@ -378,7 +378,8 @@ public class BookshelfActivity extends AppCompatActivity {
                 Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
                 cover.setImageBitmap(bm);
             } else {
-                cover.setImageBitmap(downloader.getNoCoverBitmap());
+                Bitmap bm = Utils.getAutoCover(BookshelfActivity.this, book.getTitle());
+                cover.setImageBitmap(bm);
             }
             return view;
         }

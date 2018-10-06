@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Environment;
@@ -18,10 +20,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Utils {
@@ -60,9 +67,6 @@ public class Utils {
             }
             is.close();
             return sb.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -168,6 +172,11 @@ public class Utils {
 
     }
 
+    public static boolean exists(String path) {
+        File file = new File(path);
+        return file.exists();
+    }
+
     public static String getSavePathRoot(Context context) {
         String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
         return sdcard + "/" + context.getPackageName();
@@ -190,6 +199,127 @@ public class Utils {
         }
         mk |= file.delete();
         Log.i(TAG, "deleteDirectory:" + file.toString() + ", " + mk);
+    }
+
+    private static Bitmap paintCover(Bitmap blank, String title) {
+        int MIN_TEXT_SIZE = 12;
+        int MAX_TEXT_SIZE = 40;
+        List<String> lines = explodeBySpecialChar(title);
+        String maxLine = Collections.max(lines, new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) { return s.length() - t1.length(); }
+        });
+        Canvas canvas = new Canvas(blank);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setDither(true);
+        paint.setFilterBitmap(true);
+        paint.setColor(Color.BLACK);
+        paint.setShadowLayer(1f, 0f, 1f, Color.LTGRAY);
+        for (int i = MIN_TEXT_SIZE; i < MAX_TEXT_SIZE; i++) {
+            paint.setTextSize(i);
+            if ((blank.getWidth() - paint.measureText(maxLine)) < 10) {
+                break;
+            }
+        }
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            Rect bounds = new Rect();
+            paint.getTextBounds(line, 0, line.length(), bounds);
+            int x = (blank.getWidth() - bounds.width()) / 2;
+            int y = (blank.getHeight() + bounds.height()) / 4 + i * bounds.height();
+            canvas.drawText(line, x, y, paint);
+        }
+        return  blank;
+    }
+
+    private static List<String> explodeBySpecialChar(String title) {
+        List<String> list = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        for (char c : title.toCharArray()) {
+            if (c >= '0' && c <= '9') {
+                sb.append(c);
+                continue;
+            }
+            if (c >= 'A' && c <= 'Z') {
+                sb.append(c);
+                continue;
+            }
+            if (c >= 'a' && c <= 'z') {
+                sb.append(c);
+                continue;
+            }
+            Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+            if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+                sb.append(c);
+                continue;
+            } else if (ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS) {
+                sb.append(c);
+                continue;
+            }
+            list.add(sb.toString());
+            sb = new StringBuilder();
+        }
+        if (sb.length() != 0)
+            list.add(sb.toString());
+        return list;
+    }
+
+    private static Bitmap getBlankCoverBitmap(Context context) {
+        try {
+            int WIDTH = 160;
+            int HEIGHT = 200;
+            InputStream is = context.getAssets().open("texture_paper.jpg");
+            Bitmap texture = BitmapFactory.decodeStream(is);
+            int x = (int)(Math.random() * (texture.getWidth() - WIDTH));
+            int y = (int)(Math.random() * (texture.getHeight() - HEIGHT));
+            Bitmap blank = Bitmap.createBitmap(texture, x, y, WIDTH, HEIGHT);
+            is.close();
+            return blank;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Bitmap getAutoCover(Context context, String title) {
+        String saveRoot = getSavePathRoot(context);
+        String autoCoverRoot = saveRoot + "/AutoCover/";
+        String autoCoverPath = autoCoverRoot + title + ".jpg";
+        if (exists(autoCoverPath)) {
+            return BitmapFactory.decodeFile(autoCoverPath);
+        } else {
+            Bitmap blank = getBlankCoverBitmap(context);
+            Bitmap cover = paintCover(blank, title);
+            try {
+                mkdir(autoCoverRoot);
+                OutputStream os = new FileOutputStream(autoCoverPath);
+                cover.compress(Bitmap.CompressFormat.JPEG, 80, os);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            return cover;
+        }
     }
 
     public interface Func<T> {

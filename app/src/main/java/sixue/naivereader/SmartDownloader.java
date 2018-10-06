@@ -177,18 +177,6 @@ public class SmartDownloader {
         return f.exists();
     }
 
-    Bitmap getNoCoverBitmap() {
-        try {
-            InputStream is = context.getAssets().open("NoCover.jpg");
-            Bitmap noCover = BitmapFactory.decodeStream(is);
-            is.close();
-            return noCover;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     String getChapterUrl(Chapter chapter) {
         NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
         return provider.getChapterUrl(book, chapter);

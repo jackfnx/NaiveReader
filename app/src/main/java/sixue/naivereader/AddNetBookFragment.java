@@ -81,7 +81,8 @@ public class AddNetBookFragment extends Fragment {
                     Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
                     cover.setImageBitmap(bm);
                 } else {
-                    cover.setImageBitmap(downloader.getNoCoverBitmap());
+                    Bitmap bm = Utils.getAutoCover(getContext(), book.getTitle());
+                    cover.setImageBitmap(bm);
                 }
                 title.setText(book.getTitle());
                 author.setText(book.getAuthor());
