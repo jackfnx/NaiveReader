@@ -33,4 +33,6 @@
     <string name="menu_batch_download">批量下载</string>
     <string name="msg_batch_download_finish">批量下载完成</string>
     <string name="download"><![CDATA[<已下载>]]></string>
+    <string name="clear_garbage">清理垃圾</string>
+    <string name="start">开始</string>
 </resources>

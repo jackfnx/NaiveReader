@@ -6,13 +6,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
 
-public class BookLoader {
+class BookLoader {
     private static BookLoader instance;
     private List<Book> list;
     private String saveRootPath;
@@ -21,14 +22,14 @@ public class BookLoader {
         list = new ArrayList<>();
     }
 
-    public static BookLoader getInstance() {
+    static BookLoader getInstance() {
         if (instance == null) {
             instance = new BookLoader();
         }
         return instance;
     }
 
-    public void reload(Context context) {
+    void reload(Context context) {
         saveRootPath = Utils.getSavePathRoot(context);
         String json = Utils.readText(saveRootPath + "/books/.DIR");
         if (json == null) {
@@ -44,7 +45,7 @@ public class BookLoader {
         }
     }
 
-    public void save() {
+    void save() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(list);
@@ -54,11 +55,11 @@ public class BookLoader {
         }
     }
 
-    public int getBookNum() {
+    int getBookNum() {
         return list.size();
     }
 
-    public Book getBook(int i) {
+    Book getBook(int i) {
         if (list.size() == 0) {
             return null;
         }
@@ -70,19 +71,19 @@ public class BookLoader {
         return list.get(i);
     }
 
-    public void addBook(Book book) {
+    void addBook(Book book) {
         list.add(0, book);
 
         save();
     }
 
-    public void deleteBooks(List<Book> deleteList) {
+    void deleteBooks(List<Book> deleteList) {
         list.removeAll(deleteList);
 
         save();
     }
 
-    public Book findBook(String id) {
+    Book findBook(String id) {
         for (Book book : list) {
             if (book.getId().equals(id)) {
                 return book;
@@ -91,7 +92,7 @@ public class BookLoader {
         return null;
     }
 
-    public void bookBubble(int i) {
+    void bookBubble(int i) {
         if (list.size() == 0) {
             return;
         }
@@ -108,12 +109,30 @@ public class BookLoader {
         save();
     }
 
-    public void bookBubble(Book book) {
+    void bookBubble(Book book) {
         if (list.contains(book)) {
             list.remove(book);
             list.add(0, book);
         }
 
         save();
+    }
+
+    void clearGarbage() {
+        File f = new File(saveRootPath + "/books/");
+        File[] files = f.listFiles();
+        if (files == null)
+        {
+            return;
+        }
+        List<String> favorites = new ArrayList<>();
+        for (Book book : list) {
+            favorites.add(book.getId());
+        }
+        for (File file : files) {
+            if (file.isDirectory() && !favorites.contains(file.getName())) {
+                Utils.deleteDirectory(file);
+            }
+        }
     }
 }

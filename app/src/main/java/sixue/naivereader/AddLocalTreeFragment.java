@@ -3,6 +3,7 @@ package sixue.naivereader;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ public class AddLocalTreeFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_local_tree, container, false);
@@ -63,7 +64,7 @@ public class AddLocalTreeFragment extends Fragment {
     private class MyAdapter extends BaseAdapter {
         private File[] children;
 
-        public MyAdapter(File root) {
+        MyAdapter(File root) {
             setCurrentDir(root);
         }
 
@@ -95,7 +96,7 @@ public class AddLocalTreeFragment extends Fragment {
             return view;
         }
 
-        public void setCurrentDir(File currentDir) {
+        void setCurrentDir(File currentDir) {
             if (!currentDir.isDirectory()) {
                 this.children = new File[]{};
             } else {

@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ public class NetProviderManagerActivity extends AppCompatActivity {
 
         netProviders = new ArrayList<>(NetProviderCollections.getProviders(this));
 
-        ListView listView = (ListView) findViewById(R.id.list_net_providers);
+        ListView listView = findViewById(R.id.list_net_providers);
         listView.setAdapter(new BaseAdapter() {
             @Override
             public int getCount() {
@@ -46,12 +48,11 @@ public class NetProviderManagerActivity extends AppCompatActivity {
 
             @Override
             public View getView(int i, View view, ViewGroup viewGroup) {
-                if (view == null) {
+                if (view == null)
                     view = LayoutInflater.from(NetProviderManagerActivity.this).inflate(R.layout.listviewitem_provider, viewGroup, false);
-                }
 
-                final TextView name = (TextView) view.findViewById(R.id.name);
-                final Switch sw = (Switch) view.findViewById(R.id.sw);
+                final TextView name = view.findViewById(R.id.name);
+                final Switch sw = view.findViewById(R.id.sw);
 
                 final NetProvider netProvider = netProviders.get(i);
                 name.setText(netProvider.getProviderName());
@@ -66,6 +67,15 @@ public class NetProviderManagerActivity extends AppCompatActivity {
                 sw.setChecked(netProvider.isActive());
 
                 return view;
+            }
+        });
+
+        Button cg = findViewById(R.id.garbage_button);
+        cg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BookLoader.getInstance().clearGarbage();
+                Toast.makeText(NetProviderManagerActivity.this, "[GARBAGE] clear.", Toast.LENGTH_SHORT).show();
             }
         });
     }

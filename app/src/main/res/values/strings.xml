@@ -34,4 +34,6 @@
     <string name="menu_batch_download">Batch download</string>
     <string name="msg_batch_download_finish">Batch download finish</string>
     <string name="download"><![CDATA[<Download>]]></string>
+    <string name="clear_garbage">Clear Garbage</string>
+    <string name="start">Start</string>
 </resources>

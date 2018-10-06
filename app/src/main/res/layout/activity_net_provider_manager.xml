@@ -10,9 +10,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="sixue.naivereader.NetProviderManagerActivity">
 
+    <LinearLayout
+        android:id="@+id/_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/clear_garbage"/>
+        <Button
+            android:id="@+id/garbage_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/start"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/_sep_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/_footer"
+        android:background="@color/colorAccent"/>
+
     <ListView
         android:id="@+id/list_net_providers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:layout_above="@+id/_sep_line"/>
 </RelativeLayout>

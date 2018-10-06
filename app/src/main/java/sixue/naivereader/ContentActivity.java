@@ -51,9 +51,9 @@ public class ContentActivity extends AppCompatActivity {
         downloader = new SmartDownloader(this, book);
         localChapterNodes = new ArrayList<>();
 
-        final ListView listView = (ListView) findViewById(R.id.content);
+        final ListView listView = findViewById(R.id.content);
         final MyAdapter myAdapter = new MyAdapter(book);
-        final SwipeRefreshLayout srl = (SwipeRefreshLayout) findViewById(R.id.srl);
+        final SwipeRefreshLayout srl = findViewById(R.id.srl);
 
         listView.setAdapter(myAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -148,7 +148,7 @@ public class ContentActivity extends AppCompatActivity {
 
         private final Book book;
 
-        public MyAdapter(Book book) {
+        MyAdapter(Book book) {
             this.book = book;
         }
 
@@ -173,8 +173,8 @@ public class ContentActivity extends AppCompatActivity {
                 view = LayoutInflater.from(ContentActivity.this).inflate(R.layout.listviewitem_content, viewGroup, false);
                 view.setPadding(20, 20, 20, 20);
             }
-            TextView title = (TextView) view.findViewById(R.id.title);
-            TextView summary = (TextView) view.findViewById(R.id.summary);
+            TextView title = view.findViewById(R.id.title);
+            TextView summary = view.findViewById(R.id.summary);
             if (book.isLocal()) {
                 int node = localChapterNodes.get(i);
                 int length = localText.length();

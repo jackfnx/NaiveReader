@@ -56,9 +56,9 @@ public class BookshelfActivity extends AppCompatActivity {
         editList = new ArrayList<>();
         actionBar = getSupportActionBar();
 
-        GridView gv = (GridView) findViewById(R.id.gridview_books);
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
-        final SwipeRefreshLayout srl = (SwipeRefreshLayout) findViewById(R.id.srl);
+        GridView gv = findViewById(R.id.gridview_books);
+        final FloatingActionButton fab = findViewById(R.id.fab_add);
+        final SwipeRefreshLayout srl = findViewById(R.id.srl);
 
         myAdapter = new MyAdapter();
         gv.setAdapter(myAdapter);
@@ -210,15 +210,15 @@ public class BookshelfActivity extends AppCompatActivity {
         if (book.isLocal()) {
             View v = getLayoutInflater().inflate(R.layout.edit_dialog_local, null);
 
-            final EditText title = (EditText) v.findViewById(R.id.title);
+            final EditText title = v.findViewById(R.id.title);
             title.setText(book.getTitle());
             title.clearFocus();
 
-            final EditText author = (EditText) v.findViewById(R.id.author);
+            final EditText author = v.findViewById(R.id.author);
             author.setText(book.getAuthor());
             author.clearFocus();
 
-            EditText localPath = (EditText) v.findViewById(R.id.local_path);
+            EditText localPath = v.findViewById(R.id.local_path);
             localPath.setHint(book.getLocalPath());
             localPath.clearFocus();
 
@@ -238,15 +238,15 @@ public class BookshelfActivity extends AppCompatActivity {
         } else {
             View v = getLayoutInflater().inflate(R.layout.edit_dialog_net, null);
 
-            final EditText title = (EditText) v.findViewById(R.id.title);
+            final EditText title = v.findViewById(R.id.title);
             title.setText(book.getTitle());
             title.clearFocus();
 
-            final EditText author = (EditText) v.findViewById(R.id.author);
+            final EditText author = v.findViewById(R.id.author);
             author.setText(book.getAuthor());
             author.clearFocus();
 
-            Spinner sources = (Spinner) v.findViewById(R.id.sources);
+            Spinner sources = v.findViewById(R.id.sources);
             String[] sourceNames = Utils.convert(book.getSources(), new Utils.Func<Source>() {
                 @Override
                 public String exec(Source source) {
@@ -257,7 +257,7 @@ public class BookshelfActivity extends AppCompatActivity {
             sources.setAdapter(adapter);
             sources.clearFocus();
 
-            final CheckBox end = (CheckBox) v.findViewById(R.id.end);
+            final CheckBox end = v.findViewById(R.id.end);
             end.setChecked(book.isEnd());
             end.clearFocus();
 
@@ -314,7 +314,7 @@ public class BookshelfActivity extends AppCompatActivity {
 
     private class MyAdapter extends BaseAdapter {
 
-        public MyAdapter() {
+        MyAdapter() {
 
         }
 
@@ -340,10 +340,10 @@ public class BookshelfActivity extends AppCompatActivity {
             }
             Book book = BookLoader.getInstance().getBook(i);
 
-            TextView title = (TextView) view.findViewById(R.id.title);
+            TextView title = view.findViewById(R.id.title);
             title.setText(book.getTitle());
 
-            TextView progress = (TextView) view.findViewById(R.id.progress);
+            TextView progress = view.findViewById(R.id.progress);
             if (book.isLocal()) {
                 int cp = book.getCurrentPosition();
                 int wc = book.getWordCount();
@@ -372,7 +372,7 @@ public class BookshelfActivity extends AppCompatActivity {
             }
             selectIcon.setSelected(editList.contains(book));
 
-            ImageView cover = (ImageView) view.findViewById(R.id.cover);
+            ImageView cover = view.findViewById(R.id.cover);
             SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
             if (downloader.coverIsDownloaded()) {
                 Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());

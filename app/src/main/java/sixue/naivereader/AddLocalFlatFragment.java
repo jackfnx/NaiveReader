@@ -2,6 +2,7 @@ package sixue.naivereader;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ public class AddLocalFlatFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_local_flat, container, false);
 
@@ -68,7 +69,7 @@ public class AddLocalFlatFragment extends Fragment {
     private class MyAdapter extends BaseAdapter {
         private List<File> files;
 
-        public MyAdapter(File root) {
+        MyAdapter(File root) {
             this.files = new ArrayList<>();
             running = true;
             startLoadFiles(root);

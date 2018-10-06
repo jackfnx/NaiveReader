@@ -34,7 +34,7 @@ public class SmartDownloader {
         this.book = book;
     }
 
-    public boolean reloadContent() {
+    boolean reloadContent() {
         if (book.isLocal()) {
             return true;
         }
@@ -80,7 +80,7 @@ public class SmartDownloader {
         }
     }
 
-    public boolean isDownloaded(Chapter chapter) {
+    boolean isDownloaded(Chapter chapter) {
         File file = new File(chapter.getSavePath());
         return file.exists();
     }
@@ -101,7 +101,7 @@ public class SmartDownloader {
         return saveRootPath + "/books/" + book.getId() + "/" + book.getSiteId();
     }
 
-    public void startDownloadContent() {
+    void startDownloadContent() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -110,7 +110,7 @@ public class SmartDownloader {
         }).start();
     }
 
-    public void startDownloadChapter(final Chapter chapter) {
+    void startDownloadChapter(final Chapter chapter) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -167,7 +167,7 @@ public class SmartDownloader {
         context.sendBroadcast(intent);
     }
 
-    public boolean coverIsDownloaded() {
+    boolean coverIsDownloaded() {
         String coverSavePath = book.getCoverSavePath();
         if (coverSavePath.length() == 0) {
             return false;
@@ -177,7 +177,7 @@ public class SmartDownloader {
         return f.exists();
     }
 
-    public Bitmap getNoCoverBitmap() {
+    Bitmap getNoCoverBitmap() {
         try {
             InputStream is = context.getAssets().open("NoCover.jpg");
             Bitmap noCover = BitmapFactory.decodeStream(is);
@@ -189,12 +189,12 @@ public class SmartDownloader {
         }
     }
 
-    public String getChapterUrl(Chapter chapter) {
+    String getChapterUrl(Chapter chapter) {
         NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
         return provider.getChapterUrl(book, chapter);
     }
 
-    public void startDownloadAllChapter() {
+    void startDownloadAllChapter() {
         new Thread(new Runnable() {
             @Override
             public void run() {

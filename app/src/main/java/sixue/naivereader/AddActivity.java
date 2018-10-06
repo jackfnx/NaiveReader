@@ -16,16 +16,16 @@ public class AddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
 
         MyFragmentPagerAdapter myAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         viewPager.setAdapter(myAdapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
-        public MyFragmentPagerAdapter(FragmentManager fm) {
+        MyFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

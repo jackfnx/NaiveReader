@@ -173,6 +173,25 @@ public class Utils {
         return sdcard + "/" + context.getPackageName();
     }
 
+    public static void deleteDirectory(File file) {
+        boolean mk = false;
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files == null) {
+                return;
+            }
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    mk |= f.delete();
+                }
+            }
+        }
+        mk |= file.delete();
+        Log.i(TAG, "deleteDirectory:" + file.toString() + ", " + mk);
+    }
+
     public interface Func<T> {
         String exec(T t);
     }

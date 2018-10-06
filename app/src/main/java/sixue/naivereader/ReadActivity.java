@@ -59,13 +59,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         text = "";
         localChapterNodes = new ArrayList<>();
 
-        readerView = (ReaderView) findViewById(R.id.text_area);
-        ImageView maskView = (ImageView) findViewById(R.id.page_mask);
+        readerView = findViewById(R.id.text_area);
+        ImageView maskView = findViewById(R.id.page_mask);
         View loading = findViewById(R.id.loading_mask);
-        final TextView title = (TextView) findViewById(R.id.title);
-        final TextView subtitle = (TextView) findViewById(R.id.subtitle);
-        final TextView progress = (TextView) findViewById(R.id.progress);
-        final TextView battery = (TextView) findViewById(R.id.battery);
+        final TextView title = findViewById(R.id.title);
+        final TextView subtitle = findViewById(R.id.subtitle);
+        final TextView progress = findViewById(R.id.progress);
+        final TextView battery = findViewById(R.id.battery);
 
         detector = new GestureDetector(this, this);
         detector.setIsLongpressEnabled(true);
