@@ -18,14 +18,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Accepts URIs that begin with "java-lang-programming://android-app-google-plus-demo" -->
-                <data
-                    android:host="java-lang-programming"
-                    android:scheme="android-app-google-plus-demo" />
             </intent-filter>
         </activity>
         <activity
