@@ -36,4 +36,7 @@
     <string name="download"><![CDATA[<Download>]]></string>
     <string name="clear_garbage">Clear Garbage</string>
     <string name="start">Start</string>
+    <string name="server_offline">Server offline</string>
+    <string name="server_not_found">Server not found.</string>
+    <string name="tab_import_packet">Import packet</string>
 </resources>
