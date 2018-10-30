@@ -45,6 +45,14 @@ public class Packet {
         this.summary = summary;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public List<Chapter> getChapterList() {
         return chapterList;
     }
@@ -58,6 +66,7 @@ public class Packet {
     private Boolean simple;
     private String key;
     private String summary;
+    private long timestamp;
     @JsonIgnore
     private List<Chapter> chapterList;
 }
