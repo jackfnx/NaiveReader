@@ -1,7 +1,7 @@
 package sixue.naivereader;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,19 +16,17 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import sixue.naivereader.data.Packet;
 
@@ -37,11 +35,12 @@ public class AddPacketFragment extends Fragment {
 
     private static final int UDP_PORT = 4999;
     private static final int HTTP_PORT = 5000;
-    private static final String CODES_WORD = "Naive Reader Pack Server RUNNING";
+    private static final String CODES_WORD = "Naive Reader Pack Server RUNNING.";
     private static final String TAG = "AddPacketFragment";
     private ListView listView;
     private View loadingProgress;
     private View offline;
+    private MyAdapter adapter;
 
     public AddPacketFragment() {
         // Required empty public constructor
@@ -53,31 +52,33 @@ public class AddPacketFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_packet, container, false);
         loadingProgress = v.findViewById(R.id.loading);
         offline = v.findViewById(R.id.offline);
         listView = v.findViewById(R.id.list_packets);
-        MyAdapter adapter = new MyAdapter();
+        adapter = new MyAdapter();
         listView.setAdapter(adapter);
-        adapter.getPackets();
         return v;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onResume() {
+        super.onResume();
+        adapter.startLoading();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onPause() {
+        super.onPause();
+        adapter.stopLoading();
     }
 
     private class MyAdapter extends BaseAdapter {
         private List<Packet> packets;
+        private Thread clientThread;
 
         MyAdapter() {
             this.packets = new ArrayList<>();
@@ -115,37 +116,38 @@ public class AddPacketFragment extends Fragment {
             return convertView;
         }
 
-        void getPackets() {
+        void startLoading() {
             loadingProgress.setVisibility(View.VISIBLE);
             listView.setVisibility(View.INVISIBLE);
             offline.setVisibility(View.INVISIBLE);
-            new Thread(new Runnable() {
+            clientThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        DatagramSocket socket = new DatagramSocket(UDP_PORT);
+                    try (DatagramSocket socket = new DatagramSocket(UDP_PORT)) {
+                        socket.setReuseAddress(true);
                         socket.setSoTimeout(3000);
                         String serverAddress = "";
                         for (int i = 0; i < 3; i++) {
                             try {
+                                Log.i(TAG, "Trying to find UDP server, " + (i+1) + " times.");
                                 byte[] buffer = new byte[1024];
                                 DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
                                 socket.receive(dp);
                                 byte[] data = dp.getData();
-                                byte[] bytes = Arrays.copyOfRange(data, 1, data[0]);
+                                byte[] bytes = Arrays.copyOfRange(data, 1, data[0] + 1);
                                 String msg = new String(bytes, StandardCharsets.UTF_8);
+                                Log.i(TAG, "UDP MSG:" + msg);
                                 if (msg.equals(CODES_WORD)) {
-                                    Log.i(TAG, "UDP MSG:" + msg);
                                     serverAddress = dp.getAddress().getHostAddress();
                                     break;
                                 }
                             } catch (Exception e) {
+                                Log.i(TAG, "UDP ERROR:");
                                 e.printStackTrace();
                             }
                         }
 
-                        if (serverAddress.length() == 0)
-                        {
+                        if (serverAddress.length() == 0) {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -155,16 +157,19 @@ public class AddPacketFragment extends Fragment {
                                     offline.setVisibility(View.VISIBLE);
                                 }
                             });
+                            Log.i(TAG, "Server not found.");
                             return;
                         }
 
-                        URL url = new URL(String.format("http://%s:%d/books", serverAddress, HTTP_PORT));
+                        URL url = new URL(String.format(Locale.PRC, "http://%s:%d/books", serverAddress, HTTP_PORT));
+                        Log.i(TAG, "GET:" + url);
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                         conn.setRequestProperty("Connection", "close");
                         conn.setDoInput(true);
                         conn.connect();
                         int c = conn.getResponseCode();
                         if (c != HttpURLConnection.HTTP_OK) {
+                            Log.i(TAG, "HTTP Error:" + c);
                             return;
                         }
                         InputStream is = conn.getInputStream();
@@ -173,13 +178,14 @@ public class AddPacketFragment extends Fragment {
                         BufferedReader br = new BufferedReader(isr);
                         String line;
                         StringBuilder buf = new StringBuilder();
-                        while ((line = br.readLine())!= null) {
+                        while ((line = br.readLine()) != null) {
                             buf.append(line);
                         }
                         String json = buf.toString();
                         ObjectMapper mapper = new ObjectMapper();
                         JavaType listType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Packet.class);
                         packets = mapper.readValue(json, listType);
+                        Log.i(TAG, "GET JSON: " + packets.size() + " packets.");
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -190,10 +196,20 @@ public class AddPacketFragment extends Fragment {
                             }
                         });
                     } catch (Exception e) {
+                        Log.i(TAG, "OTHER Error:");
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
+            clientThread.start();
+        }
+
+        void stopLoading() {
+            if (clientThread != null && clientThread.isAlive()) {
+                Log.i(TAG, "STOP Loading: interrupt thread.");
+                clientThread.interrupt();
+                clientThread = null;
+            }
         }
     }
 }
