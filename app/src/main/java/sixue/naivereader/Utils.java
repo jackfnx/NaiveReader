@@ -116,12 +116,20 @@ public class Utils {
     }
 
     static void verifyPermissions(Activity activity) {
-        int permission = ActivityCompat.checkSelfPermission(activity,
+        int r = ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
+        if (r != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    1);
+        }
+
+        int w = ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (w != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     1);
         }
     }
