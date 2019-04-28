@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.provider.LocalTextProvider;
 
@@ -81,7 +82,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 int currentPage = readerView.getCurrentPage();
                 progress.setText(String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages));
                 book.setCurrentPosition(readerView.getCurrentPosition());
-                if (book.isLocal() && localChapterNodes.size() > 0) {
+                if (book.getKind() == BookKind.LocalText && localChapterNodes.size() > 0) {
                     for (int i = 0; i < localChapterNodes.size(); i++) {
                         int node = localChapterNodes.get(i);
                         int next = (i + 1) < localChapterNodes.size() ? localChapterNodes.get(i + 1) : Integer.MAX_VALUE;
@@ -101,7 +102,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
             @Override
             public void onTurnPageOver(int step) {
-                if (!book.isLocal()) {
+                if (book.getKind() != BookKind.LocalText) {
                     int i = book.getCurrentChapterIndex() + (step > 0 ? 1 : -1);
                     if (i >= 0 && i < book.getChapterList().size()) {
                         loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
@@ -150,7 +151,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                             if (text == null) {
                                 text = "Can't open file.";
                             } else {
-                                if (book.isLocal()) {
+                                if (book.getKind() == BookKind.LocalText) {
                                     localChapterNodes = LocalTextProvider.calcChapterNodes(text);
                                     book.setWordCount(text.length());
                                     BookLoader.getInstance().save();
@@ -183,7 +184,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
         smartDownloader = new SmartDownloader(this, book);
         if (smartDownloader.reloadContent()) {
-            if (book.isLocal()) {
+            if (book.getKind() == BookKind.LocalText) {
                 Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
                 intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
                 intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "");
@@ -247,8 +248,8 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.refresh).setEnabled(!book.isLocal());
-        menu.findItem(R.id.browse_it).setEnabled(!book.isLocal());
+        menu.findItem(R.id.refresh).setEnabled(book.getKind() == BookKind.Online);
+        menu.findItem(R.id.browse_it).setEnabled(book.getKind() == BookKind.Online);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -262,14 +263,14 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 return true;
             }
             case R.id.refresh: {
-                if (!book.isLocal()) {
+                if (book.getKind() == BookKind.Online) {
                     Utils.deleteFile(chapter.getSavePath());
                     loadNetChapter(book.getCurrentChapterIndex(), 0);
                     return true;
                 }
             }
             case R.id.browse_it: {
-                if (!book.isLocal()) {
+                if (book.getKind() == BookKind.Online) {
                     String url = smartDownloader.getChapterUrl(chapter);
                     Intent intent = new Intent("android.intent.action.VIEW");
                     intent.setData(Uri.parse(url));

@@ -1,5 +1,7 @@
 package sixue.naivereader.data;
 
+import android.support.annotation.NonNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ public class Book {
     private String id;
     private String title;
     private String author;
-    private boolean isLocal;
+    private BookKind kind;
     private String localPath;
     private String siteId;
     private String sitePara;
@@ -58,12 +60,12 @@ public class Book {
         this.author = author;
     }
 
-    public boolean isLocal() {
-        return isLocal;
+    public BookKind getKind() {
+        return kind;
     }
 
-    public void setLocal(boolean local) {
-        isLocal = local;
+    public void setKind(BookKind kind) {
+        this.kind = kind;
     }
 
     public String getLocalPath() {
@@ -146,6 +148,7 @@ public class Book {
         this.end = end;
     }
 
+    @NonNull
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
@@ -158,8 +161,8 @@ public class Book {
         sb.append("author=");
         sb.append(author);
         sb.append(",");
-        sb.append("isLocal=");
-        sb.append(isLocal);
+        sb.append("kind=");
+        sb.append(kind);
         if (localPath != null) {
             sb.append(",");
             sb.append("localPath=");

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 
 public class LocalTextProvider {
 
@@ -39,7 +40,7 @@ public class LocalTextProvider {
         book.setId(file.getAbsolutePath());
         book.setTitle(title);
         book.setAuthor(author);
-        book.setLocal(true);
+        book.setKind(BookKind.LocalText);
         book.setLocalPath(file.getAbsolutePath());
         return book;
     }

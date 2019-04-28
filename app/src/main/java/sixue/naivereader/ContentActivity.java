@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
 import sixue.naivereader.provider.LocalTextProvider;
@@ -61,7 +62,7 @@ public class ContentActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                if (!book.isLocal()) {
+                if (book.getKind() != BookKind.LocalText) {
                     int index = book.getChapterList().size() - i - 1;
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, index);
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
@@ -109,14 +110,14 @@ public class ContentActivity extends AppCompatActivity {
         srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!book.isLocal()) {
+                if (book.getKind() == BookKind.Online) {
                     downloader.startDownloadContent();
                 }
             }
         });
 
         if (downloader.reloadContent()) {
-            if (book.isLocal()) {
+            if (book.getKind() == BookKind.LocalText) {
                 localText = Utils.readText(book.getLocalPath());
                 localChapterNodes = LocalTextProvider.calcChapterNodes(localText);
                 currentLocalChapter = 0;
@@ -154,7 +155,7 @@ public class ContentActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return book.isLocal() ? localChapterNodes.size() : book.getChapterList().size();
+            return book.getKind() == BookKind.LocalText ? localChapterNodes.size() : book.getChapterList().size();
         }
 
         @Override
@@ -175,7 +176,7 @@ public class ContentActivity extends AppCompatActivity {
             }
             TextView title = view.findViewById(R.id.title);
             TextView summary = view.findViewById(R.id.summary);
-            if (book.isLocal()) {
+            if (book.getKind() == BookKind.LocalText) {
                 int node = localChapterNodes.get(i);
                 int length = localText.length();
 
@@ -226,7 +227,7 @@ public class ContentActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuProviders = menu.findItem(R.id.menu_providers);
-        if (book.isLocal()) {
+        if (book.getKind() == BookKind.LocalText) {
             menuProviders.setVisible(false);
         } else {
             SubMenu subMenu = menuProviders.getSubMenu();

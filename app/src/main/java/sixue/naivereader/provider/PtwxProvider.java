@@ -17,6 +17,7 @@ import java.util.List;
 import sixue.naivereader.SmartDownloader;
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
 
@@ -64,7 +65,7 @@ public class PtwxProvider extends NetProvider {
                 book.setId(s);
                 book.setTitle(s);
                 book.setAuthor(author);
-                book.setLocal(false);
+                book.setKind(BookKind.Online);
 
                 Source source = new Source();
                 source.setId(getProviderId());
@@ -101,7 +102,7 @@ public class PtwxProvider extends NetProvider {
                     book.setId(id);
                     book.setTitle(title);
                     book.setAuthor(author);
-                    book.setLocal(false);
+                    book.setKind(BookKind.Online);
 
                     Source source = new Source();
                     source.setId(getProviderId());

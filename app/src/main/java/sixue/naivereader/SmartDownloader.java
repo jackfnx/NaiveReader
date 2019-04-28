@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.provider.NetProvider;
 import sixue.naivereader.provider.NetProviderCollections;
@@ -35,7 +36,7 @@ public class SmartDownloader {
     }
 
     boolean reloadContent() {
-        if (book.isLocal()) {
+        if (book.getKind() != BookKind.Online) {
             return true;
         }
 

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Source;
 
 public class BookshelfActivity extends AppCompatActivity {
@@ -130,7 +131,7 @@ public class BookshelfActivity extends AppCompatActivity {
     private void refreshAllBooks() {
         for (int i = 0; i < BookLoader.getInstance().getBookNum(); i++) {
             Book book = BookLoader.getInstance().getBook(i);
-            if (!book.isLocal()) {
+            if (book.getKind() == BookKind.Online) {
                 SmartDownloader downloader = new SmartDownloader(this, book);
                 if (downloader.reloadContent()) {
                     Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
@@ -207,7 +208,7 @@ public class BookshelfActivity extends AppCompatActivity {
     }
 
     private void editItem(final Book book) {
-        if (book.isLocal()) {
+        if (book.getKind() == BookKind.LocalText) {
             View v = getLayoutInflater().inflate(R.layout.edit_dialog_local, null);
 
             final EditText title = v.findViewById(R.id.title);
@@ -235,7 +236,7 @@ public class BookshelfActivity extends AppCompatActivity {
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
-        } else {
+        } else if (book.getKind() == BookKind.Online) {
             View v = getLayoutInflater().inflate(R.layout.edit_dialog_net, null);
 
             final EditText title = v.findViewById(R.id.title);
@@ -344,7 +345,7 @@ public class BookshelfActivity extends AppCompatActivity {
             title.setText(book.getTitle());
 
             TextView progress = view.findViewById(R.id.progress);
-            if (book.isLocal()) {
+            if (book.getKind() == BookKind.LocalText) {
                 int cp = book.getCurrentPosition();
                 int wc = book.getWordCount();
                 if (wc <= 0) {
