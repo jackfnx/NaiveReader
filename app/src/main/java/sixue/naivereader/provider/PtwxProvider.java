@@ -158,7 +158,7 @@ public class PtwxProvider extends NetProvider {
     public void downloadChapter(Book book, Chapter chapter) {
 
         try {
-            Document doc = Jsoup.connect(calcBookUrl(book.getSitePara()) + "/" + chapter.getId()).timeout(5000).get();
+            Document doc = Jsoup.connect(getChapterUrl(book, chapter)).timeout(5000).get();
             String s = doc.body().toString()
                     .replace("<script language=\"javascript\">GetFont();</script>", "<div id=\"content\" class=\"fonts_mesne\">")
                     .replace("<!-- 翻页上AD开始 -->", "</div> <!-- 翻页上AD开始 -->");

@@ -36,7 +36,7 @@ public class WlzwProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "http://www.50zw.la/modules/article/search.php?searchkey=" + key;
+            String url = "https://www.50zw.la/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
@@ -125,7 +125,8 @@ public class WlzwProvider extends NetProvider {
 
         List<Chapter> content = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect("http://www.50zw.la/book_" + book.getSitePara()).timeout(5000).get();
+            String contentUrl = "https://www.50zw.la/book_" + book.getSitePara() + "/";
+            Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
             Elements elements = doc.body().select(".chapterlist");
             for (Element ch : Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
                 String title = ch.select("a").text();
@@ -153,7 +154,7 @@ public class WlzwProvider extends NetProvider {
     public void downloadChapter(Book book, Chapter chapter) {
 
         try {
-            Document doc = Jsoup.connect("http://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId()).timeout(5000).get();
+            Document doc = Jsoup.connect(getChapterUrl(book, chapter)).timeout(5000).get();
             String text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ");
             Utils.writeText(text, chapter.getSavePath());
         } catch (IOException e) {
@@ -163,7 +164,7 @@ public class WlzwProvider extends NetProvider {
 
     @Override
     public String getChapterUrl(Book book, Chapter chapter) {
-        return "http://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId();
+        return "https://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId();
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
@@ -172,7 +173,7 @@ public class WlzwProvider extends NetProvider {
 
     private String calcCoverUrl(String para) {
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("http://www.50zw.la/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        return String.format("https://www.50zw.la/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
