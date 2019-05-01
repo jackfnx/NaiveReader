@@ -23,6 +23,8 @@ import sixue.naivereader.data.Source;
 
 public class PtwxProvider extends NetProvider {
 
+    private static final String TAG = PtwxProvider.class.getSimpleName();
+
     @Override
     public String getProviderId() {
         return "www.piaotian.net";
@@ -127,9 +129,10 @@ public class PtwxProvider extends NetProvider {
     @Override
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
+        String contentUrl = calcBookUrl(book.getSitePara());
         List<Chapter> content = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(calcBookUrl(book.getSitePara())).timeout(5000).get();
+            Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
             Elements elements = doc.body().select(".centent");
             for (Element ch : Jsoup.parse(elements.toString()).select("li")) {
                 String title = ch.select("a").text();
@@ -150,7 +153,7 @@ public class PtwxProvider extends NetProvider {
                 content.add(chapter);
             }
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
+            Log.e(TAG, "downloadContent ERROR: " + contentUrl);
         }
         return content;
     }
@@ -158,8 +161,9 @@ public class PtwxProvider extends NetProvider {
     @Override
     public void downloadChapter(Book book, Chapter chapter) {
 
+        String chapterUrl = getChapterUrl(book, chapter);
         try {
-            Document doc = Jsoup.connect(getChapterUrl(book, chapter)).timeout(5000).get();
+            Document doc = Jsoup.connect(chapterUrl).timeout(5000).get();
             String s = doc.body().toString()
                     .replace("<script language=\"javascript\">GetFont();</script>", "<div id=\"content\" class=\"fonts_mesne\">")
                     .replace("<!-- 翻页上AD开始 -->", "</div> <!-- 翻页上AD开始 -->");
@@ -169,7 +173,7 @@ public class PtwxProvider extends NetProvider {
             String text = content.outerHtml().replace("<br>", "").replace("&nbsp;", " ");
             Utils.writeText(text, chapter.getSavePath());
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
+            Log.e(TAG, "downloadChapter ERROR: " + chapterUrl);
         }
     }
 

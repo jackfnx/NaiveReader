@@ -22,6 +22,8 @@ import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
 
 public class WlzwProvider extends NetProvider {
+    private static final String TAG = WlzwProvider.class.getSimpleName();
+
     @Override
     public String getProviderId() {
         return "wwww.50zw.la";
@@ -124,9 +126,9 @@ public class WlzwProvider extends NetProvider {
     @Override
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
+        String contentUrl = "https://www.50zw.la/book_" + book.getSitePara() + "/";
         List<Chapter> content = new ArrayList<>();
         try {
-            String contentUrl = "https://www.50zw.la/book_" + book.getSitePara() + "/";
             Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
             Elements elements = doc.body().select(".chapterlist");
             for (Element ch : Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
@@ -146,7 +148,7 @@ public class WlzwProvider extends NetProvider {
                 content.add(chapter);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "downloadContent ERROR: " + contentUrl);
         }
         return content;
     }
@@ -154,12 +156,13 @@ public class WlzwProvider extends NetProvider {
     @Override
     public void downloadChapter(Book book, Chapter chapter) {
 
+        String chapterUrl = getChapterUrl(book, chapter);
         try {
-            Document doc = Jsoup.connect(getChapterUrl(book, chapter)).timeout(5000).get();
+            Document doc = Jsoup.connect(chapterUrl).timeout(5000).get();
             String text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ");
             Utils.writeText(text, chapter.getSavePath());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "downloadChapter ERROR: " + chapterUrl);
         }
     }
 
