@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Packet;
 
 
@@ -24,6 +26,7 @@ public class AddPacketFragment extends Fragment {
     private View loadingProgress;
     private View offline;
     private MyAdapter adapter;
+    private List<Book> list;
 
     public AddPacketFragment() {
         // Required empty public constructor
@@ -42,8 +45,17 @@ public class AddPacketFragment extends Fragment {
         loadingProgress = v.findViewById(R.id.loading);
         offline = v.findViewById(R.id.offline);
         listView = v.findViewById(R.id.list_packets);
+        list = new ArrayList<>();
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Book book = list.get(position);
+
+            }
+        });
         return v;
     }
 
@@ -60,16 +72,11 @@ public class AddPacketFragment extends Fragment {
     }
 
     private class MyAdapter extends BaseAdapter {
-        private List<Packet> packets;
         private Thread clientThread;
-
-        MyAdapter() {
-            this.packets = new ArrayList<>();
-        }
 
         @Override
         public int getCount() {
-            return packets.size();
+            return list.size();
         }
 
         @Override
@@ -88,14 +95,14 @@ public class AddPacketFragment extends Fragment {
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.listviewitem_packet, parent, false);
             }
 
-            Packet packet = packets.get(position);
+            Book book = list.get(position);
 
             TextView title = convertView.findViewById(R.id.title);
             TextView author = convertView.findViewById(R.id.author);
             TextView status = convertView.findViewById(R.id.status);
-            title.setText(packet.getTitle());
-            author.setText(packet.getAuthor());
-            status.setText(packet.getKey());
+            title.setText(book.getTitle());
+            author.setText(book.getAuthor());
+            status.setText(book.getId());
             return convertView;
         }
 
@@ -109,7 +116,7 @@ public class AddPacketFragment extends Fragment {
                 public void run() {
                     final String ip = ScanDeviceTool.scan();
                     if (ip != null) {
-                        packets = PacketLoader.loadPackets(ip);
+                        list = PacketLoader.loadPackets(ip);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -120,7 +127,7 @@ public class AddPacketFragment extends Fragment {
                             }
                         });
                     } else {
-                        packets = new ArrayList<>();
+                        list.clear();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
