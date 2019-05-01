@@ -30,6 +30,7 @@ import sixue.naivereader.provider.NetProviderCollections;
 
 public class AddNetBookFragment extends Fragment {
 
+    private Context context;
     private List<Book> list;
     private BroadcastReceiver receiver;
 
@@ -152,17 +153,34 @@ public class AddNetBookFragment extends Fragment {
                 }
             }
         };
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH);
-        getContext().registerReceiver(receiver, filter);
 
         return v;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getContext().unregisterReceiver(receiver);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.context = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH);
+        context.registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        context.unregisterReceiver(receiver);
     }
 
     private Book findSameBook(Book book) {
