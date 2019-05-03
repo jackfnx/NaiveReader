@@ -59,14 +59,16 @@ public class AddPacketFragment extends Fragment {
                 if (b != null) {
                     BookLoader.getInstance().bookBubble(b);
                 } else {
-                    PacketHelper helper = (PacketHelper) book.buildHelper();
+                    final PacketHelper helper = (PacketHelper) book.buildHelper();
                     helper.downloadPacket(getActivity(), new PacketHelper.Func<String>() {
                         @Override
                         public void exec(final String savePath) {
 
                             book.setLocalPath(savePath);
-                            BookLoader.getInstance().addBook(book);
                             final Activity activity = getActivity();
+                            helper.reloadContent(activity);
+                            book.setCurrentChapterIndex(book.getChapterList().size() - 1);
+                            BookLoader.getInstance().addBook(book);
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

@@ -133,8 +133,10 @@ public class ContentActivity extends AppCompatActivity {
                     }
                 }
                 listView.setSelection(currentLocalChapter);
-            } else {
+            } else if (book.getKind() == BookKind.Online) {
                 listView.setSelection(book.getChapterList().size() - book.getCurrentChapterIndex() - 1);
+            } else if (book.getKind() == BookKind.Packet) {
+                listView.setSelection(book.getCurrentChapterIndex());
             }
         } else {
             srl.setRefreshing(true);
