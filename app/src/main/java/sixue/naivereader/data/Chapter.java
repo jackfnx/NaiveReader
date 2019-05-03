@@ -5,6 +5,7 @@ public class Chapter {
     private String title;
     private String para;
     private String savePath;
+    private long timestamp;
 
     public Chapter() {
         id = "";
@@ -43,5 +44,13 @@ public class Chapter {
 
     public void setSavePath(String savePath) {
         this.savePath = savePath;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

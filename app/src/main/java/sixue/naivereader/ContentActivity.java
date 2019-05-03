@@ -62,11 +62,14 @@ public class ContentActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ContentActivity.this, ReadActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                if (book.getKind() != BookKind.LocalText) {
+                if (book.getKind() == BookKind.Online) {
                     int index = book.getChapterList().size() - i - 1;
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, index);
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
-                } else {
+                } else if (book.getKind() == BookKind.Packet) {
+                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i);
+                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0);
+                } else if (book.getKind() == BookKind.LocalText) {
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0);
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, localChapterNodes.get(i));
                 }

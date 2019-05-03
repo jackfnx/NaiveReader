@@ -350,6 +350,7 @@ public class Utils {
                             String line;
                             while ((line = br.readLine()) != null) {
                                 text.append(line);
+                                text.append("\n");
                             }
                             return text.toString();
                         }

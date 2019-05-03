@@ -41,8 +41,9 @@ public class PacketHelper implements BookHelper {
                 Chapter chapter = new Chapter();
                 chapter.setId(packChapter.getFilename());
                 chapter.setTitle(packChapter.getTitle());
-                chapter.setPara("");
+                chapter.setPara(packChapter.getSource());
                 chapter.setSavePath(packChapter.getFilename());
+                chapter.setTimestamp(packChapter.getTimestamp());
                 book.getChapterList().add(chapter);
             }
             return book.getChapterList().size() > 0;
