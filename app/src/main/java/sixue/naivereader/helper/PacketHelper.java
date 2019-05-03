@@ -73,13 +73,16 @@ public class PacketHelper implements BookHelper {
 
     }
 
-    public void downloadPacket(final Context context, final Func<String> callback) {
+    public void downloadPacket(final Context context, final String ip, final Func<String> callback) {
         ensurePacketSavePath(context);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String savePath = calcPacketSavePath(context);
-                PacketLoader.getInstance().downloadPacket("/book/" + book.getId(), savePath);
+                PacketLoader.downloadPacket(ip, savePath, "/book/" + book.getId());
+                reloadContent(context);
+                book.setLocalPath(savePath);
+                book.setCurrentChapterIndex(book.getChapterList().size() - 1);
                 callback.exec(savePath);
             }
         }).start();

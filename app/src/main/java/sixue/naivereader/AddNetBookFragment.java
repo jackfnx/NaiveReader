@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,16 +40,16 @@ public class AddNetBookFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_net_book, container, false);
 
         list = new ArrayList<>();
 
-        final Button search = (Button) v.findViewById(R.id.search);
-        final EditText searchText = (EditText) v.findViewById(R.id.search_text);
-        final ListView listBooks = (ListView) v.findViewById(R.id.list_books);
+        final Button search = v.findViewById(R.id.search);
+        final EditText searchText = v.findViewById(R.id.search_text);
+        final ListView listBooks = v.findViewById(R.id.list_books);
 
         final BaseAdapter myAdapter = new BaseAdapter() {
             @Override
@@ -69,12 +70,12 @@ public class AddNetBookFragment extends Fragment {
             @Override
             public View getView(int i, View view, ViewGroup viewGroup) {
                 if (view == null) {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.listviewitem_book, viewGroup, false);
+                    view = inflater.inflate(R.layout.listviewitem_book, viewGroup, false);
                 }
-                ImageView cover = (ImageView) view.findViewById(R.id.cover);
-                TextView title = (TextView) view.findViewById(R.id.title);
-                TextView author = (TextView) view.findViewById(R.id.author);
-                TextView source = (TextView) view.findViewById(R.id.source);
+                ImageView cover = view.findViewById(R.id.cover);
+                TextView title = view.findViewById(R.id.title);
+                TextView author = view.findViewById(R.id.author);
+                TextView source = view.findViewById(R.id.source);
 
                 Book book = list.get(i);
                 SmartDownloader downloader = new SmartDownloader(getContext(), book);
@@ -113,12 +114,15 @@ public class AddNetBookFragment extends Fragment {
                                     list.add(book);
                                 }
                             }
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    myAdapter.notifyDataSetChanged();
-                                }
-                            });
+                            FragmentActivity activity = getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        myAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
                             Log.i(AddNetBookFragment.this.getClass().toString(), list.toString());
                         }
                     }).start();
@@ -136,7 +140,10 @@ public class AddNetBookFragment extends Fragment {
                 } else {
                     BookLoader.getInstance().addBook(book);
                 }
-                getActivity().finish();
+                FragmentActivity activity = getActivity();
+                if (activity != null) {
+                    activity.finish();
+                }
             }
         });
 

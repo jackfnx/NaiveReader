@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,7 @@ public class AddPacketFragment extends Fragment {
     private View offline;
     private MyAdapter adapter;
     private List<Book> list;
+    private String ip;
 
     public AddPacketFragment() {
         // Required empty public constructor
@@ -60,21 +60,20 @@ public class AddPacketFragment extends Fragment {
                     BookLoader.getInstance().bookBubble(b);
                 } else {
                     final PacketHelper helper = (PacketHelper) book.buildHelper();
-                    helper.downloadPacket(getActivity(), new PacketHelper.Func<String>() {
+                    helper.downloadPacket(getActivity(), ip, new PacketHelper.Func<String>() {
                         @Override
                         public void exec(final String savePath) {
 
-                            book.setLocalPath(savePath);
-                            final Activity activity = getActivity();
-                            helper.reloadContent(activity);
-                            book.setCurrentChapterIndex(book.getChapterList().size() - 1);
                             BookLoader.getInstance().addBook(book);
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    activity.finish();
-                                }
-                            });
+                            final Activity activity = getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        activity.finish();
+                                    }
+                                });
+                            }
                         }
                     });
                 }
@@ -139,31 +138,32 @@ public class AddPacketFragment extends Fragment {
             clientThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final String ip = ScanDeviceTool.scan();
-                    if (ip != null) {
-                        PacketLoader.getInstance().setIp(ip);
-                        list = PacketLoader.getInstance().loadPackets();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                notifyDataSetChanged();
-                                loadingProgress.setVisibility(View.INVISIBLE);
-                                listView.setVisibility(View.VISIBLE);
-                                offline.setVisibility(View.INVISIBLE);
-                            }
-                        });
-                    } else {
-                        PacketLoader.getInstance().setIp(null);
-                        list.clear();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                notifyDataSetChanged();
-                                loadingProgress.setVisibility(View.INVISIBLE);
-                                listView.setVisibility(View.INVISIBLE);
-                                offline.setVisibility(View.VISIBLE);
-                            }
-                        });
+                    ip = ScanDeviceTool.scan();
+                    Activity activity = getActivity();
+                    if (activity != null) {
+                        if (ip != null) {
+                            list = PacketLoader.loadPackets(ip);
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyDataSetChanged();
+                                    loadingProgress.setVisibility(View.INVISIBLE);
+                                    listView.setVisibility(View.VISIBLE);
+                                    offline.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                        } else {
+                            list.clear();
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyDataSetChanged();
+                                    loadingProgress.setVisibility(View.INVISIBLE);
+                                    listView.setVisibility(View.INVISIBLE);
+                                    offline.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
                     }
                 }
             });
@@ -176,7 +176,7 @@ public class AddPacketFragment extends Fragment {
                 clientThread.interrupt();
                 clientThread = null;
             }
-            PacketLoader.getInstance().setIp(null);
+            ip = null;
             loadingProgress.setVisibility(View.INVISIBLE);
             listView.setVisibility(View.INVISIBLE);
             offline.setVisibility(View.VISIBLE);

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class AddLocalTreeFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_local_tree, container, false);
 
-        ListView lvFiles = (ListView) v.findViewById(R.id.lv_files);
+        ListView lvFiles = v.findViewById(R.id.lv_files);
         final MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
         lvFiles.setAdapter(myAdapter);
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -53,7 +54,10 @@ public class AddLocalTreeFragment extends Fragment {
                         } else {
                             BookLoader.getInstance().addBook(LocalTextProvider.createBook(file));
                         }
-                        getActivity().finish();
+                        FragmentActivity activity = getActivity();
+                        if (activity != null) {
+                            activity.finish();
+                        }
                     }
                 }
             }

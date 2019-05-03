@@ -21,7 +21,6 @@ import java.util.Locale;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Packet;
-import sixue.naivereader.helper.PacketHelper;
 
 public class PacketLoader {
     private static final String TAG = PacketLoader.class.getSimpleName();
@@ -29,26 +28,26 @@ public class PacketLoader {
     public static final int HTTP_PORT = 5000;
     public static final String INIT_URL = "/books";
 
-    private static PacketLoader instance;
+    static boolean testServer(String ip) {
 
-    private String ip;
-
-    public static PacketLoader getInstance() {
-        if (instance == null) {
-            instance = new PacketLoader();
+        try {
+            URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s",
+                    ip, HTTP_PORT, INIT_URL));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Connection", "close");
+            conn.setDoInput(true);
+            conn.connect();
+            int c = conn.getResponseCode();
+            if (c == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
+        } catch (Exception e) {
+            // do nothing
         }
-        return instance;
+        return false;
     }
 
-    private PacketLoader() {
-
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public List<Book> loadPackets() {
+    static List<Book> loadPackets(String ip) {
 
         List<Book> list = new ArrayList<>();
         try {
@@ -91,7 +90,7 @@ public class PacketLoader {
         return list;
     }
 
-    public void downloadPacket(String packetUrl, String savePath) {
+    public static void downloadPacket(String ip, String savePath, String packetUrl) {
 
         try {
             URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s", ip, HTTP_PORT, packetUrl));

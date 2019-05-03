@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +37,11 @@ public class AddLocalFlatFragment extends Fragment {
         sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
         excludes = new ArrayList<>();
         excludes.add(sdcard + "/Android/data");
-        excludes.add(sdcard + "/" + getContext().getPackageName());
+        if (getContext() != null) {
+            excludes.add(sdcard + "/" + getContext().getPackageName());
+        }
 
-        ListView lvFiles = (ListView) v.findViewById(R.id.lv_files);
+        ListView lvFiles = v.findViewById(R.id.lv_files);
         MyAdapter myAdapter = new MyAdapter(Environment.getExternalStorageDirectory());
         lvFiles.setAdapter(myAdapter);
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -52,7 +55,10 @@ public class AddLocalFlatFragment extends Fragment {
                     } else {
                         BookLoader.getInstance().addBook(LocalTextProvider.createBook(file));
                     }
-                    getActivity().finish();
+                    FragmentActivity activity = getActivity();
+                    if (activity != null) {
+                        activity.finish();
+                    }
                 }
             }
         });
@@ -98,13 +104,16 @@ public class AddLocalFlatFragment extends Fragment {
                     }
                 } else {
                     if (file.getName().endsWith(".txt")) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                files.add(file);
-                                notifyDataSetChanged();
-                            }
-                        });
+                        FragmentActivity activity = getActivity();
+                        if (activity != null) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    files.add(file);
+                                    notifyDataSetChanged();
+                                }
+                            });
+                        }
                     }
                 }
             }

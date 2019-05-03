@@ -14,7 +14,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import sixue.naivereader.SmartDownloader;
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;

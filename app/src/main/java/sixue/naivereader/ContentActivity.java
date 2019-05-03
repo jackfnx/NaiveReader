@@ -85,7 +85,11 @@ public class ContentActivity extends AppCompatActivity {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                switch (intent.getAction()) {
+                String action = intent.getAction();
+                if (action == null) {
+                    return;
+                }
+                switch (action) {
                     case Utils.ACTION_DOWNLOAD_CONTENT_FINISH:
                         if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
                             srl.setRefreshing(false);
@@ -185,14 +189,10 @@ public class ContentActivity extends AppCompatActivity {
                 int node = localChapterNodes.get(i);
                 int length = localText.length();
 
-                String s;
-                if (localText != null) {
-                    int end = localText.indexOf('\n', node);
-                    end = end < 0 ? length : end;
-                    s = localText.substring(node, end);
-                } else {
-                    s = "?";
-                }
+                int end = localText.indexOf('\n', node);
+                end = end < 0 ? length : end;
+                String s = localText.substring(node, end);
+
                 if (i == currentLocalChapter) {
                     s += "*";
                 }

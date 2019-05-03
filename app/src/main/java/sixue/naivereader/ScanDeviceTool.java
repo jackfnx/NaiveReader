@@ -72,20 +72,9 @@ public class ScanDeviceTool implements AutoCloseable {
                         if (devAddress.equals(currentIp))
                             return;
 
-                        try {
-                            URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s",
-                                    currentIp, PacketLoader.HTTP_PORT, PacketLoader.INIT_URL));
-                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                            conn.setRequestProperty("Connection", "close");
-                            conn.setDoInput(true);
-                            conn.connect();
-                            int c = conn.getResponseCode();
-                            if (c == HttpURLConnection.HTTP_OK) {
-                                Log.d(TAG, "扫描成功，IP地址为：" + currentIp);
-                                ips.add(currentIp);
-                            }
-                        } catch (Exception e) {
-                            // do nothing
+                        if (PacketLoader.testServer(currentIp)) {
+                            Log.d(TAG, "扫描成功，IP地址为：" + currentIp);
+                            ips.add(currentIp);
                         }
                     }
                 };
@@ -109,12 +98,12 @@ public class ScanDeviceTool implements AutoCloseable {
                     return null;
                 }
             } catch (Exception e) {
-                // TODO: handle exception
+                // do nothing
             }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                // TODO: handle exception
+                // do nothing
             }
         }
     }
