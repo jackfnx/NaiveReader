@@ -3,18 +3,17 @@ package sixue.naivereader;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.net.HttpURLConnection;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import sixue.naivereader.helper.PacketLoader;
 
 /**
  * 局域网扫描设备工具类

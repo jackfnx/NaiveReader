@@ -18,6 +18,7 @@ import java.util.List;
 
 import sixue.naivereader.data.Book;
 import sixue.naivereader.helper.PacketHelper;
+import sixue.naivereader.helper.PacketLoader;
 
 
 public class AddPacketFragment extends Fragment {

@@ -1,4 +1,4 @@
-package sixue.naivereader;
+package sixue.naivereader.helper;
 
 import android.util.Log;
 
@@ -25,10 +25,10 @@ import sixue.naivereader.data.Packet;
 public class PacketLoader {
     private static final String TAG = PacketLoader.class.getSimpleName();
 
-    public static final int HTTP_PORT = 5000;
-    public static final String INIT_URL = "/books";
+    private static final int HTTP_PORT = 5000;
+    private static final String INIT_URL = "/books";
 
-    static boolean testServer(String ip) {
+    public static boolean testServer(String ip) {
 
         try {
             URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s",
@@ -47,7 +47,7 @@ public class PacketLoader {
         return false;
     }
 
-    static List<Book> loadPackets(String ip) {
+    public static List<Book> loadPackets(String ip) {
 
         List<Book> list = new ArrayList<>();
         try {
@@ -90,7 +90,7 @@ public class PacketLoader {
         return list;
     }
 
-    public static void downloadPacket(String ip, String savePath, String packetUrl) {
+    static void downloadPacket(String ip, String savePath, String packetUrl) {
 
         try {
             URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s", ip, HTTP_PORT, packetUrl));

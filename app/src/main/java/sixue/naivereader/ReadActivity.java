@@ -30,7 +30,7 @@ import java.util.Locale;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
-import sixue.naivereader.provider.LocalTextProvider;
+import sixue.naivereader.helper.LocalTextLoader;
 
 public class ReadActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
@@ -157,7 +157,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                                 text = "Can't open file.";
                             } else {
                                 if (book.getKind() == BookKind.LocalText) {
-                                    localChapterNodes = LocalTextProvider.calcChapterNodes(text);
+                                    localChapterNodes = LocalTextLoader.calcChapterNodes(text);
                                     book.setWordCount(text.length());
                                     BookLoader.getInstance().save();
                                 }

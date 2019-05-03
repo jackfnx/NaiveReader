@@ -1,4 +1,4 @@
-package sixue.naivereader.provider;
+package sixue.naivereader.helper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 
-public class LocalTextProvider {
+public class LocalTextLoader {
 
     public static Book createBook(File file) {
         String name = file.getName().toLowerCase();

@@ -27,7 +27,7 @@ import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
-import sixue.naivereader.provider.LocalTextProvider;
+import sixue.naivereader.helper.LocalTextLoader;
 import sixue.naivereader.provider.NetProvider;
 import sixue.naivereader.provider.NetProviderCollections;
 
@@ -126,7 +126,7 @@ public class ContentActivity extends AppCompatActivity {
         if (downloader.reloadContent()) {
             if (book.getKind() == BookKind.LocalText) {
                 localText = Utils.readText(book.getLocalPath());
-                localChapterNodes = LocalTextProvider.calcChapterNodes(localText);
+                localChapterNodes = LocalTextLoader.calcChapterNodes(localText);
                 currentLocalChapter = 0;
                 for (int i = 0; i < localChapterNodes.size(); i++) {
                     int node = localChapterNodes.get(i);

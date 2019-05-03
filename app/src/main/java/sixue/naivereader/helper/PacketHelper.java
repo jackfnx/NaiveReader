@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 
-import sixue.naivereader.PacketLoader;
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;

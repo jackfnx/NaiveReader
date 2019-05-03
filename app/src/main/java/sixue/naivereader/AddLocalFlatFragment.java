@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
-import sixue.naivereader.provider.LocalTextProvider;
+import sixue.naivereader.helper.LocalTextLoader;
 
 public class AddLocalFlatFragment extends Fragment {
     private String sdcard;
@@ -53,7 +53,7 @@ public class AddLocalFlatFragment extends Fragment {
                     if (b != null) {
                         BookLoader.getInstance().bookBubble(b);
                     } else {
-                        BookLoader.getInstance().addBook(LocalTextProvider.createBook(file));
+                        BookLoader.getInstance().addBook(LocalTextLoader.createBook(file));
                     }
                     FragmentActivity activity = getActivity();
                     if (activity != null) {
