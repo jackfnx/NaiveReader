@@ -353,7 +353,7 @@ public class BookshelfActivity extends AppCompatActivity {
                 } else {
                     progress.setText(getString(R.string.read_progress_local, (float) cp / (float) wc * 100f));
                 }
-            } else {
+            } else if (book.getKind() == BookKind.Online) {
                 int size = book.getChapterList().size();
                 int cp = book.getCurrentChapterIndex();
                 if (size <= 0) {
@@ -363,6 +363,9 @@ public class BookshelfActivity extends AppCompatActivity {
                 } else {
                     progress.setText(getString(R.string.read_progress_net, size - cp - 1));
                 }
+            } else if (book.getKind() == BookKind.Packet) {
+                int cp = book.getCurrentChapterIndex();
+                progress.setText(getString(R.string.read_progress_net,  cp));
             }
 
             View selectIcon = view.findViewById(R.id.select_icon);
