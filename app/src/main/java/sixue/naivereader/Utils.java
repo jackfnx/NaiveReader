@@ -16,6 +16,7 @@ import android.util.Log;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +31,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class Utils {
+    private static final String TAG = Utils.class.getSimpleName();
+
     public static final String ACTION_DOWNLOAD_CONTENT_FINISH = "ACTION_DOWNLOAD_CONTENT_FINISH";
     public static final String ACTION_DOWNLOAD_CHAPTER_FINISH = "ACTION_DOWNLOAD_CHAPTER_FINISH";
     public static final String ACTION_DOWNLOAD_ALL_CHAPTER_FINISH = "ACTION_DOWNLOAD_ALL_CHAPTER_FINISH";
@@ -41,7 +47,6 @@ public class Utils {
     public static final String INTENT_PARA_PATH = "INTENT_PARA_PATH";
     public static final String INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION";
     public static final String INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX";
-    private static final String TAG = "Utils";
 
     public static String readText(String s) {
         File file = new File(s);
@@ -328,6 +333,34 @@ public class Utils {
             }
             return cover;
         }
+    }
+
+    public static String readTextFromZip(String zipPath, String path) {
+
+        try {
+            ZipFile zf = new ZipFile(zipPath);
+            InputStream in = new BufferedInputStream(new FileInputStream(zipPath));
+            ZipInputStream zin = new ZipInputStream(in);
+            for (ZipEntry ze; (ze = zin.getNextEntry()) != null; ) {
+                if (!ze.isDirectory()) {
+                    if (ze.getName().equals(path)) {
+                        try (BufferedReader br = new BufferedReader(
+                                new InputStreamReader(zf.getInputStream(ze)))) {
+                            StringBuilder text = new StringBuilder();
+                            String line;
+                            while ((line = br.readLine()) != null) {
+                                text.append(line);
+                            }
+                            return text.toString();
+                        }
+                    }
+                }
+            }
+            zin.closeEntry();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public interface Func<T> {

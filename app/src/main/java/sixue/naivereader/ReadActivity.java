@@ -146,8 +146,13 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
                             title.setText(book.getTitle());
                             subtitle.setText(chapter.getTitle());
-                            String path = intent.getStringExtra(Utils.INTENT_PARA_PATH);
-                            text = Utils.readText(path);
+                            if (book.getKind() == BookKind.Packet) {
+                                text = Utils.readTextFromZip(book.getLocalPath(), chapter.getSavePath());
+                            } else if (book.getKind() == BookKind.Online) {
+                                text = Utils.readText(chapter.getSavePath());
+                            } else if (book.getKind() == BookKind.LocalText) {
+                                text = Utils.readText(book.getLocalPath());
+                            }
                             if (text == null) {
                                 text = "Can't open file.";
                             } else {
@@ -188,9 +193,10 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                 Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
                 intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
                 intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "");
-                intent.putExtra(Utils.INTENT_PARA_PATH, book.getLocalPath());
                 intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
                 sendBroadcast(intent);
+            } else if (book.getKind() == BookKind.Packet) {
+                loadPackChapter(newIndex, newPosition);
             } else {
                 Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
                 intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
@@ -200,6 +206,27 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             readerView.setLoading(true, false);
             smartDownloader.startDownloadContent();
         }
+    }
+
+    private void loadPackChapter(int newIndex, int newPosition) {
+        if (newIndex >= 0 && newIndex < book.getChapterList().size()) {
+            if (book.getCurrentChapterIndex() != newIndex) {
+                book.setCurrentChapterIndex(newIndex);
+                book.setCurrentPosition(newPosition);
+            }
+        }
+
+        if (book.getChapterList().size() == 0) {
+            return;
+        }
+
+        chapter = book.getChapterList().get(book.getCurrentChapterIndex());
+
+        Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
+        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
+        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.getId());
+        intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
+        sendBroadcast(intent);
     }
 
     private void loadNetChapter(int newIndex, int newPosition) {
@@ -222,7 +249,6 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
             intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.getId());
-            intent.putExtra(Utils.INTENT_PARA_PATH, chapter.getSavePath());
             intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.getCurrentPosition());
             sendBroadcast(intent);
         } else {

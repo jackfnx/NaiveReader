@@ -1,5 +1,6 @@
 package sixue.naivereader;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,12 +12,13 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
-import sixue.naivereader.data.Packet;
+import sixue.naivereader.helper.PacketHelper;
 
 
 public class AddPacketFragment extends Fragment {
@@ -52,7 +54,28 @@ public class AddPacketFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Book book = list.get(position);
+                final Book book = list.get(position);
+                Book b = BookLoader.getInstance().findBook(book.getId());
+                if (b != null) {
+                    BookLoader.getInstance().bookBubble(b);
+                } else {
+                    PacketHelper helper = (PacketHelper) book.buildHelper();
+                    helper.downloadPacket(getActivity(), new PacketHelper.Func<String>() {
+                        @Override
+                        public void exec(final String savePath) {
+
+                            book.setLocalPath(savePath);
+                            BookLoader.getInstance().addBook(book);
+                            final Activity activity = getActivity();
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    activity.finish();
+                                }
+                            });
+                        }
+                    });
+                }
 
             }
         });
@@ -116,7 +139,8 @@ public class AddPacketFragment extends Fragment {
                 public void run() {
                     final String ip = ScanDeviceTool.scan();
                     if (ip != null) {
-                        list = PacketLoader.loadPackets(ip);
+                        PacketLoader.getInstance().setIp(ip);
+                        list = PacketLoader.getInstance().loadPackets();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -127,6 +151,7 @@ public class AddPacketFragment extends Fragment {
                             }
                         });
                     } else {
+                        PacketLoader.getInstance().setIp(null);
                         list.clear();
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -149,6 +174,7 @@ public class AddPacketFragment extends Fragment {
                 clientThread.interrupt();
                 clientThread = null;
             }
+            PacketLoader.getInstance().setIp(null);
             loadingProgress.setVisibility(View.INVISIBLE);
             listView.setVisibility(View.INVISIBLE);
             offline.setVisibility(View.VISIBLE);

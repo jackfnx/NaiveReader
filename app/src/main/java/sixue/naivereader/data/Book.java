@@ -7,6 +7,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
+import sixue.naivereader.helper.BookHelper;
+import sixue.naivereader.helper.LocalTextHelper;
+import sixue.naivereader.helper.OnlineHelper;
+import sixue.naivereader.helper.PacketHelper;
+
 public class Book {
     private String id;
     private String title;
@@ -23,6 +28,8 @@ public class Book {
     private int wordCount;
     private String coverSavePath;
     private boolean end;
+    @JsonIgnore
+    private BookHelper bookHelper;
 
     public Book() {
         id = "";
@@ -34,6 +41,7 @@ public class Book {
         sources = new ArrayList<>();
         coverSavePath = "";
         end = false;
+        bookHelper = null;
     }
 
     public String getId() {
@@ -180,5 +188,20 @@ public class Book {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    public BookHelper buildHelper() {
+        if (bookHelper == null) {
+            if (kind == BookKind.LocalText) {
+                bookHelper = new LocalTextHelper(this);
+            } else if (kind == BookKind.Online) {
+                bookHelper = new OnlineHelper(this);
+            } else if (kind == BookKind.Packet) {
+                bookHelper = new PacketHelper(this);
+            } else {
+                throw new IllegalArgumentException("Unknown KIND: " + kind.toString());
+            }
+        }
+        return bookHelper;
     }
 }

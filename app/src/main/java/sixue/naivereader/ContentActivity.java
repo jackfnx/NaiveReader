@@ -200,7 +200,11 @@ public class ContentActivity extends AppCompatActivity {
                 summary.setGravity(Gravity.START);
 
             } else {
-                int index = book.getChapterList().size() - i - 1;
+                int index;
+                if (book.getKind() == BookKind.Online)
+                    index = book.getChapterList().size() - i - 1;
+                else
+                    index = i;
                 Chapter chapter = book.getChapterList().get(index);
                 String s = chapter.getTitle();
                 if (index == book.getCurrentChapterIndex()) {
@@ -227,7 +231,7 @@ public class ContentActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuProviders = menu.findItem(R.id.menu_providers);
-        if (book.getKind() == BookKind.LocalText) {
+        if (book.getKind() != BookKind.Online) {
             menuProviders.setVisible(false);
         } else {
             SubMenu subMenu = menuProviders.getSubMenu();
@@ -248,6 +252,11 @@ public class ContentActivity extends AppCompatActivity {
             }
 
             subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size(), providerIds.size() + 1, R.string.menu_search_again);
+        }
+
+        MenuItem batchDownload = menu.findItem(R.id.menu_batch_download);
+        if (book.getKind() != BookKind.Online) {
+            batchDownload.setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);

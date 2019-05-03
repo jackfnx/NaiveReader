@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +21,7 @@ import java.util.Locale;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Packet;
+import sixue.naivereader.helper.PacketHelper;
 
 public class PacketLoader {
     private static final String TAG = PacketLoader.class.getSimpleName();
@@ -25,7 +29,26 @@ public class PacketLoader {
     public static final int HTTP_PORT = 5000;
     public static final String INIT_URL = "/books";
 
-    public static List<Book> loadPackets(String ip) {
+    private static PacketLoader instance;
+
+    private String ip;
+
+    public static PacketLoader getInstance() {
+        if (instance == null) {
+            instance = new PacketLoader();
+        }
+        return instance;
+    }
+
+    private PacketLoader() {
+
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public List<Book> loadPackets() {
 
         List<Book> list = new ArrayList<>();
         try {
@@ -66,5 +89,33 @@ public class PacketLoader {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public void downloadPacket(String packetUrl, String savePath) {
+
+        try {
+            URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s", ip, HTTP_PORT, packetUrl));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return;
+            }
+            try (InputStream inputStream = conn.getInputStream()) {
+                byte[] buffer = new byte[1024];
+                try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                    for (int len; (len = inputStream.read(buffer)) != -1; ) {
+                        bos.write(buffer, 0, len);
+                    }
+                    byte[] getData = bos.toByteArray();
+                    File file = new File(savePath);
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(getData);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

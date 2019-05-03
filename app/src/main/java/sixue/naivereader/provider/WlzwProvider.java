@@ -20,6 +20,7 @@ import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
+import sixue.naivereader.helper.OnlineHelper;
 
 public class WlzwProvider extends NetProvider {
     private static final String TAG = WlzwProvider.class.getSimpleName();
@@ -76,8 +77,8 @@ public class WlzwProvider extends NetProvider {
                 book.setSiteId(source.getId());
                 book.setSitePara(source.getPara());
 
-                SmartDownloader downloader = new SmartDownloader(context, book);
-                downloader.startDownloadCover(coverUrl);
+                OnlineHelper helper = (OnlineHelper) book.buildHelper();
+                helper.downloadCover(context, coverUrl);
 
                 list.add(book);
             } else {
@@ -111,8 +112,8 @@ public class WlzwProvider extends NetProvider {
                     book.setSiteId(source.getId());
                     book.setSitePara(source.getPara());
 
-                    SmartDownloader downloader = new SmartDownloader(context, book);
-                    downloader.startDownloadCover(coverUrl);
+                    OnlineHelper helper = (OnlineHelper) book.buildHelper();
+                    helper.downloadCover(context, coverUrl);
 
                     list.add(book);
                 }
