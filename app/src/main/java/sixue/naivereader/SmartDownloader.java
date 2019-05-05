@@ -10,7 +10,7 @@ import sixue.naivereader.data.Chapter;
 import sixue.naivereader.provider.NetProvider;
 import sixue.naivereader.provider.NetProviderCollections;
 
-public class SmartDownloader {
+class SmartDownloader {
     private final Book book;
     private final Context context;
 

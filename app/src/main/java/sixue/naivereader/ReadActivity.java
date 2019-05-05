@@ -137,7 +137,12 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                switch (intent.getAction()) {
+                String action = intent.getAction();
+                if (action == null) {
+                    return;
+                }
+
+                switch (action) {
                     case Utils.ACTION_DOWNLOAD_CONTENT_FINISH:
                         if (book.getId().equals(intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID))) {
                             loadNetChapter(newIndex, 0);
@@ -395,6 +400,9 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         //Log.i(getClass().toString(), "onTouch");
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            return readerView.performClick();
+        }
         return detector.onTouchEvent(motionEvent);
     }
 }

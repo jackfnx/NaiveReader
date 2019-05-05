@@ -177,6 +177,11 @@ public class ReaderView extends View {
     }
 
     @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
+    @Override
     public void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
 
@@ -188,7 +193,8 @@ public class ReaderView extends View {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        drawPage(canvas, currentPage);
+        int pos = drawPage(canvas, currentPage);
+        Log.d(TAG, "Draw pos: " + pos);
     }
 
     private int drawPage(Canvas canvas, int page) {
