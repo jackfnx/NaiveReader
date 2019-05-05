@@ -1,6 +1,6 @@
 package sixue.naivereader.data;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

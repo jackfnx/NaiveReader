@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="sixue.naivereader.BookshelfActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/srl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,9 +25,9 @@
             android:gravity="center"
             android:numColumns="auto_fit"
             android:stretchMode="columnWidth" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
