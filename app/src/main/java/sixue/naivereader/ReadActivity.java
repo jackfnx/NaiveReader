@@ -102,17 +102,20 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
             @Override
             public void onTurnPageOver(int step) {
-                if (book.getKind() != BookKind.LocalText) {
+                if (book.getKind() == BookKind.LocalText) {
+                    if (step < 0) {
+                        Toast.makeText(ReadActivity.this, R.string.msg_first_page, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ReadActivity.this, R.string.msg_last_page, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
                     int i = book.getCurrentChapterIndex() + (step > 0 ? 1 : -1);
                     if (i >= 0 && i < book.getChapterList().size()) {
-                        loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
-                        return;
+                        if (book.getKind() == BookKind.Online)
+                            loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
+                        else if (book.getKind() == BookKind.Packet)
+                            loadPackChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
                     }
-                }
-                if (step < 0) {
-                    Toast.makeText(ReadActivity.this, R.string.msg_first_page, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ReadActivity.this, R.string.msg_last_page, Toast.LENGTH_SHORT).show();
                 }
             }
         });
