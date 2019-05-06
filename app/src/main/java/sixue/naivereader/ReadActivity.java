@@ -102,20 +102,23 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
 
             @Override
             public void onTurnPageOver(int step) {
-                if (book.getKind() == BookKind.LocalText) {
-                    if (step < 0) {
-                        Toast.makeText(ReadActivity.this, R.string.msg_first_page, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(ReadActivity.this, R.string.msg_last_page, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
+                if (book.getKind() == BookKind.Online) {
                     int i = book.getCurrentChapterIndex() + (step > 0 ? 1 : -1);
                     if (i >= 0 && i < book.getChapterList().size()) {
-                        if (book.getKind() == BookKind.Online)
-                            loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
-                        else if (book.getKind() == BookKind.Packet)
-                            loadPackChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
+                        loadNetChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
+                        return;
                     }
+                } else if (book.getKind() == BookKind.Packet) {
+                    int i = book.getCurrentChapterIndex() + (step > 0 ? -1 : 1);
+                    if (i >= 0 && i < book.getChapterList().size()) {
+                        loadPackChapter(i, step > 0 ? 0 : Integer.MAX_VALUE);
+                        return;
+                    }
+                }
+                if (step < 0) {
+                    Toast.makeText(ReadActivity.this, R.string.msg_first_page, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ReadActivity.this, R.string.msg_last_page, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -400,9 +403,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         //Log.i(getClass().toString(), "onTouch");
-        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            return readerView.performClick();
-        }
-        return detector.onTouchEvent(motionEvent);
+        readerView.isGesture = detector.onTouchEvent(motionEvent);
+        return readerView.performClick();
     }
 }

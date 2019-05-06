@@ -24,6 +24,7 @@ public class ReaderView extends View {
     private static final int MIN_H_PADDING = 32;
     private static final int LINE_SPACING = 5;
     private static final float TEXT_SIZE = 50.0f;
+    public boolean isGesture;
 
     private String text;
     private TextPaint textPaint;
@@ -178,7 +179,10 @@ public class ReaderView extends View {
 
     @Override
     public boolean performClick() {
-        return super.performClick();
+        if (isGesture)
+            return true;
+        else
+            return super.performClick();
     }
 
     @Override
