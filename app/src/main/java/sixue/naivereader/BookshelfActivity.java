@@ -209,7 +209,7 @@ public class BookshelfActivity extends AppCompatActivity {
 
     private void editItem(final Book book) {
         if (book.getKind() == BookKind.LocalText) {
-            View v = getLayoutInflater().inflate(R.layout.edit_dialog_local, null);
+            View v = View.inflate(this, R.layout.edit_dialog_local, null);
 
             final EditText title = v.findViewById(R.id.title);
             title.setText(book.getTitle());
@@ -237,7 +237,7 @@ public class BookshelfActivity extends AppCompatActivity {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else if (book.getKind() == BookKind.Online) {
-            View v = getLayoutInflater().inflate(R.layout.edit_dialog_net, null);
+            View v = View.inflate(this, R.layout.edit_dialog_net, null);
 
             final EditText title = v.findViewById(R.id.title);
             title.setText(book.getTitle());
@@ -359,13 +359,17 @@ public class BookshelfActivity extends AppCompatActivity {
                 if (size <= 0) {
                     progress.setText(R.string.read_progress_net_predownload);
                 } else if (cp + 1 == size) {
-                    progress.setText(R.string.read_progress_net_allread);
+                    if (book.isEnd()) {
+                        progress.setText(R.string.read_progress_net_end);
+                    } else {
+                        progress.setText(R.string.read_progress_net_allread);
+                    }
                 } else {
                     progress.setText(getString(R.string.read_progress_net, size - cp - 1));
                 }
             } else if (book.getKind() == BookKind.Packet) {
                 int cp = book.getCurrentChapterIndex();
-                progress.setText(getString(R.string.read_progress_net,  cp));
+                progress.setText(getString(R.string.read_progress_net, cp));
             }
 
             View selectIcon = view.findViewById(R.id.select_icon);

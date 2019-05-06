@@ -38,4 +38,5 @@
     <string name="server_offline">服务器离线</string>
     <string name="server_not_found">找不到服务器</string>
     <string name="tab_import_packet">导入打包文件</string>
+    <string name="read_progress_net_end">已完结</string>
 </resources>
