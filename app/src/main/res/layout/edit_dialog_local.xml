@@ -45,6 +45,6 @@
         android:focusableInTouchMode="false"
         android:inputType="text"
         android:labelFor="@id/local_path"
-        android:maxLines="1" />
+        android:singleLine="true" />
 
 </LinearLayout>
