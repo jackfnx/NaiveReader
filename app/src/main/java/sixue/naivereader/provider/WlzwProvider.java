@@ -141,7 +141,6 @@ public class WlzwProvider extends NetProvider {
                 final Chapter chapter = new Chapter();
                 chapter.setId(url);
                 chapter.setTitle(title);
-                chapter.setPara("");
                 String chapterSavePath = calcChapterSavePath(chapter, bookSavePath);
                 chapter.setSavePath(chapterSavePath);
 

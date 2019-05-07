@@ -3,14 +3,16 @@ package sixue.naivereader.data;
 public class Chapter {
     private String id;
     private String title;
-    private String para;
+    private String author;
+    private String source;
     private String savePath;
     private long timestamp;
 
     public Chapter() {
         id = "";
         title = "";
-        para = "";
+        author = "";
+        source = "";
         savePath = "";
     }
 
@@ -30,12 +32,20 @@ public class Chapter {
         this.title = title;
     }
 
-    public String getPara() {
-        return para;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setPara(String para) {
-        this.para = para;
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getSavePath() {

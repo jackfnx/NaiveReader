@@ -3,16 +3,17 @@ package sixue.naivereader.helper;
 import android.content.Context;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;
-import sixue.naivereader.data.PackChapter;
-import sixue.naivereader.data.Packet;
 
 public class PacketHelper implements BookHelper {
 
@@ -27,25 +28,17 @@ public class PacketHelper implements BookHelper {
     public boolean reloadContent(Context context) {
 
         String bookSavePath = calcPacketSavePath(context);
-        String json = Utils.readTextFromZip(bookSavePath, ".META.json");
+        String json = Utils.readTextFromZip(bookSavePath, ".CONTENT");
         if (json == null) {
             return false;
         }
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            Packet packet = mapper.readValue(json, Packet.class);
-            book.getChapterList().clear();
-            for (PackChapter packChapter : packet.getChapters()) {
-                Chapter chapter = new Chapter();
-                chapter.setId(packChapter.getFilename());
-                chapter.setTitle(packChapter.getTitle());
-                chapter.setPara(packChapter.getSource());
-                chapter.setSavePath(packChapter.getFilename());
-                chapter.setTimestamp(packChapter.getTimestamp());
-                book.getChapterList().add(chapter);
-            }
-            return book.getChapterList().size() > 0;
+            JavaType listType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Chapter.class);
+            List<Chapter> list = mapper.readValue(json, listType);
+            book.setChapterList(list);
+            return list.size() > 0;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
