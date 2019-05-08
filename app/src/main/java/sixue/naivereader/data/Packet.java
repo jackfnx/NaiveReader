@@ -1,5 +1,7 @@
 package sixue.naivereader.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class Packet {
@@ -51,11 +53,11 @@ public class Packet {
         this.timestamp = timestamp;
     }
 
-    public List<PackChapter> getChapters() {
+    public List<Chapter> getChapters() {
         return chapters;
     }
 
-    public void setChapters(List<PackChapter> chapters) {
+    public void setChapters(List<Chapter> chapters) {
         this.chapters = chapters;
     }
 
@@ -65,5 +67,6 @@ public class Packet {
     private String key;
     private String summary;
     private long timestamp;
-    private List<PackChapter> chapters;
+    @JsonIgnore
+    private List<Chapter> chapters;
 }
