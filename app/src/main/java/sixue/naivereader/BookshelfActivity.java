@@ -132,13 +132,13 @@ public class BookshelfActivity extends AppCompatActivity {
         for (int i = 0; i < BookLoader.getInstance().getBookNum(); i++) {
             Book book = BookLoader.getInstance().getBook(i);
             if (book.getKind() == BookKind.Online) {
-                SmartDownloader downloader = new SmartDownloader(this, book);
-                if (downloader.reloadContent()) {
+                if (book.buildHelper().reloadContent(this)) {
                     Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH);
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
                     sendBroadcast(intent);
                 }
 
+                SmartDownloader downloader = new SmartDownloader(this, book);
                 if (!book.isEnd()) {
                     downloader.startDownloadContent();
                 }

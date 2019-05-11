@@ -123,7 +123,7 @@ public class ContentActivity extends AppCompatActivity {
             }
         });
 
-        if (downloader.reloadContent()) {
+        if (book.buildHelper().reloadContent(this)) {
             if (book.getKind() == BookKind.LocalText) {
                 localText = Utils.readText(book.getLocalPath());
                 localChapterNodes = LocalTextLoader.calcChapterNodes(localText);

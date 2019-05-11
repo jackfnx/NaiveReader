@@ -199,7 +199,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
         registerReceiver(batteryReceiver, filter);
 
         smartDownloader = new SmartDownloader(this, book);
-        if (smartDownloader.reloadContent()) {
+        if (book.buildHelper().reloadContent(this)) {
             if (book.getKind() == BookKind.LocalText) {
                 Intent intent = new Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH);
                 intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());

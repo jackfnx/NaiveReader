@@ -19,14 +19,6 @@ class SmartDownloader {
         this.book = book;
     }
 
-    boolean reloadContent() {
-        return book.buildHelper().reloadContent(context);
-    }
-
-    private void downloadContent() {
-        book.buildHelper().downloadContent(context);
-    }
-
     boolean isDownloaded(Chapter chapter) {
         File file = new File(chapter.getSavePath());
         return file.exists();
@@ -47,7 +39,7 @@ class SmartDownloader {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                downloadContent();
+                book.buildHelper().downloadContent(context);
             }
         }).start();
     }
