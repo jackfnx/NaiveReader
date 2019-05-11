@@ -39,4 +39,7 @@
     <string name="server_not_found">找不到服务器</string>
     <string name="tab_import_packet">导入打包文件</string>
     <string name="read_progress_net_end">已完结</string>
+    <string name="not_download">未下载</string>
+    <string name="no_changes">无更新</string>
+    <string name="new_changes">有更新</string>
 </resources>

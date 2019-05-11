@@ -40,4 +40,7 @@
     <string name="server_not_found">Server not found.</string>
     <string name="tab_import_packet">Import packet</string>
     <string name="read_progress_net_end">end</string>
+    <string name="not_download">Not download.</string>
+    <string name="no_changes">No changes.</string>
+    <string name="new_changes">New</string>
 </resources>

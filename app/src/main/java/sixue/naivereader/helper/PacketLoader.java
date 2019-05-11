@@ -47,9 +47,8 @@ public class PacketLoader {
         return false;
     }
 
-    public static List<Book> loadPackets(String ip) {
+    public static List<Packet> loadPackets(String ip) {
 
-        List<Book> list = new ArrayList<>();
         try {
             URL url = new URL(String.format(Locale.PRC, "http://%s:%d%s", ip, HTTP_PORT, INIT_URL));
             Log.i(TAG, "GET:" + url);
@@ -60,7 +59,7 @@ public class PacketLoader {
             int c = conn.getResponseCode();
             if (c != HttpURLConnection.HTTP_OK) {
                 Log.i(TAG, "HTTP Error:" + c);
-                return list;
+                return new ArrayList<>();
             }
             InputStream is = conn.getInputStream();
 
@@ -76,18 +75,11 @@ public class PacketLoader {
             JavaType listType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Packet.class);
             List<Packet> packets = mapper.readValue(json, listType);
             Log.i(TAG, "GET JSON: " + packets.size() + " packets.");
-            for (Packet packet : packets) {
-                Book book = new Book();
-                book.setId(packet.getKey());
-                book.setTitle(packet.getTitle());
-                book.setAuthor(packet.getAuthor());
-                book.setKind(BookKind.Packet);
-                list.add(book);
-            }
+            return packets;
         } catch (IOException e) {
             e.printStackTrace();
+            return new ArrayList<>();
         }
-        return list;
     }
 
     static void downloadPacket(String ip, String savePath, String packetUrl) {
@@ -116,5 +108,14 @@ public class PacketLoader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Book createBook(Packet packet) {
+        Book book = new Book();
+        book.setId(packet.getKey());
+        book.setTitle(packet.getTitle());
+        book.setAuthor(packet.getAuthor());
+        book.setKind(BookKind.Packet);
+        return book;
     }
 }

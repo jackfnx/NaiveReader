@@ -27,10 +27,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -362,6 +365,12 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String fmtTimestamp(long timestamp) {
+        Date date = new Date(timestamp * 1000);
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+        return f.format(date);
     }
 
     public interface Func<T> {

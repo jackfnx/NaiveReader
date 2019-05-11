@@ -20,4 +20,16 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="EmphasizeText">
+        <item name="android:textColor">#FF0000</item>
+    </style>
+
+    <style name="PeaceText">
+        <item name="android:textColor">#88DD00</item>
+    </style>
+
+    <style name="SecondaryText">
+        <item name="android:textColor">#cccccc</item>
+    </style>
 </resources>

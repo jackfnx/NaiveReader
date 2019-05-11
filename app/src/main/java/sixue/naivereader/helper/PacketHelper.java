@@ -14,6 +14,7 @@ import java.util.List;
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.Chapter;
+import sixue.naivereader.data.Packet;
 
 public class PacketHelper implements BookHelper {
 
@@ -78,6 +79,23 @@ public class PacketHelper implements BookHelper {
                 callback.exec(savePath);
             }
         }).start();
+    }
+
+    public Packet loadMetaData(Context context) {
+
+        String bookSavePath = calcPacketSavePath(context);
+        String json = Utils.readTextFromZip(bookSavePath, ".META.json");
+        if (json == null) {
+            return null;
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(json, Packet.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public interface Func<T> {

@@ -2,8 +2,6 @@ package sixue.naivereader;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +11,14 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.data.Book;
+import sixue.naivereader.data.Packet;
 import sixue.naivereader.helper.PacketHelper;
 import sixue.naivereader.helper.PacketLoader;
 
@@ -28,7 +30,7 @@ public class AddPacketFragment extends Fragment {
     private View loadingProgress;
     private View offline;
     private MyAdapter adapter;
-    private List<Book> list;
+    private List<Packet> list;
     private String ip;
 
     public AddPacketFragment() {
@@ -55,11 +57,12 @@ public class AddPacketFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final Book book = list.get(position);
-                Book b = BookLoader.getInstance().findBook(book.getId());
+                final Packet packet = list.get(position);
+                Book b = BookLoader.getInstance().findBook(packet.getKey());
                 if (b != null) {
                     BookLoader.getInstance().bookBubble(b);
                 } else {
+                    final Book book = PacketLoader.createBook(packet);
                     final PacketHelper helper = (PacketHelper) book.buildHelper();
                     helper.downloadPacket(getActivity(), ip, new PacketHelper.Func<String>() {
                         @Override
@@ -120,14 +123,30 @@ public class AddPacketFragment extends Fragment {
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.listviewitem_packet, parent, false);
             }
 
-            Book book = list.get(position);
+            Packet packet = list.get(position);
 
             TextView title = convertView.findViewById(R.id.title);
             TextView author = convertView.findViewById(R.id.author);
+            TextView time = convertView.findViewById(R.id.timestamp);
             TextView status = convertView.findViewById(R.id.status);
-            title.setText(book.getTitle());
-            author.setText(book.getAuthor());
-            status.setText(book.getId());
+            title.setText(packet.getTitle());
+            author.setText(packet.getAuthor());
+            time.setText(Utils.fmtTimestamp(packet.getTimestamp()));
+            Book b = BookLoader.getInstance().findBook(packet.getKey());
+            if (b == null) {
+                status.setText(R.string.not_download);
+                status.setTextAppearance(R.style.SecondaryText);
+            } else {
+                PacketHelper helper = (PacketHelper) b.buildHelper();
+                Packet currentPacket = helper.loadMetaData(getContext());
+                if (currentPacket.getSummary().equals(packet.getSummary())) {
+                    status.setText(R.string.no_changes);
+                    status.setTextAppearance(R.style.PeaceText);
+                } else {
+                    status.setText(R.string.new_changes);
+                    status.setTextAppearance(R.style.EmphasizeText);
+                }
+            }
             return convertView;
         }
 
