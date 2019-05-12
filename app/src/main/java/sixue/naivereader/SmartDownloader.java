@@ -53,16 +53,6 @@ class SmartDownloader {
         }).start();
     }
 
-    boolean coverIsDownloaded() {
-        String coverSavePath = book.getCoverSavePath();
-        if (coverSavePath.length() == 0) {
-            return false;
-        }
-
-        File f = new File(coverSavePath);
-        return f.exists();
-    }
-
     String getChapterUrl(Chapter chapter) {
         NetProvider provider = NetProviderCollections.findProviders(book.getSiteId());
         return provider.getChapterUrl(book, chapter);

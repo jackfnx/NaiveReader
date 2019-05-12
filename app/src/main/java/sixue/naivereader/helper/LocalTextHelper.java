@@ -2,9 +2,6 @@ package sixue.naivereader.helper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import java.io.File;
 
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;

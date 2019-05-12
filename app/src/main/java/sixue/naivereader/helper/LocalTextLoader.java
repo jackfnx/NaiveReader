@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
 import sixue.naivereader.data.BookKind;
 
