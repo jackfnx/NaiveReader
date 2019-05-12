@@ -5,14 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +21,13 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +143,7 @@ public class BookshelfActivity extends AppCompatActivity {
                     downloader.startDownloadContent();
                 }
 
-                if (!downloader.coverIsDownloaded()) {
+                if (book.buildHelper().loadCoverBitmap(this) == null) {
                     downloader.startDownloadContent();
                 }
             }
@@ -381,14 +381,7 @@ public class BookshelfActivity extends AppCompatActivity {
             selectIcon.setSelected(editList.contains(book));
 
             ImageView cover = view.findViewById(R.id.cover);
-            SmartDownloader downloader = new SmartDownloader(BookshelfActivity.this, book);
-            if (downloader.coverIsDownloaded()) {
-                Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
-                cover.setImageBitmap(bm);
-            } else {
-                Bitmap bm = Utils.getAutoCover(BookshelfActivity.this, book.getTitle());
-                cover.setImageBitmap(bm);
-            }
+            cover.setImageBitmap(book.buildHelper().loadCoverBitmap(BookshelfActivity.this));
             return view;
         }
     }

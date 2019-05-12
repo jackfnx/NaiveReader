@@ -80,6 +80,22 @@ public class OnlineHelper implements BookHelper {
         }
     }
 
+    @Override
+    public Bitmap loadCoverBitmap(Context context) {
+        String coverSavePath = book.getCoverSavePath();
+
+        if (coverSavePath.length() == 0) {
+            return Utils.getAutoCover(context, book.getTitle());
+        }
+
+        File f = new File(coverSavePath);
+        if (!f.exists()) {
+            return Utils.getAutoCover(context, book.getTitle());
+        }
+
+        return BitmapFactory.decodeFile(coverSavePath);
+    }
+
     private String calcBookSavePath(Context context) {
         String saveRootPath = Utils.getSavePathRoot(context);
         return saveRootPath + "/books/" + book.getId() + "/" + book.getSiteId();

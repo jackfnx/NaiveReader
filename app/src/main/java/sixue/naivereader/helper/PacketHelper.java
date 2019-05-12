@@ -1,6 +1,8 @@
 package sixue.naivereader.helper;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -79,6 +81,18 @@ public class PacketHelper implements BookHelper {
                 callback.exec(savePath);
             }
         }).start();
+    }
+
+    @Override
+    public Bitmap loadCoverBitmap(Context context) {
+        String bookSavePath = calcPacketSavePath(context);
+        byte[] coverBytes = Utils.readBytesFromZip(bookSavePath, "cover.jpg");
+
+        if (coverBytes == null) {
+            return Utils.getAutoCover(context, book.getTitle());
+        }
+
+        return BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
     }
 
     public Packet loadMetaData(Context context) {

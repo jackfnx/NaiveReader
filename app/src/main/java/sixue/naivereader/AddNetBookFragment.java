@@ -4,12 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +16,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,14 +77,7 @@ public class AddNetBookFragment extends Fragment {
                 TextView source = view.findViewById(R.id.source);
 
                 Book book = list.get(i);
-                SmartDownloader downloader = new SmartDownloader(getContext(), book);
-                if (downloader.coverIsDownloaded()) {
-                    Bitmap bm = BitmapFactory.decodeFile(book.getCoverSavePath());
-                    cover.setImageBitmap(bm);
-                } else {
-                    Bitmap bm = Utils.getAutoCover(getContext(), book.getTitle());
-                    cover.setImageBitmap(bm);
-                }
+                cover.setImageBitmap(book.buildHelper().loadCoverBitmap(context));
                 title.setText(book.getTitle());
                 author.setText(book.getAuthor());
                 source.setText(getString(R.string.sources, book.getSources().size()));

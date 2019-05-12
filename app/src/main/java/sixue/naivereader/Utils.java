@@ -11,13 +11,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Environment;
-import androidx.core.app.ActivityCompat;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -356,6 +358,35 @@ public class Utils {
                                 text.append("\n");
                             }
                             return text.toString();
+                        }
+                    }
+                }
+            }
+            zin.closeEntry();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static byte[] readBytesFromZip(String zipPath, String path) {
+
+        try {
+            ZipFile zf = new ZipFile(zipPath);
+            InputStream in = new BufferedInputStream(new FileInputStream(zipPath));
+            ZipInputStream zin = new ZipInputStream(in);
+            for (ZipEntry ze; (ze = zin.getNextEntry()) != null; ) {
+                if (!ze.isDirectory()) {
+                    if (ze.getName().equals(path)) {
+                        try (BufferedInputStream is =
+                                new BufferedInputStream(zf.getInputStream(ze))) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream((int) ze.getSize());
+                            byte[] cache = new byte[1024];
+                            int len = 0;
+                            while ((len = is.read(cache, 0, cache.length)) != -1) {
+                                bos.write(cache, 0, len);
+                            }
+                            return bos.toByteArray();
                         }
                     }
                 }
