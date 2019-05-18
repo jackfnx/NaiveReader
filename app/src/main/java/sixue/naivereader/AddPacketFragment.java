@@ -58,9 +58,28 @@ public class AddPacketFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 final Packet packet = list.get(position);
-                Book b = BookLoader.getInstance().findBook(packet.getKey());
+                final Book b = BookLoader.getInstance().findBook(packet.getKey());
                 if (b != null) {
-                    BookLoader.getInstance().bookBubble(b);
+                    PacketHelper helper = (PacketHelper) b.buildHelper();
+                    Packet currentPacket = helper.loadMetaData(getContext());
+                    if (!currentPacket.getSummary().equals(packet.getSummary())) {
+                        helper.downloadPacket(getActivity(), ip, new PacketHelper.Func<String>() {
+                            @Override
+                            public void exec(final String savePath) {
+
+                                BookLoader.getInstance().bookBubble(b);
+                                final Activity activity = getActivity();
+                                if (activity != null) {
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            activity.finish();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
                 } else {
                     final Book book = PacketLoader.createBook(packet);
                     final PacketHelper helper = (PacketHelper) book.buildHelper();
@@ -197,9 +216,9 @@ public class AddPacketFragment extends Fragment {
                 clientThread = null;
             }
             ip = null;
-            loadingProgress.setVisibility(View.INVISIBLE);
-            listView.setVisibility(View.INVISIBLE);
-            offline.setVisibility(View.VISIBLE);
+//            loadingProgress.setVisibility(View.INVISIBLE);
+//            listView.setVisibility(View.INVISIBLE);
+//            offline.setVisibility(View.VISIBLE);
         }
     }
 }
