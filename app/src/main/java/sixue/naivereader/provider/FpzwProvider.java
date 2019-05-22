@@ -21,17 +21,17 @@ import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
 import sixue.naivereader.helper.OnlineHelper;
 
-public class WlzwProvider extends NetProvider {
+public class FpzwProvider extends NetProvider {
     private static final String TAG = WlzwProvider.class.getSimpleName();
 
     @Override
     public String getProviderId() {
-        return "wwww.50zw.la";
+        return "www.fpzw.com";
     }
 
     @Override
     public String getProviderName() {
-        return "武林中文";
+        return "富品中文";
     }
 
     @Override
@@ -39,7 +39,7 @@ public class WlzwProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.50zw.la/modules/article/search.php?searchkey=" + key;
+            String url = "https://www.fpzw.com/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
@@ -126,12 +126,14 @@ public class WlzwProvider extends NetProvider {
     @Override
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
-        String contentUrl = "https://www.50zw.la/book_" + book.getSitePara() + "/";
+        String para = book.getSitePara();
+        String prefix = para.length() > 2 ? para.substring(0, 2) : "0";
+        String contentUrl = String.format("https://www.fpzw.com/xiaoshuo/%s/%s/", prefix, para);
         List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
-            Elements elements = doc.body().select(".chapterlist");
-            for (Element ch : Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
+            Elements elements = doc.body().select(".book");
+            for (Element ch : Jsoup.parse(elements.toString()).select("dd")) {
                 String title = ch.select("a").text();
                 String url = ch.select("a").attr("href").replace("/", "").trim();
                 if (url.length() == 0) {
@@ -149,6 +151,7 @@ public class WlzwProvider extends NetProvider {
         } catch (IOException e) {
             Log.e(TAG, "downloadContent ERROR: " + contentUrl);
         }
+        content = content.subList(4, content.size());
         return content;
     }
 
@@ -158,8 +161,11 @@ public class WlzwProvider extends NetProvider {
         String chapterUrl = getChapterUrl(book, chapter);
         try {
             Document doc = Jsoup.connect(chapterUrl).timeout(5000).get();
-            String text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ");
-            Utils.writeText(text, chapter.getSavePath());
+            String text = doc.body().select(".text").html();
+            String plainText = Utils.clearHtmlTag(text, new String[]{"a", "script", "font", "strong"})
+                    .replace("<br>", "")
+                    .replace("&nbsp;", " ");
+            Utils.writeText(plainText, chapter.getSavePath());
         } catch (IOException e) {
             Log.e(TAG, "downloadChapter ERROR: " + chapterUrl);
         }
@@ -167,7 +173,10 @@ public class WlzwProvider extends NetProvider {
 
     @Override
     public String getChapterUrl(Book book, Chapter chapter) {
-        return "https://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId();
+
+        String para = book.getSitePara();
+        String prefix = para.length() > 2 ? para.substring(0, 2) : "0";
+        return String.format("https://www.fpzw.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.getId());
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
@@ -175,15 +184,16 @@ public class WlzwProvider extends NetProvider {
     }
 
     private String calcCoverUrl(String para) {
-        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.50zw.la/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        String prefix = para.length() > 2 ? para.substring(0, para.length() - 2) : "0";
+        return String.format("https://www.fpzw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
-        int l = bookUrl.lastIndexOf('_');
+        bookUrl = bookUrl.endsWith("/") ? bookUrl.substring(0, bookUrl.length() - 1) : bookUrl;
+        int l = bookUrl.lastIndexOf('/');
         int r = bookUrl.length();
         if (l != -1 && l < r) {
-            return bookUrl.substring(l + 1, r - 1).replace("/", "");
+            return bookUrl.substring(l + 1, r);
         } else {
             return "";
         }

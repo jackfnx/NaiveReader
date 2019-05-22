@@ -53,6 +53,7 @@ public class NetProviderCollections {
             providers = new HashMap<>();
             addProvider(new WlzwProvider());
             addProvider(new PtwxProvider());
+            addProvider(new FpzwProvider());
         }
     }
 

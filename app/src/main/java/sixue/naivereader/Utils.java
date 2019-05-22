@@ -15,6 +15,9 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.BufferedInputStream;
@@ -402,6 +405,16 @@ public class Utils {
         Date date = new Date(timestamp * 1000);
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         return f.format(date);
+    }
+
+    public static String clearHtmlTag(String text, String[] tags) {
+        Document textDoc = Jsoup.parse(text);
+        for (String t : tags) {
+            for (Element o : textDoc.body().select(t)) {
+                o.remove();
+            }
+        }
+        return textDoc.body().html();
     }
 
     public interface Func<T> {

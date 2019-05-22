@@ -29,6 +29,7 @@ import sixue.naivereader.provider.NetProvider;
 import sixue.naivereader.provider.NetProviderCollections;
 
 public class AddNetBookFragment extends Fragment {
+    private static final String TAG = AddNetBookFragment.class.getSimpleName();
 
     private Context context;
     private List<Book> list;
@@ -115,7 +116,7 @@ public class AddNetBookFragment extends Fragment {
                                     }
                                 });
                             }
-                            Log.i(AddNetBookFragment.this.getClass().toString(), list.toString());
+                            Log.i(TAG, list.toString());
                         }
                     }).start();
                 }
