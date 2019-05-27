@@ -127,7 +127,7 @@ public class FpzwProvider extends NetProvider {
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
         String para = book.getSitePara();
-        String prefix = para.length() > 2 ? para.substring(0, 2) : "0";
+        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
         String contentUrl = String.format("https://www.fpzw.com/xiaoshuo/%s/%s/", prefix, para);
         List<Chapter> content = new ArrayList<>();
         try {
@@ -151,7 +151,7 @@ public class FpzwProvider extends NetProvider {
         } catch (IOException e) {
             Log.e(TAG, "downloadContent ERROR: " + contentUrl);
         }
-        content = content.subList(4, content.size());
+        content = content.size() >= 4 ? content.subList(4, content.size()) : content;
         return content;
     }
 
@@ -175,7 +175,7 @@ public class FpzwProvider extends NetProvider {
     public String getChapterUrl(Book book, Chapter chapter) {
 
         String para = book.getSitePara();
-        String prefix = para.length() > 2 ? para.substring(0, 2) : "0";
+        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
         return String.format("https://www.fpzw.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.getId());
     }
 
@@ -184,7 +184,7 @@ public class FpzwProvider extends NetProvider {
     }
 
     private String calcCoverUrl(String para) {
-        String prefix = para.length() > 2 ? para.substring(0, para.length() - 2) : "0";
+        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
         return String.format("https://www.fpzw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
