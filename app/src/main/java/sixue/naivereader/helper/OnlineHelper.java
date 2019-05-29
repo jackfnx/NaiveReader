@@ -29,6 +29,7 @@ import sixue.naivereader.provider.NetProviderCollections;
 public class OnlineHelper implements BookHelper {
 
     private final Book book;
+    private Bitmap cover;
 
     public OnlineHelper(Book book) {
         this.book = book;
@@ -82,18 +83,17 @@ public class OnlineHelper implements BookHelper {
 
     @Override
     public Bitmap loadCoverBitmap(Context context) {
-        String coverSavePath = book.getCoverSavePath();
+        if (cover == null) {
+            String coverSavePath = book.getCoverSavePath();
+            File f = new File(coverSavePath);
 
-        if (coverSavePath.length() == 0) {
-            return Utils.getAutoCover(context, book.getTitle());
+            if (coverSavePath.length() == 0 || !f.exists()) {
+                cover = Utils.getAutoCover(context, book.getTitle());
+            } else {
+                cover = BitmapFactory.decodeFile(coverSavePath);
+            }
         }
-
-        File f = new File(coverSavePath);
-        if (!f.exists()) {
-            return Utils.getAutoCover(context, book.getTitle());
-        }
-
-        return BitmapFactory.decodeFile(coverSavePath);
+        return cover;
     }
 
     private String calcBookSavePath(Context context) {

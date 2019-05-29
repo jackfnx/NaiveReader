@@ -9,6 +9,7 @@ import sixue.naivereader.data.Book;
 public class LocalTextHelper implements BookHelper {
 
     private final Book book;
+    private Bitmap cover;
 
     public LocalTextHelper(Book book) {
         this.book = book;
@@ -26,6 +27,9 @@ public class LocalTextHelper implements BookHelper {
 
     @Override
     public Bitmap loadCoverBitmap(Context context) {
-        return Utils.getAutoCover(context, book.getTitle());
+        if (cover == null) {
+            cover = Utils.getAutoCover(context, book.getTitle());
+        }
+        return cover;
     }
 }

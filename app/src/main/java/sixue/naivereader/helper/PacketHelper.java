@@ -22,6 +22,7 @@ public class PacketHelper implements BookHelper {
 
     private static final String TAG = PacketHelper.class.getSimpleName();
     private final Book book;
+    private Bitmap cover;
 
     public PacketHelper(Book book) {
         this.book = book;
@@ -85,14 +86,17 @@ public class PacketHelper implements BookHelper {
 
     @Override
     public Bitmap loadCoverBitmap(Context context) {
-        String bookSavePath = calcPacketSavePath(context);
-        byte[] coverBytes = Utils.readBytesFromZip(bookSavePath, "cover.jpg");
+        if (cover == null) {
+            String bookSavePath = calcPacketSavePath(context);
+            byte[] coverBytes = Utils.readBytesFromZip(bookSavePath, "cover.jpg");
 
-        if (coverBytes == null) {
-            return Utils.getAutoCover(context, book.getTitle());
+            if (coverBytes == null) {
+                cover = Utils.getAutoCover(context, book.getTitle());
+            } else {
+                cover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
+            }
         }
-
-        return BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
+        return cover;
     }
 
     public Packet loadMetaData(Context context) {
