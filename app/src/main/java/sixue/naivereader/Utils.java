@@ -39,6 +39,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -222,10 +224,19 @@ public class Utils {
         Log.i(TAG, "deleteDirectory:" + file.toString() + ", " + mk);
     }
 
-    private static Bitmap paintCover(Bitmap blank, String title) {
+    private static Bitmap paintCover(Bitmap blank, String title, String author) {
         int MIN_TEXT_SIZE = 12;
         int MAX_TEXT_SIZE = 40;
-        List<String> lines = explodeBySpecialChar(title);
+        List<String> lines = explodeBySpecialChar(title, 6);
+        int title_size = paintText(blank, lines, blank.getHeight() / 4, MIN_TEXT_SIZE, MAX_TEXT_SIZE);
+        if (author != null) {
+            List<String> lines2 = explodeBySpecialChar(author, 7);
+            paintText(blank, lines2, blank.getHeight() * 3 / 4, MIN_TEXT_SIZE, title_size - 1);
+        }
+        return blank;
+    }
+
+    private static int paintText(Bitmap blank, List<String> lines, int y0, int minSize, int maxSize) {
         String maxLine = Collections.max(lines, new Comparator<String>() {
             @Override
             public int compare(String s, String t1) { return s.length() - t1.length(); }
@@ -236,8 +247,9 @@ public class Utils {
         paint.setFilterBitmap(true);
         paint.setColor(Color.BLACK);
         paint.setShadowLayer(1f, 0f, 1f, Color.LTGRAY);
-        for (int i = MIN_TEXT_SIZE; i < MAX_TEXT_SIZE; i++) {
-            paint.setTextSize(i);
+        int textSize = minSize;
+        for (; textSize < maxSize; textSize++) {
+            paint.setTextSize(textSize);
             if ((blank.getWidth() - paint.measureText(maxLine)) < 10) {
                 break;
             }
@@ -247,13 +259,13 @@ public class Utils {
             Rect bounds = new Rect();
             paint.getTextBounds(line, 0, line.length(), bounds);
             int x = (blank.getWidth() - bounds.width()) / 2;
-            int y = (blank.getHeight() + bounds.height()) / 4 + i * bounds.height();
+            int y = y0 + bounds.height() / 4 + i * bounds.height();
             canvas.drawText(line, x, y, paint);
         }
-        return  blank;
+        return textSize;
     }
 
-    private static List<String> explodeBySpecialChar(String title) {
+    private static List<String> explodeBySpecialChar(String title, int maxLen) {
         List<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (char c : title.toCharArray()) {
@@ -298,19 +310,36 @@ public class Utils {
                 sb.append(c);
                 continue;
             }
-            list.add(sb.toString());
+            toMultiLines(list, sb, maxLen);
             sb = new StringBuilder();
         }
         if (sb.length() != 0)
-            list.add(sb.toString());
+            toMultiLines(list, sb, maxLen);
         return list;
     }
 
-    private static Bitmap getBlankCoverBitmap(Context context) {
+    private static void toMultiLines(List<String> list, StringBuilder sb, int maxLen) {
+        String line = sb.toString();
+        int len = line.length();
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9]+$");
+        Matcher matcher = pattern.matcher(line);
+        if (len <= maxLen || matcher.matches()) {
+            list.add(line);
+        } else if (len <= maxLen * 2) {
+            list.add(line.substring(0, len / 2 + 1));
+            list.add(line.substring(len / 2 + 1));
+        } else {
+            list.add(line.substring(0, maxLen));
+            list.add("...");
+        }
+    }
+
+    private static Bitmap getBlankCoverBitmap(Context context, int texture_id) {
         try {
             int WIDTH = 160;
             int HEIGHT = 200;
-            InputStream is = context.getAssets().open("texture_paper.jpg");
+            String texture_name = String.format(Locale.CHINA, "texture_paper_%d.jpg", texture_id);
+            InputStream is = context.getAssets().open(texture_name);
             Bitmap texture = BitmapFactory.decodeStream(is);
             int x = (int)(Math.random() * (texture.getWidth() - WIDTH));
             int y = (int)(Math.random() * (texture.getHeight() - HEIGHT));
@@ -323,15 +352,15 @@ public class Utils {
         }
     }
 
-    public static Bitmap getAutoCover(Context context, String title) {
+    public static Bitmap getAutoCover(Context context, String title, String author, int texture) {
         String saveRoot = getSavePathRoot(context);
         String autoCoverRoot = saveRoot + "/AutoCover/";
         String autoCoverPath = autoCoverRoot + title + ".jpg";
         if (exists(autoCoverPath)) {
             return BitmapFactory.decodeFile(autoCoverPath);
         } else {
-            Bitmap blank = getBlankCoverBitmap(context);
-            Bitmap cover = paintCover(blank, title);
+            Bitmap blank = getBlankCoverBitmap(context, texture);
+            Bitmap cover = paintCover(blank, title, author);
             try {
                 mkdir(autoCoverRoot);
                 OutputStream os = new FileOutputStream(autoCoverPath);

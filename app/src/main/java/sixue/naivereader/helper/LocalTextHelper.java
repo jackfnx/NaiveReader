@@ -28,7 +28,7 @@ public class LocalTextHelper implements BookHelper {
     @Override
     public Bitmap loadCoverBitmap(Context context) {
         if (cover == null) {
-            cover = Utils.getAutoCover(context, book.getTitle());
+            cover = Utils.getAutoCover(context, book.getTitle(), book.getAuthor(), 1);
         }
         return cover;
     }

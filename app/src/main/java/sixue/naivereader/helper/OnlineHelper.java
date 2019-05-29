@@ -88,7 +88,7 @@ public class OnlineHelper implements BookHelper {
             File f = new File(coverSavePath);
 
             if (coverSavePath.length() == 0 || !f.exists()) {
-                cover = Utils.getAutoCover(context, book.getTitle());
+                cover = Utils.getAutoCover(context, book.getTitle(), book.getAuthor(), 2);
             } else {
                 cover = BitmapFactory.decodeFile(coverSavePath);
             }

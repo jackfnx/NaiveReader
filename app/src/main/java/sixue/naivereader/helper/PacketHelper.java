@@ -91,7 +91,7 @@ public class PacketHelper implements BookHelper {
             byte[] coverBytes = Utils.readBytesFromZip(bookSavePath, "cover.jpg");
 
             if (coverBytes == null) {
-                cover = Utils.getAutoCover(context, book.getTitle());
+                cover = Utils.getAutoCover(context, book.getTitle(), book.getAuthor(), 3);
             } else {
                 cover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
             }
