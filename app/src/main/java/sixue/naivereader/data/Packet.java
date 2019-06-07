@@ -61,12 +61,21 @@ public class Packet {
         this.chapters = chapters;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     private String title;
     private String author;
     private Boolean simple;
     private String key;
     private String summary;
     private long timestamp;
+    private String source;
     @JsonIgnore
     private List<Chapter> chapters;
 }

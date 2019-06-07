@@ -42,4 +42,5 @@
     <string name="not_download">未下载</string>
     <string name="no_changes">无更新</string>
     <string name="new_changes">有更新</string>
+    <string name="msg_packet_download">Packet下载完毕</string>
 </resources>

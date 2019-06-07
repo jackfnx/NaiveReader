@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -73,7 +74,8 @@ public class AddPacketFragment extends Fragment {
                                     activity.runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            activity.finish();
+                                            Toast.makeText(activity, R.string.msg_packet_download, Toast.LENGTH_SHORT).show();
+                                            adapter.notifyDataSetChanged();
                                         }
                                     });
                                 }
@@ -93,7 +95,8 @@ public class AddPacketFragment extends Fragment {
                                 activity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        activity.finish();
+                                        Toast.makeText(activity, R.string.msg_packet_download, Toast.LENGTH_SHORT).show();
+                                        adapter.notifyDataSetChanged();
                                     }
                                 });
                             }

@@ -43,4 +43,5 @@
     <string name="not_download">Not download.</string>
     <string name="no_changes">No changes.</string>
     <string name="new_changes">New</string>
+    <string name="msg_packet_download">Packet download.</string>
 </resources>

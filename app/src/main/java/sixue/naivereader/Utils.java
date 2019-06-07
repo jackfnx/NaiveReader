@@ -231,7 +231,8 @@ public class Utils {
         int title_size = paintText(blank, lines, blank.getHeight() / 4, MIN_TEXT_SIZE, MAX_TEXT_SIZE);
         if (author != null) {
             List<String> lines2 = explodeBySpecialChar(author, 7);
-            paintText(blank, lines2, blank.getHeight() * 3 / 4, MIN_TEXT_SIZE, title_size - 1);
+            int author_size = title_size > MAX_TEXT_SIZE - 10 ? MAX_TEXT_SIZE - 10 : title_size - 1;
+            paintText(blank, lines2, blank.getHeight() * 3 / 4, MIN_TEXT_SIZE, author_size);
         }
         return blank;
     }
