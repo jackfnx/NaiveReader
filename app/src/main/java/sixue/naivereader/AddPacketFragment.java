@@ -61,6 +61,8 @@ public class AddPacketFragment extends Fragment {
                 final Packet packet = list.get(position);
                 final Book b = BookLoader.getInstance().findBook(packet.getKey());
                 if (b != null) {
+                    final int currentChapterIndex = b.getCurrentChapterIndex();
+                    final int currentPosition = b.getCurrentPosition();
                     PacketHelper helper = (PacketHelper) b.buildHelper();
                     Packet currentPacket = helper.loadMetaData(getContext());
                     if (!currentPacket.getSummary().equals(packet.getSummary())) {
@@ -68,6 +70,8 @@ public class AddPacketFragment extends Fragment {
                             @Override
                             public void exec(final String savePath) {
 
+                                b.setCurrentChapterIndex(currentChapterIndex);
+                                b.setCurrentPosition(currentPosition);
                                 BookLoader.getInstance().bookBubble(b);
                                 final Activity activity = getActivity();
                                 if (activity != null) {
