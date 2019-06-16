@@ -61,16 +61,17 @@ public class AddPacketFragment extends Fragment {
                 final Packet packet = list.get(position);
                 final Book b = BookLoader.getInstance().findBook(packet.getKey());
                 if (b != null) {
-                    final int currentChapterIndex = b.getCurrentChapterIndex();
-                    final int currentPosition = b.getCurrentPosition();
                     PacketHelper helper = (PacketHelper) b.buildHelper();
                     Packet currentPacket = helper.loadMetaData(getContext());
+                    helper.downloadContent(getContext());
+                    final int read = b.getChapterList().size() - 1 - b.getCurrentChapterIndex();
+                    final int currentPosition = b.getCurrentPosition();
                     if (!currentPacket.getSummary().equals(packet.getSummary())) {
                         helper.downloadPacket(getActivity(), ip, new PacketHelper.Func<String>() {
                             @Override
                             public void exec(final String savePath) {
 
-                                b.setCurrentChapterIndex(currentChapterIndex);
+                                b.setCurrentChapterIndex(b.getChapterList().size() - 1 - read);
                                 b.setCurrentPosition(currentPosition);
                                 BookLoader.getInstance().bookBubble(b);
                                 final Activity activity = getActivity();
