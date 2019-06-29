@@ -54,6 +54,7 @@ public class NetProviderCollections {
             addProvider(new WlzwProvider());
             addProvider(new PtwxProvider());
             addProvider(new FpzwProvider());
+            addProvider(new XbqgProvider());
         }
     }
 

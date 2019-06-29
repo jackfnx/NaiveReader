@@ -21,17 +21,17 @@ import sixue.naivereader.data.Chapter;
 import sixue.naivereader.data.Source;
 import sixue.naivereader.helper.OnlineHelper;
 
-public class FpzwProvider extends NetProvider {
-    private static final String TAG = FpzwProvider.class.getSimpleName();
+public class XbqgProvider extends NetProvider {
+    private static final String TAG = XbqgProvider.class.getSimpleName();
 
     @Override
     public String getProviderId() {
-        return "www.fpzw.com";
+        return "www.xbiquge.cc";
     }
 
     @Override
     public String getProviderName() {
-        return "富品中文";
+        return "笔趣阁cc";
     }
 
     @Override
@@ -39,16 +39,13 @@ public class FpzwProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.fpzw.com/modules/article/search.php?searchkey=" + key;
+            String url = "https://www.xbiquge.cc/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
 
-                Elements elements = doc.body().select(".book_info");
-                Document subDoc = Jsoup.parse(elements.toString());
-
                 String author = "*";
-                for (Element span : subDoc.select("#info > .options > .item")) {
+                for (Element span : doc.select("#info > p")) {
                     String t = span.text();
                     Log.i(getClass().toString(), "span.text=" + t);
 
@@ -125,14 +122,12 @@ public class FpzwProvider extends NetProvider {
 
     @Override
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
-
         String para = book.getSitePara();
-        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        String contentUrl = String.format("https://www.fpzw.com/xiaoshuo/%s/%s/", prefix, para);
+        String contentUrl = String.format("https://www.xbiquge.cc/book/%s/", para);
         List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
-            Elements elements = doc.body().select(".book");
+            Elements elements = doc.body().select("#list");
             for (Element ch : Jsoup.parse(elements.toString()).select("dd")) {
                 String title = ch.select("a").text();
                 String url = ch.select("a").attr("href").replace("/", "").trim();
@@ -151,7 +146,6 @@ public class FpzwProvider extends NetProvider {
         } catch (IOException e) {
             Log.e(TAG, "downloadContent ERROR: " + contentUrl);
         }
-        content = content.size() >= 4 ? content.subList(4, content.size()) : content;
         return content;
     }
 
@@ -161,9 +155,8 @@ public class FpzwProvider extends NetProvider {
         String chapterUrl = getChapterUrl(book, chapter);
         try {
             Document doc = Jsoup.connect(chapterUrl).timeout(5000).get();
-            String text = doc.body().select(".text").html();
-            String plainText = Utils.clearHtmlTag(text, new String[]{"a", "script", "font", "strong"})
-                    .replace("<br>", "")
+            String text = doc.body().select("#contentZ").html();
+            String plainText = text.replace("<br>", "")
                     .replace("&nbsp;", " ");
             Utils.writeText(plainText, chapter.getSavePath());
         } catch (IOException e) {
@@ -175,8 +168,7 @@ public class FpzwProvider extends NetProvider {
     public String getChapterUrl(Book book, Chapter chapter) {
 
         String para = book.getSitePara();
-        String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.fpzw.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.getId());
+        return String.format("https://www.xbiquge.cc/book/%s/%s", para, chapter.getId());
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
@@ -185,7 +177,7 @@ public class FpzwProvider extends NetProvider {
 
     private String calcCoverUrl(String para) {
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.fpzw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        return String.format("https://www.xbiquge.cc/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
