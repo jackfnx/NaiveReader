@@ -167,10 +167,11 @@ public class PtwxProvider extends NetProvider {
                     .replace("<script language=\"javascript\">GetFont();</script>", "<div id=\"content\" class=\"fonts_mesne\">")
                     .replace("<!-- 翻页上AD开始 -->", "</div> <!-- 翻页上AD开始 -->");
             Element content = Jsoup.parse(s).select("#content").first();
-            content.select("h1").remove();
-            content.select("table").remove();
-            String text = content.outerHtml().replace("<br>", "").replace("&nbsp;", " ");
-            Utils.writeText(text, chapter.getSavePath());
+            String text = content.html();
+            String plainText = Utils.clearHtmlTag(text, new String[] {"h1", "table", "div"})
+                    .replace("<br>", "")
+                    .replace("&nbsp;", " ");
+            Utils.writeText(plainText, chapter.getSavePath());
         } catch (IOException | NullPointerException e) {
             Log.e(TAG, "downloadChapter ERROR: " + chapterUrl);
         }
