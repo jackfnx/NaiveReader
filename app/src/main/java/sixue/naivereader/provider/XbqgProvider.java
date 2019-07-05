@@ -155,7 +155,7 @@ public class XbqgProvider extends NetProvider {
         String chapterUrl = getChapterUrl(book, chapter);
         try {
             Document doc = Jsoup.connect(chapterUrl).timeout(5000).get();
-            String text = doc.body().select("#contentZ").html();
+            String text = doc.body().select("#content").html();
             String plainText = text.replace("<br>", "")
                     .replace("&nbsp;", " ");
             Utils.writeText(plainText, chapter.getSavePath());
