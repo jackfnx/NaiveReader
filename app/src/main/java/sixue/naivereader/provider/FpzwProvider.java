@@ -44,20 +44,8 @@ public class FpzwProvider extends NetProvider {
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
 
-                Elements elements = doc.body().select(".book_info");
-                Document subDoc = Jsoup.parse(elements.toString());
-
-                String author = "*";
-                for (Element span : subDoc.select("#info > .options > .item")) {
-                    String t = span.text();
-                    Log.i(getClass().toString(), "span.text=" + t);
-
-                    final String prefix = "作者：";
-                    if (t.startsWith(prefix)) {
-                        author = t.substring(prefix.length());
-                        break;
-                    }
-                }
+                Elements elements = doc.select("#title > h2 > em > a");
+                String author = elements.first().text();
 
                 String para = parseBookUrl(response.url().toString());
                 String coverUrl = calcCoverUrl(para);
