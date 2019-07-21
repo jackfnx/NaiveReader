@@ -69,6 +69,14 @@ public class Packet {
         this.source = source;
     }
 
+    public List<String> getRegexps() {
+        return regexps;
+    }
+
+    public void setRegexps(List<String> regexps) {
+        this.regexps = regexps;
+    }
+
     private String title;
     private String author;
     private Boolean simple;
@@ -78,4 +86,5 @@ public class Packet {
     private String source;
     @JsonIgnore
     private List<Chapter> chapters;
+    private List<String> regexps;
 }
