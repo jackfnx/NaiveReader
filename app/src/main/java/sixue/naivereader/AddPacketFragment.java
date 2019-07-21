@@ -70,7 +70,16 @@ public class AddPacketFragment extends Fragment {
                             @Override
                             public void exec(final String savePath) {
 
-                                b.setCurrentChapterIndex(b.getChapterList().size() - 1 - read);
+                                int idx = b.getChapterList().size() - 1 - read;
+                                if (idx < 0)
+                                {
+                                    idx = 0;
+                                }
+                                if (idx >= b.getChapterList().size())
+                                {
+                                    idx = b.getChapterList().size() - 1;
+                                }
+                                b.setCurrentChapterIndex(idx);
                                 BookLoader.getInstance().bookBubble(b);
                                 final Activity activity = getActivity();
                                 if (activity != null) {
