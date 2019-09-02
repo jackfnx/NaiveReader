@@ -39,7 +39,7 @@ public class WlzwProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.50zw.la/modules/article/search.php?searchkey=" + key;
+            String url = "https://www.50zw.com/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
@@ -126,7 +126,7 @@ public class WlzwProvider extends NetProvider {
     @Override
     public List<Chapter> downloadContent(Book book, String bookSavePath) {
 
-        String contentUrl = "https://www.50zw.la/book_" + book.getSitePara() + "/";
+        String contentUrl = "https://www.50zw.com/book_" + book.getSitePara() + "/";
         List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
@@ -167,7 +167,7 @@ public class WlzwProvider extends NetProvider {
 
     @Override
     public String getChapterUrl(Book book, Chapter chapter) {
-        return "https://www.50zw.la/book_" + book.getSitePara() + "/" + chapter.getId();
+        return "https://www.50zw.com/book_" + book.getSitePara() + "/" + chapter.getId();
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
@@ -176,7 +176,7 @@ public class WlzwProvider extends NetProvider {
 
     private String calcCoverUrl(String para) {
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.50zw.la/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        return String.format("https://www.50zw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
