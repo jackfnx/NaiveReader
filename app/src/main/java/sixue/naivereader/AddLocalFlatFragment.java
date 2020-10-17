@@ -2,9 +2,6 @@ package sixue.naivereader;
 
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +9,10 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,8 +100,11 @@ public class AddLocalFlatFragment extends Fragment {
                     if (file.getName().startsWith(".")) {
                         return;
                     }
-                    for (File subFile : file.listFiles()) {
-                        loadFiles(subFile);
+                    File[] lf = file.listFiles();
+                    if (lf != null) {
+                        for (File subFile : lf) {
+                            loadFiles(subFile);
+                        }
                     }
                 } else {
                     if (file.getName().endsWith(".txt")) {
