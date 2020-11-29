@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -22,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +41,8 @@ import sixue.naivereader.data.Source;
 
 public class BookshelfActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_BROWSE = 0x1000;
+    private static final int REQUEST_CODE_BOOKID_MASK = 0x0FFF;
     private MyAdapter myAdapter;
     private boolean isEditMode;
     private List<Book> editList;
@@ -219,9 +224,24 @@ public class BookshelfActivity extends AppCompatActivity {
             author.setText(book.getAuthor());
             author.clearFocus();
 
-            EditText localPath = v.findViewById(R.id.local_path);
+            final EditText localPath = v.findViewById(R.id.local_path);
             localPath.setHint(book.getLocalPath());
             localPath.clearFocus();
+
+            Button browser = v.findViewById(R.id.button_browser);
+            browser.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("text/plain");
+                    int bookId = BookLoader.getInstance().bookIndex(book);
+                    int reqCode = REQUEST_CODE_BROWSE | bookId;
+                    startActivityForResult(intent, reqCode);
+                    localPath.setHint(R.string.HintTextEditing);
+                }
+            });
 
             new AlertDialog.Builder(this)
                     .setTitle("Local book")
@@ -277,6 +297,22 @@ public class BookshelfActivity extends AppCompatActivity {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if ((resultCode == RESULT_OK) && ((requestCode & REQUEST_CODE_BROWSE) != 0)) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                int bookId = requestCode & REQUEST_CODE_BOOKID_MASK;
+                if (bookId >= 0) {
+                    Book b = BookLoader.getInstance().getBook(bookId);
+                    b.setLocalPath(uri.toString());
+                    BookLoader.getInstance().save();
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

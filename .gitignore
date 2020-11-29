@@ -11,4 +11,5 @@
 gradle.properties
 *.apk
 *.aab
-app/release/output.json
+app/build
+app/release

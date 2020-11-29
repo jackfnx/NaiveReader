@@ -162,7 +162,7 @@ public class ReadActivity extends AppCompatActivity implements View.OnTouchListe
                             } else if (book.getKind() == BookKind.Online) {
                                 text = Utils.readText(chapter.getSavePath());
                             } else if (book.getKind() == BookKind.LocalText) {
-                                text = Utils.readText(book.getLocalPath());
+                                text = Utils.readExternalText(context, book.getLocalPath());
                             }
                             if (text == null) {
                                 text = "Can't open file.";

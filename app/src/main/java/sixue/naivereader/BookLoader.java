@@ -135,4 +135,8 @@ class BookLoader {
             }
         }
     }
+
+    public int bookIndex(Book book) {
+        return list.indexOf(book);
+    }
 }

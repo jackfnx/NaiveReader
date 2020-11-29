@@ -34,17 +34,31 @@
         android:layout_height="wrap_content"
         android:text="@string/local_path" />
 
-    <EditText
-        android:id="@+id/local_path"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="false"
-        android:cursorVisible="false"
-        android:ellipsize="middle"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:inputType="text"
-        android:labelFor="@id/local_path"
-        android:singleLine="true" />
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/local_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:ellipsize="middle"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="text"
+            android:labelFor="@id/local_path"
+            android:singleLine="true"/>
+
+        <Button
+            android:id="@+id/button_browser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/browse" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -2,6 +2,8 @@ package sixue.naivereader;
 
 import android.os.Bundle;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -29,14 +31,13 @@ public class AddActivity extends AppCompatActivity {
             super(fm);
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
                 return new AddNetBookFragment();
             } else if (position == 1) {
-                return new AddLocalFlatFragment();
-            } else if (position == 2) {
-                return new AddLocalTreeFragment();
+                return new AddLocalBookFragment();
             } else {
                 return new AddPacketFragment();
             }
@@ -44,7 +45,7 @@ public class AddActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
         @Override
@@ -53,8 +54,6 @@ public class AddActivity extends AppCompatActivity {
                 return getString(R.string.tab_add_net_book);
             } else if (position == 1) {
                 return getString(R.string.tab_import_txt_flat);
-            } else if (position == 2) {
-                return getString(R.string.tab_import_txt_tree);
             } else {
                 return getString(R.string.tab_import_packet);
             }

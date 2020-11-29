@@ -1,6 +1,7 @@
 package sixue.naivereader.helper;
 
-import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,10 +12,15 @@ import sixue.naivereader.data.BookKind;
 
 public class LocalTextLoader {
 
-    public static Book createBook(File file) {
-        String name = file.getName().toLowerCase();
+    public static Book createBook(String uri) {
+        String name = uri.substring(uri.lastIndexOf("/") + 1).toLowerCase();
         if (name.endsWith(".txt")) {
             name = name.substring(0, name.length() - 4);
+        }
+        try {
+            name = URLDecoder.decode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
         String title;
@@ -36,11 +42,11 @@ public class LocalTextLoader {
         }
 
         Book book = new Book();
-        book.setId(file.getAbsolutePath());
+        book.setId(uri);
         book.setTitle(title);
         book.setAuthor(author);
         book.setKind(BookKind.LocalText);
-        book.setLocalPath(file.getAbsolutePath());
+        book.setLocalPath(uri);
         return book;
     }
 

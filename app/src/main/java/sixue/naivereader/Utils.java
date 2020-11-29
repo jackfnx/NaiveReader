@@ -2,6 +2,7 @@ package sixue.naivereader;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,7 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Environment;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
@@ -114,6 +115,25 @@ public class Utils {
     private static String guessFileEncoding(File file) {
         try {
             InputStream is = new FileInputStream(file);
+            return guessFileEncoding(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static String guessFileEncoding(ContentResolver resolver, Uri uri) {
+        try {
+            InputStream is = resolver.openInputStream(uri);
+            return guessFileEncoding(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static String guessFileEncoding(InputStream is) {
+        try {
             UniversalDetector detector = new UniversalDetector(null);
             byte[] buf = new byte[1024];
             int n;
@@ -201,8 +221,7 @@ public class Utils {
     }
 
     public static String getSavePathRoot(Context context) {
-        String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
-        return sdcard + "/" + context.getPackageName();
+        return context.getExternalFilesDir(null).getAbsolutePath();
     }
 
     public static void deleteDirectory(File file) {
@@ -415,7 +434,7 @@ public class Utils {
                                 new BufferedInputStream(zf.getInputStream(ze))) {
                             ByteArrayOutputStream bos = new ByteArrayOutputStream((int) ze.getSize());
                             byte[] cache = new byte[1024];
-                            int len = 0;
+                            int len;
                             while ((len = is.read(cache, 0, cache.length)) != -1) {
                                 bos.write(cache, 0, len);
                             }
@@ -445,6 +464,30 @@ public class Utils {
             }
         }
         return textDoc.body().html();
+    }
+
+    public static String readExternalText(Context context, String uriString) {
+        Uri uri = Uri.parse(uriString);
+        ContentResolver resolver = context.getContentResolver();
+
+        String encoding = guessFileEncoding(resolver, uri);
+        if (encoding == null) {
+            encoding = "utf-8";
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(resolver.openInputStream(uri), encoding))) {
+            StringBuilder text = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append("\n");
+            }
+            return text.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public interface Func<T> {

@@ -43,4 +43,6 @@
     <string name="no_changes">无更新</string>
     <string name="new_changes">有更新</string>
     <string name="msg_packet_download">Packet下载完毕</string>
+    <string name="browse">浏览</string>
+    <string name="HintTextEditing">重定向…</string>
 </resources>

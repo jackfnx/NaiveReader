@@ -44,4 +44,6 @@
     <string name="no_changes">No changes.</string>
     <string name="new_changes">New</string>
     <string name="msg_packet_download">Packet download.</string>
+    <string name="browse">Browse</string>
+    <string name="HintTextEditing">Editing…</string>
 </resources>
