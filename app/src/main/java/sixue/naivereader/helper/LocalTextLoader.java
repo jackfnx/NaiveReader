@@ -22,6 +22,7 @@ public class LocalTextLoader {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        name = name.substring(name.lastIndexOf("/") + 1).toLowerCase();
 
         String title;
         int l1 = name.indexOf("【");

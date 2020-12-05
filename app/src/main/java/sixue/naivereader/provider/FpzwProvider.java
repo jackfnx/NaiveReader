@@ -39,7 +39,7 @@ public class FpzwProvider extends NetProvider {
         List<Book> list = new ArrayList<>();
         try {
             String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.fpzw.com/modules/article/search.php?searchkey=" + key;
+            String url = "https://www.2kxs.com/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();
@@ -116,7 +116,7 @@ public class FpzwProvider extends NetProvider {
 
         String para = book.getSitePara();
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        String contentUrl = String.format("https://www.fpzw.com/xiaoshuo/%s/%s/", prefix, para);
+        String contentUrl = String.format("https://www.2kxs.com/xiaoshuo/%s/%s/", prefix, para);
         List<Chapter> content = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(contentUrl).timeout(5000).get();
@@ -164,7 +164,7 @@ public class FpzwProvider extends NetProvider {
 
         String para = book.getSitePara();
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.fpzw.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.getId());
+        return String.format("https://www.2kxs.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.getId());
     }
 
     private String calcChapterSavePath(Chapter chapter, String bookSavePath) {
@@ -173,7 +173,7 @@ public class FpzwProvider extends NetProvider {
 
     private String calcCoverUrl(String para) {
         String prefix = para.length() > 3 ? para.substring(0, para.length() - 3) : "0";
-        return String.format("https://www.fpzw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
+        return String.format("https://www.2kxs.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para);
     }
 
     private String parseBookUrl(String bookUrl) {
