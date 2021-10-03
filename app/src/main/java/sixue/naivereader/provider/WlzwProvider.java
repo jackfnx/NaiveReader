@@ -26,7 +26,7 @@ public class WlzwProvider extends NetProvider {
 
     @Override
     public String getProviderId() {
-        return "wwww.50zw.la";
+        return "www.50zw.la";
     }
 
     @Override
@@ -38,7 +38,7 @@ public class WlzwProvider extends NetProvider {
     public List<Book> search(String s, Context context) {
         List<Book> list = new ArrayList<>();
         try {
-            String key = URLEncoder.encode(s, "GB2312");
+            String key = URLEncoder.encode(s, "GBK");
             String url = "https://www.50zw.com/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {

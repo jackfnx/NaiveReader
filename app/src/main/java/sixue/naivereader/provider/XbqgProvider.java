@@ -38,8 +38,8 @@ public class XbqgProvider extends NetProvider {
     public List<Book> search(String s, Context context) {
         List<Book> list = new ArrayList<>();
         try {
-            String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.xbiquge.cc/modules/article/search.php?searchkey=" + key;
+            String key = URLEncoder.encode(s, "GBK");
+            String url = "https://www.xbiquge.so/modules/article/search.php?searchkey=" + key;
             Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
             if (!url.equals(response.url().toString())) {
                 Document doc = response.parse();

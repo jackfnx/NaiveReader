@@ -3,23 +3,18 @@ package sixue.naivereader.provider;
 import android.content.Context;
 import android.util.Log;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import sixue.naivereader.Utils;
 import sixue.naivereader.data.Book;
-import sixue.naivereader.data.BookKind;
 import sixue.naivereader.data.Chapter;
-import sixue.naivereader.data.Source;
-import sixue.naivereader.helper.OnlineHelper;
 
 public class FpzwProvider extends NetProvider {
     private static final String TAG = FpzwProvider.class.getSimpleName();
@@ -36,79 +31,77 @@ public class FpzwProvider extends NetProvider {
 
     @Override
     public List<Book> search(String s, Context context) {
-        List<Book> list = new ArrayList<>();
-        try {
-            String key = URLEncoder.encode(s, "GB2312");
-            String url = "https://www.2kxs.com/modules/article/search.php?searchkey=" + key;
-            Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
-            if (!url.equals(response.url().toString())) {
-                Document doc = response.parse();
-
-                Elements elements = doc.select("#title > h2 > em > a");
-                String author = elements.first().text();
-
-                String para = parseBookUrl(response.url().toString());
-                String coverUrl = calcCoverUrl(para);
-
-                Book book = new Book();
-                book.setId(s);
-                book.setTitle(s);
-                book.setAuthor(author);
-                book.setKind(BookKind.Online);
-
-                Source source = new Source();
-                source.setId(getProviderId());
-                source.setPara(para);
-                book.getSources().add(source);
-
-                book.setSiteId(source.getId());
-                book.setSitePara(source.getPara());
-
-                OnlineHelper helper = (OnlineHelper) book.buildHelper();
-                helper.downloadCover(context, coverUrl);
-
-                list.add(book);
-            } else {
-                Document doc = response.parse();
-
-                Elements elements = doc.body().select("table.grid");
-                for (Element tr : Jsoup.parse(elements.toString()).select("tr")) {
-                    Elements tds = tr.select("td.odd");
-                    Elements a = tds.select("a");
-                    if (tds.size() == 0) {
-                        continue;
-                    }
-
-                    String para = parseBookUrl(a.attr("href").trim());
-                    String coverUrl = calcCoverUrl(para);
-
-                    Book book = new Book();
-                    String title = a.text();
-                    String id = a.text();
-                    String author = tds.get(1).text();
-                    book.setId(id);
-                    book.setTitle(title);
-                    book.setAuthor(author);
-                    book.setKind(BookKind.Online);
-
-                    Source source = new Source();
-                    source.setId(getProviderId());
-                    source.setPara(para);
-                    book.getSources().add(source);
-
-                    book.setSiteId(source.getId());
-                    book.setSitePara(source.getPara());
-
-                    OnlineHelper helper = (OnlineHelper) book.buildHelper();
-                    helper.downloadCover(context, coverUrl);
-
-                    list.add(book);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
+        // 似乎over了，干
+//        List<Book> list = new ArrayList<>();
+//        try {
+//            String key = URLEncoder.encode(s, "UTF-8");
+//            String url = "https://m.fpzw.cc/case.php?m=search&key=" + key;
+//            Connection.Response response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute();
+//            if (!url.equals(response.url().toString())) {
+//                Document doc = response.parse();
+//
+//                Elements elements = doc.select("#title > h2 > em > a");
+//                String author = elements.first().text();
+//
+//                String para = parseBookUrl(response.url().toString());
+//                String coverUrl = calcCoverUrl(para);
+//
+//                Book book = new Book();
+//                book.setId(s);
+//                book.setTitle(s);
+//                book.setAuthor(author);
+//                book.setKind(BookKind.Online);
+//
+//                Source source = new Source();
+//                source.setId(getProviderId());
+//                source.setPara(para);
+//                book.getSources().add(source);
+//
+//                book.setSiteId(source.getId());
+//                book.setSitePara(source.getPara());
+//
+//                OnlineHelper helper = (OnlineHelper) book.buildHelper();
+//                helper.downloadCover(context, coverUrl);
+//
+//                list.add(book);
+//            } else {
+//                Document doc = response.parse();
+//
+//                Elements elements = doc.body().select("#main > #newscontent > .1 > ul > li");
+//                for (Element li : elements) {
+//                    Elements a = li.select(".s2 > a");
+//                    Elements au = li.select(".s5");
+//
+//                    String para = parseBookUrl(a.attr("href").trim());
+//                    String coverUrl = calcCoverUrl(para);
+//
+//                    Book book = new Book();
+//                    String title = a.text();
+//                    String id = a.text();
+//                    String author = au.get(0).text();
+//                    book.setId(id);
+//                    book.setTitle(title);
+//                    book.setAuthor(author);
+//                    book.setKind(BookKind.Online);
+//
+//                    Source source = new Source();
+//                    source.setId(getProviderId());
+//                    source.setPara(para);
+//                    book.getSources().add(source);
+//
+//                    book.setSiteId(source.getId());
+//                    book.setSitePara(source.getPara());
+//
+//                    OnlineHelper helper = (OnlineHelper) book.buildHelper();
+//                    helper.downloadCover(context, coverUrl);
+//
+//                    list.add(book);
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return new ArrayList<>();
     }
 
     @Override
