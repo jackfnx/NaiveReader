@@ -304,6 +304,8 @@ public class BookshelfActivity extends AppCompatActivity {
         if ((resultCode == RESULT_OK) && ((requestCode & REQUEST_CODE_BROWSE) != 0)) {
             Uri uri = data.getData();
             if (uri != null) {
+                int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(uri, takeFlags);
                 int bookId = requestCode & REQUEST_CODE_BOOKID_MASK;
                 if (bookId >= 0) {
                     Book b = BookLoader.getInstance().getBook(bookId);

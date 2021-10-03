@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -469,6 +470,8 @@ public class Utils {
     public static String readExternalText(Context context, String uriString) {
         Uri uri = Uri.parse(uriString);
         ContentResolver resolver = context.getContentResolver();
+        int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        resolver.takePersistableUriPermission(uri, takeFlags);
 
         String encoding = guessFileEncoding(resolver, uri);
         if (encoding == null) {

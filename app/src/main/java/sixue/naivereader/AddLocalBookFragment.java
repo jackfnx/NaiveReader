@@ -49,6 +49,8 @@ public class AddLocalBookFragment extends Fragment {
         if ((resultCode == Activity.RESULT_OK) && (requestCode == REQUEST_CODE_OPEN)) {
             Uri uri = data.getData();
             if (uri != null) {
+                int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                this.getContext().getContentResolver().takePersistableUriPermission(uri, takeFlags);
                 Book b = BookLoader.getInstance().findBook(uri.toString());
                 if (b != null) {
                     BookLoader.getInstance().bookBubble(b);
