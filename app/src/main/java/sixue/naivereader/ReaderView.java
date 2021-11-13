@@ -296,6 +296,7 @@ public class ReaderView extends View {
     }
 
     public void importText(String text, int currentPosition) {
+        text = text.length() > 0 ? text : " ";
         boolean init = (this.text == null) || (this.text.length() == 0);
         this.text = text;
         this.currentPosition = currentPosition;
