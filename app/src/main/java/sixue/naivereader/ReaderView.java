@@ -72,72 +72,63 @@ public class ReaderView extends View {
 
     private void startTypesetThread() {
         final Handler handler = new Handler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                pageBreaks.clear();
-                currentPage = -1;
-                typesetFinished = false;
+        new Thread(() -> {
+            pageBreaks.clear();
+            currentPage = -1;
+            typesetFinished = false;
 
-                while (maxWidth <= 0 || maxHeight <= 0) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            while (maxWidth <= 0 || maxHeight <= 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+            }
 
-                for (int pageBreak = 0; pageBreak < text.length(); ) {
-                    int i = pageBreak;
-                    pageBreaks.add(i);
+            for (int pageBreak = 0; pageBreak < text.length(); ) {
+                int i = pageBreak;
+                pageBreaks.add(i);
 
-                    i = getPage(i, null, null, null);
+                i = getPage(i, null, null, null);
 
-                    // 当前页排版完毕
-                    if (currentPosition != Integer.MAX_VALUE && i > currentPosition && currentPage < 0) {
-                        currentPage = pageBreaks.size() - 1;
-                        currentPageTypesetFinish(handler);
-                    }
-
-                    pageBreak = i;
-                }
-                typesetFinished = true;
-
-                // 当前页是最后一页
-                if (currentPage < 0) {
+                // 当前页排版完毕
+                if (currentPosition != Integer.MAX_VALUE && i > currentPosition && currentPage < 0) {
                     currentPage = pageBreaks.size() - 1;
                     currentPageTypesetFinish(handler);
                 }
 
-                // 排版完成
-                allPagesTypesetFinish(handler);
+                pageBreak = i;
             }
+            typesetFinished = true;
+
+            // 当前页是最后一页
+            if (currentPage < 0) {
+                currentPage = pageBreaks.size() - 1;
+                currentPageTypesetFinish(handler);
+            }
+
+            // 排版完成
+            allPagesTypesetFinish(handler);
         }).start();
     }
 
     // 更新总页数
     private void allPagesTypesetFinish(Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Typeset:pageNum=" + pageBreaks.size() + " finished.");
-                if (onPageChangeListener != null) {
-                    onPageChangeListener.onPageChanged(ReaderView.this);
-                }
+        handler.post(() -> {
+            Log.d(TAG, "Typeset:pageNum=" + pageBreaks.size() + " finished.");
+            if (onPageChangeListener != null) {
+                onPageChangeListener.onPageChanged(ReaderView.this);
             }
         });
     }
 
     // 取消loading，更新当前页码
     private void currentPageTypesetFinish(Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
-                setLoading(false, true);
-                if (onPageChangeListener != null) {
-                    onPageChangeListener.onPageChanged(ReaderView.this);
-                }
+        handler.post(() -> {
+            Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks.size() + " finished.");
+            setLoading(false, true);
+            if (onPageChangeListener != null) {
+                onPageChangeListener.onPageChanged(ReaderView.this);
             }
         });
     }
