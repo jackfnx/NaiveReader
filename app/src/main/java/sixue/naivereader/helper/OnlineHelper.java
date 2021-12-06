@@ -84,10 +84,11 @@ public class OnlineHelper implements BookHelper {
     @Override
     public Bitmap loadCoverBitmap(Context context) {
         if (cover == null) {
-            String coverSavePath = book.getCoverSavePath();
+            String saveRootPath = Utils.getSavePathRoot(context);
+            String coverSavePath = saveRootPath + "/" + book.getCoverSavePath();
             File f = new File(coverSavePath);
 
-            if (coverSavePath.length() == 0 || !f.exists()) {
+            if (book.getCoverSavePath().length() == 0 || !f.exists()) {
                 cover = Utils.getAutoCover(context, book.getTitle(), book.getAuthor(), 2);
             } else {
                 cover = BitmapFactory.decodeFile(coverSavePath);
@@ -97,8 +98,11 @@ public class OnlineHelper implements BookHelper {
     }
 
     private String calcBookSavePath(Context context) {
-        String saveRootPath = Utils.getSavePathRoot(context);
-        return saveRootPath + "/books/" + book.getId() + "/" + book.getSiteId();
+        return Utils.getSavePathRoot(context) + "/" + calcRelBookSavePath();
+    }
+
+    private String calcRelBookSavePath() {
+        return "books/" + book.getId() + "/" + book.getSiteId();
     }
 
     public void downloadCover(Context context, String coverUrl) {
@@ -106,15 +110,17 @@ public class OnlineHelper implements BookHelper {
         String bookSavePath = calcBookSavePath(context);
         Utils.mkdir(bookSavePath);
 
+        String bookRelSavePath = calcRelBookSavePath();
+        String coverRelSavePath = bookRelSavePath + "/cover.jpg";
         String coverSavePath = bookSavePath + "/cover.jpg";
 
         try {
             if ((new File(coverSavePath)).exists()) {
-                book.setCoverSavePath(coverSavePath);
+                book.setCoverSavePath(coverRelSavePath);
                 return;
             }
 
-            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverSavePath + "] startDownload.");
+            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverRelSavePath + "] startDownload.");
             URL url = new URL(coverUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoInput(true);
@@ -129,13 +135,13 @@ public class OnlineHelper implements BookHelper {
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, os);
             os.close();
             is.close();
-            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverSavePath + "] download finished.");
+            Log.i(getClass().toString(), "cover:[" + coverUrl + "]=>[" + coverRelSavePath + "] download finished.");
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
-        book.setCoverSavePath(coverSavePath);
+        book.setCoverSavePath(coverRelSavePath);
 
         Intent intent = new Intent(Utils.ACTION_DOWNLOAD_COVER_FINISH);
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.getId());
