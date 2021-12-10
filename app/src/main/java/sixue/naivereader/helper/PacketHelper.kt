@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import sixue.naivereader.Utils
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.Chapter
@@ -19,7 +19,7 @@ class PacketHelper(private val book: Book) : BookHelper {
         val bookSavePath = calcPacketSavePath(context)
         val json = Utils.readTextFromZip(bookSavePath, ".CONTENT") ?: return false
         return try {
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             val listType = mapper.typeFactory.constructParametricType(ArrayList::class.java, Chapter::class.java)
             val list = mapper.readValue<List<Chapter>>(json, listType)
             book.chapterList = list
@@ -75,7 +75,7 @@ class PacketHelper(private val book: Book) : BookHelper {
         val bookSavePath = calcPacketSavePath(context)
         val json = Utils.readTextFromZip(bookSavePath, ".META.json") ?: return null
         return try {
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             mapper.readValue(json, Packet::class.java)
         } catch (e: IOException) {
             e.printStackTrace()

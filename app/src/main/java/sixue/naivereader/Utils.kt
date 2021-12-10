@@ -19,7 +19,6 @@ import java.util.*
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 import kotlin.collections.ArrayList
 
 object Utils {
@@ -204,14 +203,14 @@ object Utils {
     }
 
     private fun paintCover(blank: Bitmap, title: String, author: String?): Bitmap {
-        val MIN_TEXT_SIZE = 12
-        val MAX_TEXT_SIZE = 40
+        val minTextSize = 12
+        val maxTextSize = 40
         val lines = explodeBySpecialChar(title, 6)
-        val title_size = paintText(blank, lines, blank.height / 4, MIN_TEXT_SIZE, MAX_TEXT_SIZE)
+        val titleSize = paintText(blank, lines, blank.height / 4, minTextSize, maxTextSize)
         if (author != null) {
             val lines2 = explodeBySpecialChar(author, 7)
-            val author_size = if (title_size > MAX_TEXT_SIZE - 10) MAX_TEXT_SIZE - 10 else title_size - 1
-            paintText(blank, lines2, blank.height * 3 / 4, MIN_TEXT_SIZE, author_size)
+            val authorSize = if (titleSize > maxTextSize - 10) maxTextSize - 10 else titleSize - 1
+            paintText(blank, lines2, blank.height * 3 / 4, minTextSize, authorSize)
         }
         return blank
     }
@@ -312,14 +311,14 @@ object Utils {
     }
 
     private fun getBlankCoverBitmap(context: Context, texture_id: Int): Bitmap {
-        val WIDTH = 160
-        val HEIGHT = 200
-        val texture_name = String.format(Locale.CHINA, "texture_paper_%d.jpg", texture_id)
-        val `is` = context.assets.open(texture_name)
+        val w = 160
+        val h = 200
+        val textureName = String.format(Locale.CHINA, "texture_paper_%d.jpg", texture_id)
+        val `is` = context.assets.open(textureName)
         val texture = BitmapFactory.decodeStream(`is`)
-        val x = (Math.random() * (texture.width - WIDTH)).toInt()
-        val y = (Math.random() * (texture.height - HEIGHT)).toInt()
-        val blank = Bitmap.createBitmap(texture, x, y, WIDTH, HEIGHT)
+        val x = (Math.random() * (texture.width - w)).toInt()
+        val y = (Math.random() * (texture.height - h)).toInt()
+        val blank = Bitmap.createBitmap(texture, x, y, w, h)
         `is`.close()
         return blank
     }
@@ -347,10 +346,9 @@ object Utils {
     fun readTextFromZip(zipPath: String?, path: String?): String? {
         try {
             val zf = ZipFile(zipPath)
-            val `in`: InputStream = BufferedInputStream(FileInputStream(zipPath))
-            val zin = ZipInputStream(`in`)
-            var ze: ZipEntry
-            while (zin.nextEntry.also { ze = it } != null) {
+            val entries = zf.entries()
+            while (entries.hasMoreElements()) {
+                val ze : ZipEntry = entries.nextElement() as ZipEntry
                 if (!ze.isDirectory) {
                     if (ze.name == path) {
                         BufferedReader(
@@ -366,7 +364,6 @@ object Utils {
                     }
                 }
             }
-            zin.closeEntry()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -376,10 +373,9 @@ object Utils {
     fun readBytesFromZip(zipPath: String?, path: String): ByteArray? {
         try {
             val zf = ZipFile(zipPath)
-            val `in`: InputStream = BufferedInputStream(FileInputStream(zipPath))
-            val zin = ZipInputStream(`in`)
-            var ze: ZipEntry
-            while (zin.nextEntry.also { ze = it } != null) {
+            val entries = zf.entries()
+            while (entries.hasMoreElements()) {
+                val ze : ZipEntry = entries.nextElement() as ZipEntry
                 if (!ze.isDirectory) {
                     if (ze.name == path) {
                         BufferedInputStream(zf.getInputStream(ze)).use { `is` ->
@@ -394,7 +390,6 @@ object Utils {
                     }
                 }
             }
-            zin.closeEntry()
         } catch (e: IOException) {
             e.printStackTrace()
         }

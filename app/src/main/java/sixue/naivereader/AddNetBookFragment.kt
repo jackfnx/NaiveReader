@@ -51,7 +51,7 @@ class AddNetBookFragment : Fragment() {
                 } else {
                     view = convertView
                 }
-                val viewHolder: ViewHolder = (convertView!!.tag as ViewHolder)
+                val viewHolder: ViewHolder = (view!!.tag as ViewHolder)
                 val book = list[i]
                 viewHolder.cover.setImageBitmap(book.buildHelper().loadCoverBitmap(requireContext()))
                 viewHolder.title.text = book.title

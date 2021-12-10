@@ -2,7 +2,7 @@ package sixue.naivereader
 
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import sixue.naivereader.data.Book
 import java.io.File
 import java.io.IOException
@@ -15,7 +15,7 @@ internal object BookLoader {
         saveRootPath = Utils.getSavePathRoot(context)
         val json = Utils.readText("$saveRootPath/books/.DIR") ?: return
         try {
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             val listType = mapper.typeFactory.constructParametricType(ArrayList::class.java, Book::class.java)
             list = mapper.readValue(json, listType)
         } catch (e: IOException) {
@@ -25,7 +25,7 @@ internal object BookLoader {
 
     fun save() {
         try {
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             val json = mapper.writeValueAsString(list)
             Utils.writeText(json, "$saveRootPath/books/.DIR")
         } catch (e: JsonProcessingException) {

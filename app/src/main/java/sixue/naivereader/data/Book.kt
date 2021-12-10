@@ -21,7 +21,7 @@ data class Book (
     var currentPosition: Int = -1,
     var wordCount: Int = -1,
     var coverSavePath: String = "",
-    var isEnd: Boolean = false,
+    var end: Boolean = false,
 ) {
     @JsonIgnore
     var chapterList: List<Chapter> = ArrayList()

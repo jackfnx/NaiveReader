@@ -90,7 +90,7 @@ class BookshelfActivity : AppCompatActivity() {
                     sendBroadcast(intent)
                 }
                 val downloader = SmartDownloader(this, book)
-                if (!book.isEnd) {
+                if (!book.end) {
                     downloader.startDownloadContent()
                 }
 //                if (book.buildHelper().loadCoverBitmap(this) == null) {
@@ -195,7 +195,7 @@ class BookshelfActivity : AppCompatActivity() {
             sources.adapter = adapter
             sources.clearFocus()
             val end = v.findViewById<CheckBox>(R.id.end)
-            end.isChecked = book.isEnd
+            end.isChecked = book.end
             end.clearFocus()
             AlertDialog.Builder(this)
                     .setTitle("Net book")
@@ -203,7 +203,7 @@ class BookshelfActivity : AppCompatActivity() {
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         book.title = title.text.toString()
                         book.author = author.text.toString()
-                        book.isEnd = end.isChecked
+                        book.end = end.isChecked
                         BookLoader.save()
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -281,7 +281,7 @@ class BookshelfActivity : AppCompatActivity() {
             } else {
                 view = convertView
             }
-            val viewHolder : ViewHolder = (convertView!!.tag as ViewHolder)
+            val viewHolder : ViewHolder = (view!!.tag as ViewHolder)
 
             val book = BookLoader.getBook(i)
             viewHolder.title.text = book?.title
@@ -299,7 +299,7 @@ class BookshelfActivity : AppCompatActivity() {
                 if (size <= 0) {
                     viewHolder.progress.setText(R.string.read_progress_net_predownload)
                 } else if (cp + 1 == size) {
-                    if (book.isEnd) {
+                    if (book.end) {
                         viewHolder.progress.setText(R.string.read_progress_net_end)
                     } else {
                         viewHolder.progress.setText(R.string.read_progress_net_allread)

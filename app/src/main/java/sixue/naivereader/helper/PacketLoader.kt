@@ -1,7 +1,7 @@
 package sixue.naivereader.helper
 
 import android.util.Log
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
 import sixue.naivereader.data.Packet
@@ -56,7 +56,7 @@ object PacketLoader {
                 buf.append(line)
             }
             val json = buf.toString()
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             val listType = mapper.typeFactory.constructParametricType(ArrayList::class.java, Packet::class.java)
             val packets = mapper.readValue<List<Packet>>(json, listType)
             Log.i(TAG, "GET JSON: " + packets.size + " packets.")

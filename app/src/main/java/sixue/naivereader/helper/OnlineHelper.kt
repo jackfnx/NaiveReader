@@ -6,7 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import sixue.naivereader.Utils
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.Chapter
@@ -25,7 +25,7 @@ class OnlineHelper(private val book: Book) : BookHelper {
         val bookSavePath = calcBookSavePath(context)
         val json = Utils.readText("$bookSavePath/.CONTENT") ?: return false
         return try {
-            val mapper = ObjectMapper()
+            val mapper = jacksonObjectMapper()
             val listType = mapper.typeFactory.constructParametricType(ArrayList::class.java, Chapter::class.java)
             val list = mapper.readValue<List<Chapter>>(json, listType)
             book.chapterList = list
@@ -43,7 +43,7 @@ class OnlineHelper(private val book: Book) : BookHelper {
             val content = provider!!.downloadContent(book, bookSavePath)
             if (content.isNotEmpty()) {
                 book.chapterList = content
-                val mapper = ObjectMapper()
+                val mapper = jacksonObjectMapper()
                 val json = mapper.writeValueAsString(content)
                 Utils.writeText(json, "$bookSavePath/.CONTENT")
             }

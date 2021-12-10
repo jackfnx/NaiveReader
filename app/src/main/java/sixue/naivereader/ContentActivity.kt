@@ -139,7 +139,7 @@ class ContentActivity : AppCompatActivity() {
             } else {
                 view = convertView
             }
-            val viewHolder : ViewHolder = (convertView!!.tag as ViewHolder)
+            val viewHolder : ViewHolder = (view!!.tag as ViewHolder)
             if (book.kind === BookKind.LocalText) {
                 val node = localChapterNodes[i]
                 val length = localText.length
