@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '29.0.2'
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         applicationId "sixue.naivereader"
@@ -42,4 +43,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
     implementation 'org.jsoup:jsoup:1.10.1'
     testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
