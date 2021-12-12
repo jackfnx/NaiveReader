@@ -205,17 +205,43 @@ object Utils {
     private fun paintCover(blank: Bitmap, title: String, author: String?): Bitmap {
         val minTextSize = 12
         val maxTextSize = 40
-        val lines = explodeBySpecialChar(title, 6)
-        val titleSize = paintText(blank, lines, blank.height / 4, minTextSize, maxTextSize)
+        val titlePR: PaintResult
+        val regularTitle = parseRegularTitle(title)
+        if (regularTitle.size == 2) {
+            titlePR = paintText(blank, regularTitle.subList(0, 1), blank.height / 4, minTextSize, maxTextSize)
+            paintText(blank, regularTitle.subList(1, 2), titlePR.y1, minTextSize, titlePR.textSize - 12)
+        } else {
+            val lines = explodeBySpecialChar(title, 6)
+            titlePR = paintText(blank, lines, blank.height / 4, minTextSize, maxTextSize)
+        }
         if (author != null) {
             val lines2 = explodeBySpecialChar(author, 7)
-            val authorSize = if (titleSize > maxTextSize - 10) maxTextSize - 10 else titleSize - 1
+            val authorSize = if (titlePR.textSize > maxTextSize - 10) maxTextSize - 10 else titlePR.textSize - 1
             paintText(blank, lines2, blank.height * 3 / 4, minTextSize, authorSize)
         }
         return blank
     }
 
-    private fun paintText(blank: Bitmap?, lines: List<String>, y0: Int, minSize: Int, maxSize: Int): Int {
+    private fun parseRegularTitle(title: String): List<String> {
+        val regularTitle = ArrayList<String>()
+        val pattens = listOf(
+            Pair(Pattern.compile("(?<=【).+(?=】的作品集)"), "作品集"),
+            Pair(Pattern.compile("(?<=【).+(?=】系列)"), "系列"),
+            Pair(Pattern.compile("(?<=专题：【).+(?=】)"), "专题"),
+            Pair(Pattern.compile("(?<=冻结：【).+(?=】)"), "冻结"),
+        )
+        for (pair in pattens) {
+            val matcher = pair.first.matcher(title)
+            if (matcher.find()) {
+                regularTitle.add(title.substring(matcher.start(), matcher.end()))
+                regularTitle.add(pair.second)
+                break
+            }
+        }
+        return regularTitle
+    }
+
+    private fun paintText(blank: Bitmap?, lines: List<String>, y0: Int, minSize: Int, maxSize: Int): PaintResult {
         val maxLine = Collections.max(lines) { s, t1 -> s.length - t1.length }
         val canvas = Canvas(blank!!)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -231,6 +257,7 @@ object Utils {
             }
             textSize++
         }
+        var y1 : Int = y0
         for (i in lines.indices) {
             val line = lines[i]
             val bounds = Rect()
@@ -238,9 +265,12 @@ object Utils {
             val x = (blank.width - bounds.width()) / 2
             val y = y0 + bounds.height() / 4 + i * bounds.height()
             canvas.drawText(line, x.toFloat(), y.toFloat(), paint)
+            y1 = y + bounds.height()
         }
-        return textSize
+        return PaintResult(textSize, y1)
     }
+
+    data class PaintResult(val textSize: Int, val y1: Int)
 
     private fun explodeBySpecialChar(title: String, maxLen: Int): List<String> {
         val list: MutableList<String> = ArrayList()
