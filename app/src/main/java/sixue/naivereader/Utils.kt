@@ -225,10 +225,10 @@ object Utils {
     private fun parseRegularTitle(title: String): List<String> {
         val regularTitle = ArrayList<String>()
         val pattens = listOf(
-            Pair(Pattern.compile("(?<=【).+(?=】的作品集)"), "作品集"),
-            Pair(Pattern.compile("(?<=【).+(?=】系列)"), "系列"),
-            Pair(Pattern.compile("(?<=专题：【).+(?=】)"), "专题"),
-            Pair(Pattern.compile("(?<=冻结：【).+(?=】)"), "冻结"),
+            Pair(Pattern.compile("【.+】(?=的作品集)"), "作品集"),
+            Pair(Pattern.compile("【.+】(?=系列)"), "系列"),
+            Pair(Pattern.compile("(?<=专题：)【.+】"), "专题"),
+            Pair(Pattern.compile("(?<=冻结：)【.+】"), "冻结"),
         )
         for (pair in pattens) {
             val matcher = pair.first.matcher(title)
@@ -262,7 +262,9 @@ object Utils {
             val line = lines[i]
             val bounds = Rect()
             paint.getTextBounds(line, 0, line.length, bounds)
-            val x = (blank.width - bounds.width()) / 2
+            val advance =
+                paint.getRunAdvance(line, 0, line.length, 0, line.length, false, line.length)
+            val x = (blank.width - advance.toInt()) / 2
             val y = y0 + bounds.height() / 4 + i * bounds.height()
             canvas.drawText(line, x.toFloat(), y.toFloat(), paint)
             y1 = y + bounds.height()
