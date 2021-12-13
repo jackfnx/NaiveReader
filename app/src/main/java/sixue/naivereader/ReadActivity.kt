@@ -250,7 +250,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
             R.id.refresh -> {
                 run {
                     if (book.kind === BookKind.Online) {
-                        chapter.savePath?.let { Utils.deleteFile(it) }
+                        Utils.deleteFile(chapter.savePath)
                         loadNetChapter(book.currentChapterIndex, 0)
                         return true
                     }
@@ -302,7 +302,8 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
             actionBar.hide()
         } else {
             val metrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(metrics)
+            val display = this.display
+            display?.getRealMetrics(metrics)
             val widthPixels = metrics.widthPixels
             val heightPixels = metrics.heightPixels
             val x = motionEvent.rawX

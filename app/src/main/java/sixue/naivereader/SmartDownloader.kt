@@ -9,10 +9,8 @@ import java.io.File
 
 internal class SmartDownloader(private val context: Context, private val book: Book) {
     fun isDownloaded(chapter: Chapter): Boolean {
-        return chapter.savePath?.let {
-            val file = File(it)
-            file.exists()
-        } ?: false
+        val file = File(chapter.savePath)
+        return file.exists()
     }
 
     private fun downloadChapter(chapter: Chapter) {

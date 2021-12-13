@@ -100,6 +100,7 @@ object PacketLoader {
             title = packet.title,
             author = packet.author,
             kind = BookKind.Packet,
+            localPath = "",
         )
     }
 }

@@ -46,6 +46,7 @@ class WlzwProvider : NetProvider() {
                     title = s,
                     author = author,
                     kind = BookKind.Online,
+                    localPath = "",
                 )
                 val source = Source(
                     id = providerId,
@@ -76,6 +77,7 @@ class WlzwProvider : NetProvider() {
                         title = title,
                         author = author,
                         kind = BookKind.Online,
+                        localPath = "",
                     )
                     val source = Source(
                         id = providerId,
@@ -85,7 +87,7 @@ class WlzwProvider : NetProvider() {
                     book.siteId = source.id
                     book.sitePara = source.para
                     val helper = book.buildHelper() as OnlineHelper
-                    helper.downloadCover(context!!, coverUrl)
+                    helper.downloadCover(context, coverUrl)
                     list.add(book)
                 }
             }

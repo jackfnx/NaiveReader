@@ -46,6 +46,7 @@ class PtwxProvider : NetProvider() {
                     title = s,
                     author = author,
                     kind = BookKind.Online,
+                    localPath = "",
                 )
                 val source = Source(
                     id = providerId,
@@ -76,6 +77,7 @@ class PtwxProvider : NetProvider() {
                         title = title,
                         author = author,
                         kind = BookKind.Online,
+                        localPath = "",
                     )
                     val source = Source(
                         id = providerId,

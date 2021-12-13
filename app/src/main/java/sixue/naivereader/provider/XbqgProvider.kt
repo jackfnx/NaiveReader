@@ -44,6 +44,7 @@ class XbqgProvider : NetProvider() {
                     title = s,
                     author = author,
                     kind = BookKind.Online,
+                    localPath = "",
                 )
                 val source = Source(
                     id = providerId,
@@ -74,6 +75,7 @@ class XbqgProvider : NetProvider() {
                         title = title,
                         author = author,
                         kind = BookKind.Online,
+                        localPath = "",
                     )
                     val source = Source(
                         id = providerId,

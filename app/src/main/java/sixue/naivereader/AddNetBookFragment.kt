@@ -57,7 +57,7 @@ class AddNetBookFragment : Fragment() {
                 viewHolder.title.text = book.title
                 viewHolder.author.text = book.author
                 viewHolder.source.text = getString(R.string.sources, book.sources.size)
-                return view!!
+                return view
             }
 
             inner class ViewHolder(

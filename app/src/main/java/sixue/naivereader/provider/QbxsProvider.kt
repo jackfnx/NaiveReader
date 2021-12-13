@@ -44,6 +44,7 @@ class QbxsProvider : NetProvider() {
                         title = title,
                         author = author,
                         kind = BookKind.Online,
+                        localPath = "",
                     )
                     val source = Source(
                         id = providerId,

@@ -170,7 +170,7 @@ class ContentActivity : AppCompatActivity() {
                 }
                 viewHolder.summary.gravity = Gravity.END
             }
-            return view!!
+            return view
         }
 
         inner class ViewHolder(val title: TextView, val summary: TextView)

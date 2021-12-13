@@ -1,21 +1,20 @@
 package sixue.naivereader
 
 import android.content.Context
-import android.text.TextPaint
-import sixue.naivereader.ReaderView.OnTurnPageOverListener
-import android.view.animation.TranslateAnimation
-import sixue.naivereader.ReaderView
-import android.view.animation.Animation
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Handler
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.ImageView
-import java.util.ArrayList
+import java.util.*
+import kotlin.math.abs
 
 class ReaderView : View {
     var isGesture = false
@@ -57,8 +56,8 @@ class ReaderView : View {
         textPaint!!.setARGB(0xFF, 0, 0, 0)
         textPaint!!.textSize = TEXT_SIZE
         val fm = textPaint!!.fontMetrics
-        fontTop = Math.abs(fm.top) + LINE_SPACING
-        fontHeight = Math.abs(fm.ascent) + Math.abs(fm.descent) + Math.abs(fm.leading) + LINE_SPACING
+        fontTop = abs(fm.top) + LINE_SPACING
+        fontHeight = abs(fm.ascent) + abs(fm.descent) + abs(fm.leading) + LINE_SPACING
     }
 
     private fun startTypesetThread() {
@@ -114,15 +113,15 @@ class ReaderView : View {
     private fun currentPageTypesetFinish(handler: Handler) {
         handler.post {
             Log.d(TAG, "Typeset:currentPage=" + currentPage + ",pageNum=" + pageBreaks!!.size + " finished.")
-            setLoading(false, true)
+            setLoading(isLoading = false, anim = true)
             if (onPageChangeListener != null) {
                 onPageChangeListener!!.onPageChanged(this@ReaderView)
             }
         }
     }
 
-    private fun getPage(i: Int, lines: MutableList<String>?, ys: MutableList<Float>?, lss: MutableList<Float>?): Int {
-        var i = i
+    private fun getPage(n: Int, lines: MutableList<String>?, ys: MutableList<Float>?, lss: MutableList<Float>?): Int {
+        var i = n
         var y = fontTop
         while (y < maxHeight) {
             var k = i + MAX_LINE_LENGTH
@@ -254,10 +253,8 @@ class ReaderView : View {
     }
 
     fun importText(text: String, currentPosition: Int) {
-        var text = text
-        text = if (text.isNotEmpty()) text else " "
         val init = this.text == null || this.text!!.isEmpty()
-        this.text = text
+        this.text = if (text.isNotEmpty()) text else " "
         this.currentPosition = currentPosition
         setLoading(true, !init)
         startTypesetThread()

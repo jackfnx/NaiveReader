@@ -318,7 +318,7 @@ class BookshelfActivity : AppCompatActivity() {
             }
             viewHolder.selectIcon.isSelected = editList.contains(book)
             viewHolder.cover.setImageBitmap(book?.buildHelper()?.loadCoverBitmap(this@BookshelfActivity))
-            return view!!
+            return view
         }
 
         inner class ViewHolder(val title: TextView, val progress: TextView, val selectIcon: View, val cover: ImageView)

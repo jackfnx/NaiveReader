@@ -61,7 +61,7 @@ class ScanDeviceTool : AutoCloseable {
                     return ips[0]
                 }
                 // 扫描结束
-                if (executor!!.isTerminated()) {
+                if (executor!!.isTerminated) {
                     executor = null
                     return null
                 }
@@ -114,7 +114,7 @@ class ScanDeviceTool : AutoCloseable {
          * @return List<String>
         </String> */
         private val hostIps: List<String>
-            private get() {
+            get() {
                 val hostIps: MutableList<String> = ArrayList()
                 try {
                     val nis: Enumeration<*> = NetworkInterface.getNetworkInterfaces()

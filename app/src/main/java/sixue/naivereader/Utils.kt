@@ -32,7 +32,7 @@ object Utils {
     const val INTENT_PARA_PATH = "INTENT_PARA_PATH"
     const val INTENT_PARA_CURRENT_POSITION = "INTENT_PARA_CURRENT_POSITION"
     const val INTENT_PARA_CHAPTER_INDEX = "INTENT_PARA_CHAPTER_INDEX"
-    fun readText(s: String?): String? {
+    fun readText(s: String): String? {
         val file = File(s)
         if (!file.exists()) {
             return null
@@ -59,11 +59,11 @@ object Utils {
         }
     }
 
-    fun writeText(s: String?, path: String?) {
+    fun writeText(s: String, path: String) {
         try {
             val file = File(path)
             val dir = file.parentFile
-            if (!dir.exists()) {
+            if (dir != null && !dir.exists()) {
                 val mk = dir.mkdirs()
                 Log.i("Utils", "mkdir:$dir, $mk")
             }
@@ -169,7 +169,7 @@ object Utils {
         Log.i(TAG, "delete:$path, $dr")
     }
 
-    fun mkdir(path: String?) {
+    fun mkdir(path: String) {
         val dir = File(path)
         if (!dir.exists()) {
             val mk = dir.mkdirs()
@@ -177,7 +177,7 @@ object Utils {
         }
     }
 
-    private fun exists(path: String?): Boolean {
+    private fun exists(path: String): Boolean {
         val file = File(path)
         return file.exists()
     }
@@ -375,7 +375,7 @@ object Utils {
         }
     }
 
-    fun readTextFromZip(zipPath: String?, path: String?): String? {
+    fun readTextFromZip(zipPath: String, path: String): String? {
         try {
             val zf = ZipFile(zipPath)
             val entries = zf.entries()
@@ -402,7 +402,7 @@ object Utils {
         return null
     }
 
-    fun readBytesFromZip(zipPath: String?, path: String): ByteArray? {
+    fun readBytesFromZip(zipPath: String, path: String): ByteArray? {
         try {
             val zf = ZipFile(zipPath)
             val entries = zf.entries()
@@ -434,7 +434,7 @@ object Utils {
         return f.format(date)
     }
 
-    fun clearHtmlTag(text: String?, tags: Array<String?>): String {
+    fun clearHtmlTag(text: String, tags: Array<String>): String {
         val textDoc = Jsoup.parse(text)
         for (t in tags) {
             for (o in textDoc.body().select(t)) {
@@ -444,7 +444,7 @@ object Utils {
         return textDoc.body().html()
     }
 
-    fun readExternalText(context: Context, uriString: String?): String? {
+    fun readExternalText(context: Context, uriString: String): String? {
         val uri = Uri.parse(uriString)
         val resolver = context.contentResolver
         val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
