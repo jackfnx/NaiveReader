@@ -133,7 +133,9 @@ class ScanDeviceTool : AutoCloseable {
                                 continue
                             }
                             val ip = ia.hostAddress
-                            hostIps.add(ip)
+                            if (ip != null) {
+                                hostIps.add(ip)
+                            }
                         }
                     }
                 } catch (e: SocketException) {

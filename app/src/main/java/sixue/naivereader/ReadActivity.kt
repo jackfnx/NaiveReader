@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
@@ -301,11 +300,9 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         if (actionBar.isShowing) {
             actionBar.hide()
         } else {
-            val metrics = DisplayMetrics()
-            val display = this.display
-            display?.getRealMetrics(metrics)
-            val widthPixels = metrics.widthPixels
-            val heightPixels = metrics.heightPixels
+            val metrics = windowManager.currentWindowMetrics
+            val widthPixels = metrics.bounds.width()
+            val heightPixels = metrics.bounds.height()
             val x = motionEvent.rawX
             val y = motionEvent.rawY
             Log.d(javaClass.toString(), "Display:width=$widthPixels,height=$heightPixels; Touch:x=$x,y=$y")
