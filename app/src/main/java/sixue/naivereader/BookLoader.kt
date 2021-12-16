@@ -106,10 +106,6 @@ internal object BookLoader {
         }
     }
 
-    fun bookIndex(book: Book): Int {
-        return list.indexOf(book)
-    }
-
     init {
         list = ArrayList()
     }

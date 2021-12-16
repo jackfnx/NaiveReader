@@ -9,5 +9,6 @@ data class Packet(
     var timestamp: Long,
     var source: String,
 
-    var regexps: List<String>,
+    var chapters: List<Chapter>? = null,
+    var regexps: List<String>? = null,
 )

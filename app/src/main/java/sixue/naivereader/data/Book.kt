@@ -12,7 +12,7 @@ data class Book (
     var title: String,
     var author: String,
     var kind: BookKind,
-    var localPath: String,
+    var localPath: String? = null,
     var siteId: String? = null,
     var sitePara: String? = null,
 
@@ -42,7 +42,7 @@ data class Book (
         sb.append(",")
         sb.append("kind=")
         sb.append(kind)
-        if (localPath != "") {
+        if (localPath != null) {
             sb.append(",")
             sb.append("localPath=")
             sb.append(localPath)

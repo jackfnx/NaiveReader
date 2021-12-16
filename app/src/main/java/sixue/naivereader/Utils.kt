@@ -1,19 +1,18 @@
 package sixue.naivereader
 
 import android.Manifest
-import android.content.ContentResolver
-import org.mozilla.universalchardet.UniversalDetector
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import org.jsoup.Jsoup
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.*
 import android.net.Uri
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import org.jsoup.Jsoup
+import org.mozilla.universalchardet.UniversalDetector
 import java.io.*
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -117,18 +116,26 @@ object Utils {
         }
     }
 
-    fun verifyPermissions(activity: Activity?) {
-        val r = ActivityCompat.checkSelfPermission(activity!!,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun verifyPermissions(activity: Activity) {
+        val r = ActivityCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
         if (r != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    1)
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                1
+            )
         }
-        val w = ActivityCompat.checkSelfPermission(activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val w = ActivityCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
         if (w != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    1)
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
         }
     }
 

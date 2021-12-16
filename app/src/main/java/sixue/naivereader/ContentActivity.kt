@@ -87,12 +87,13 @@ class ContentActivity : AppCompatActivity() {
         }
         if (book.buildHelper().reloadContent(this)) {
             if (book.kind === BookKind.LocalText) {
-                localText = Utils.readText(book.localPath)!!
+                localText = Utils.readExternalText(this, book.localPath!!) ?: "Can't open file."
                 localChapterNodes = calcChapterNodes(localText)
                 currentLocalChapter = 0
                 for (i in localChapterNodes.indices) {
                     val node = localChapterNodes[i]
-                    val next = if (i + 1 < localChapterNodes.size) localChapterNodes[i + 1] else Int.MAX_VALUE
+                    val next =
+                        if (i + 1 < localChapterNodes.size) localChapterNodes[i + 1] else Int.MAX_VALUE
                     if (book.currentPosition in node until next) {
                         currentLocalChapter = i
                         break

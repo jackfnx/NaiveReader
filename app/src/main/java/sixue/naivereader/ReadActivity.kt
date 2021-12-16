@@ -120,11 +120,11 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                         title.text = book.title
                         subtitle.text = chapter.title
                         if (book.kind === BookKind.Packet) {
-                            text = Utils.readTextFromZip(book.localPath, chapter.savePath) ?: "Can't open file."
+                            text = Utils.readTextFromZip(book.localPath!!, chapter.savePath) ?: "Can't open file."
                         } else if (book.kind === BookKind.Online) {
                             text = Utils.readText(chapter.savePath) ?: "Can't open file."
                         } else if (book.kind === BookKind.LocalText) {
-                            val t = Utils.readExternalText(context, book.localPath)
+                            val t = Utils.readExternalText(context, book.localPath!!)
                             if (t == null) {
                                 text = "Can't open file."
                             } else {

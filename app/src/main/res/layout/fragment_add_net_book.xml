@@ -22,7 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_toStartOf="@id/search"
         android:hint="@string/input_book_title"
-        android:inputType="text" />
+        android:inputType="text"
+        android:importantForAutofill="no" />
 
     <ListView
         android:id="@+id/list_books"

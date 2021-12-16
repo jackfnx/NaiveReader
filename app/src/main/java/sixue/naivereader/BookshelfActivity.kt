@@ -1,25 +1,24 @@
 package sixue.naivereader
 
 import android.content.*
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
-import androidx.appcompat.app.ActionBar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
-import sixue.naivereader.data.BookKind.Online
 import java.util.*
 
 class BookshelfActivity : AppCompatActivity() {
     private lateinit var myAdapter: MyAdapter
     private lateinit var editList: MutableList<Book>
-    private var actionBar: ActionBar? = null
     private lateinit var receiver: BroadcastReceiver
     private var isEditMode = false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +28,6 @@ class BookshelfActivity : AppCompatActivity() {
         BookLoader.reload(this)
         isEditMode = false
         editList = ArrayList()
-        actionBar = supportActionBar
         val gv = findViewById<GridView>(R.id.gridview_books)
         val fab = findViewById<FloatingActionButton>(R.id.fab_add)
         val srl = findViewById<SwipeRefreshLayout>(R.id.srl)
@@ -83,7 +81,7 @@ class BookshelfActivity : AppCompatActivity() {
     private fun refreshAllBooks() {
         for (i in 0 until BookLoader.bookNum) {
             val book = BookLoader.getBook(i)
-            if (book?.kind == Online) {
+            if (book?.kind == BookKind.Online) {
                 if (book.buildHelper().reloadContent(this)) {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
@@ -161,14 +159,19 @@ class BookshelfActivity : AppCompatActivity() {
             val localPath = v.findViewById<EditText>(R.id.local_path)
             localPath.hint = book.localPath
             localPath.clearFocus()
+            val getTextDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+                if (uri != null) {
+                    val takeFlags =
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    contentResolver.takePersistableUriPermission(uri, takeFlags)
+                    book.localPath = uri.toString()
+                    BookLoader.save()
+                    localPath.hint = uri.toString()
+                }
+            }
             val browser = v.findViewById<Button>(R.id.button_browser)
             browser.setOnClickListener {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "text/plain"
-                val bookId = BookLoader.bookIndex(book)
-                val reqCode = REQUEST_CODE_BROWSE or bookId
-                startActivityForResult(intent, reqCode)
+                getTextDocument.launch(arrayOf("text/plain"))
                 localPath.setHint(R.string.HintTextEditing)
             }
             AlertDialog.Builder(this)
@@ -181,7 +184,7 @@ class BookshelfActivity : AppCompatActivity() {
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
-        } else if (book.kind == Online) {
+        } else if (book.kind == BookKind.Online) {
             val v = View.inflate(this, R.layout.edit_dialog_net, null)
             val title = v.findViewById<EditText>(R.id.title)
             title.setText(book.title)
@@ -211,23 +214,6 @@ class BookshelfActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == RESULT_OK && requestCode and REQUEST_CODE_BROWSE != 0) {
-            val uri = data!!.data
-            if (uri != null) {
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
-                val bookId = requestCode and REQUEST_CODE_BOOK_ID_MASK
-                if (bookId >= 0) {
-                    val b = BookLoader.getBook(bookId)
-                    b?.localPath = uri.toString()
-                    BookLoader.save()
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val edit = menu.findItem(R.id.menu_edit)
         val delete = menu.findItem(R.id.menu_delete)
@@ -243,7 +229,7 @@ class BookshelfActivity : AppCompatActivity() {
     private fun setEditMode(editMode: Boolean) {
         isEditMode = editMode
         myAdapter.notifyDataSetChanged()
-        actionBar?.setDisplayShowTitleEnabled(!editMode)
+        supportActionBar?.setDisplayShowTitleEnabled(!editMode)
         invalidateOptionsMenu()
     }
 
@@ -293,7 +279,7 @@ class BookshelfActivity : AppCompatActivity() {
                 } else {
                     viewHolder.progress.text = getString(R.string.read_progress_local, cp.toFloat() / wc.toFloat() * 100f)
                 }
-            } else if (book?.kind == Online) {
+            } else if (book?.kind == BookKind.Online) {
                 val size = book.chapterList.size
                 val cp = book.currentChapterIndex
                 if (size <= 0) {
@@ -322,10 +308,5 @@ class BookshelfActivity : AppCompatActivity() {
         }
 
         inner class ViewHolder(val title: TextView, val progress: TextView, val selectIcon: View, val cover: ImageView)
-    }
-
-    companion object {
-        private const val REQUEST_CODE_BROWSE = 0x1000
-        private const val REQUEST_CODE_BOOK_ID_MASK = 0x0FFF
     }
 }

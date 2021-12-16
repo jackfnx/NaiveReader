@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Handler
+import android.os.Looper
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.Log
@@ -61,7 +62,7 @@ class ReaderView : View {
     }
 
     private fun startTypesetThread() {
-        val handler = Handler()
+        val handler = Handler(Looper.getMainLooper())
         Thread {
             pageBreaks!!.clear()
             currentPage = -1
