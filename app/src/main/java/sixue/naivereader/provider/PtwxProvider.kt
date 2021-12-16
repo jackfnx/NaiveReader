@@ -134,7 +134,7 @@ class PtwxProvider : NetProvider() {
             val s = doc.body().toString()
                     .replace("<script language=\"javascript\">GetFont();</script>", "<div id=\"content\" class=\"fonts_mesne\">")
                     .replace("<!-- 翻页上AD开始 -->", "</div> <!-- 翻页上AD开始 -->")
-            val content = Jsoup.parse(s).select("#content").first()
+            val content = Jsoup.parse(s).select("#content").first()!!
             val text = content.html()
             val plainText = Utils.clearHtmlTag(text, arrayOf("h1", "table", "div"))
                     .replace("<br>", "")

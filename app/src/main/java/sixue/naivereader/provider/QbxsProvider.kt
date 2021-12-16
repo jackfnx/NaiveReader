@@ -31,9 +31,9 @@ class QbxsProvider : NetProvider() {
             } else {
                 val doc = response.parse()
                 for (item in doc.body().select(".list2")) {
-                    val titleEle = item.select("h3 a[itemprop=url]").first()
-                    val authorEle = item.select("p span[itemprop=author]").first()
-                    val coverEle = item.select("img").first()
+                    val titleEle = item.select("h3 a[itemprop=url]").first()!!
+                    val authorEle = item.select("p span[itemprop=author]").first()!!
+                    val coverEle = item.select("img").first()!!
                     val title = titleEle.text()
                     val id = titleEle.text()
                     val author = authorEle.text()
