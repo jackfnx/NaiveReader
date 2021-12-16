@@ -13,10 +13,11 @@ import sixue.naivereader.provider.NetProviderCollections.saveSettings
 import java.util.*
 
 class NetProviderManagerActivity : AppCompatActivity() {
-    private var netProviders: List<NetProvider> = ArrayList(getProviders(this))
+    private lateinit var netProviders: List<NetProvider>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_net_provider_manager)
+        netProviders = ArrayList(getProviders(this))
         val listView = findViewById<ListView>(R.id.list_net_providers)
         listView.adapter = object : BaseAdapter() {
             override fun getCount(): Int {
