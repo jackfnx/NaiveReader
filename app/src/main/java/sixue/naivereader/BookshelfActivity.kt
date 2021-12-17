@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,8 @@ class BookshelfActivity : AppCompatActivity() {
     private lateinit var myAdapter: MyAdapter
     private lateinit var editList: MutableList<Book>
     private lateinit var receiver: BroadcastReceiver
+    private lateinit var getTextDocument: ActivityResultLauncher<Array<String>>
+    private var updateBookCallback: ((Uri?) -> Unit)? = null
     private var isEditMode = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +31,9 @@ class BookshelfActivity : AppCompatActivity() {
         BookLoader.reload(this)
         isEditMode = false
         editList = ArrayList()
+        getTextDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            updateBookCallback?.invoke(uri)
+        }
         val gv = findViewById<GridView>(R.id.gridview_books)
         val fab = findViewById<FloatingActionButton>(R.id.fab_add)
         val srl = findViewById<SwipeRefreshLayout>(R.id.srl)
@@ -159,7 +165,7 @@ class BookshelfActivity : AppCompatActivity() {
             val localPath = v.findViewById<EditText>(R.id.local_path)
             localPath.hint = book.localPath
             localPath.clearFocus()
-            val getTextDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            updateBookCallback = { uri: Uri? ->
                 if (uri != null) {
                     val takeFlags =
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -167,6 +173,8 @@ class BookshelfActivity : AppCompatActivity() {
                     book.localPath = uri.toString()
                     BookLoader.save()
                     localPath.hint = uri.toString()
+                } else {
+                    localPath.hint = book.localPath
                 }
             }
             val browser = v.findViewById<Button>(R.id.button_browser)
