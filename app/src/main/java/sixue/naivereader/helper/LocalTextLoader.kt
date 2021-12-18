@@ -50,25 +50,18 @@ object LocalTextLoader {
         if (text == null) {
             return chapterNodes
         }
-        val patterns = arrayOf(
-                "\\b第[\\d\\uFF10-\\uFF19一二三四五六七八九十百千零]+[部章节篇集卷]\\b",
-                "\\b[\\d\\uFF10-\\uFF19]+\\b"
+        val pattern = Pattern.compile(
+            "^(?<=[\\S\\n\\r\\f])[\\d\\uFF10-\\uFF19]+\\b|\\b番外篇\\b|\\b第[\\d\\uFF10-\\uFF19一二三四五六七八九十百千零]+[部章节篇集卷]\\b"
         )
-        for (ps in patterns) {
-            val pattern = Pattern.compile(ps)
-            val matcher = pattern.matcher(text)
-            var last = -1
-            while (matcher.find()) {
-                val i = matcher.start()
-                if (last >= 0 && !text.substring(last, i).contains("\n")) {
-                    continue
-                }
-                last = i
-                chapterNodes.add(i)
+        val matcher = pattern.matcher(text)
+        var last = -1
+        while (matcher.find()) {
+            val i = matcher.start()
+            if (last >= 0 && !text.substring(last, i).contains("\n")) {
+                continue
             }
-            if (chapterNodes.size != 0) {
-                break
-            }
+            last = i
+            chapterNodes.add(i)
         }
         return chapterNodes
     }
