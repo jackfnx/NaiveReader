@@ -162,14 +162,6 @@ object Utils {
         }
     }
 
-    fun <T> convert(list: List<T>, func: (T)->String): List<String> {
-        val arr = ArrayList<String>(list.size)
-        for (i in list.indices) {
-            arr[i] = func(list[i])
-        }
-        return arr
-    }
-
     fun deleteFile(path: String) {
         val file = File(path)
         val dr = file.delete()

@@ -201,7 +201,7 @@ class BookshelfActivity : AppCompatActivity() {
             author.setText(book.author)
             author.clearFocus()
             val sources = v.findViewById<Spinner>(R.id.sources)
-            val sourceNames = Utils.convert(book.sources){ it.id }
+            val sourceNames = book.sources.map { it.id }
             val adapter: SpinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, sourceNames)
             sources.adapter = adapter
             sources.clearFocus()
