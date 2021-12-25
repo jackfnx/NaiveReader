@@ -227,7 +227,7 @@ object Utils {
             Pair(Pattern.compile("【.+】(?=的作品集)"), "作品集"),
             Pair(Pattern.compile("【.+】(?=系列)"), "系列"),
             Pair(Pattern.compile("(?<=专题：)【.+】"), "专题"),
-            Pair(Pattern.compile("(?<=冻结：)【.+】"), "冻结"),
+            Pair(Pattern.compile("(?<=静态：)【.+】"), "静态"),
         )
         for (pair in pattens) {
             val matcher = pair.first.matcher(title)
