@@ -47,9 +47,23 @@
         android:layout_height="wrap_content"
         android:text="@string/status" />
 
-    <CheckBox
-        android:id="@+id/end"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/end" />
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/end" />
+
+        <Button
+            android:id="@+id/archive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Archive"/>
+    </LinearLayout>
 </LinearLayout>

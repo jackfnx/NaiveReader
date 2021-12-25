@@ -165,6 +165,21 @@ class BookshelfActivity : AppCompatActivity() {
             val localPath = v.findViewById<EditText>(R.id.local_path)
             localPath.hint = book.localPath
             localPath.clearFocus()
+            val browser = v.findViewById<Button>(R.id.button_browser)
+            browser.setOnClickListener {
+                getTextDocument.launch(arrayOf("text/plain"))
+                localPath.setHint(R.string.HintTextEditing)
+            }
+            val dialog = AlertDialog.Builder(this)
+                    .setTitle("Local book")
+                    .setView(v)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        book.title = title.text.toString()
+                        book.author = author.text.toString()
+                        BookLoader.save()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
             updateBookCallback = { uri: Uri? ->
                 if (uri != null) {
                     val takeFlags =
@@ -176,22 +191,8 @@ class BookshelfActivity : AppCompatActivity() {
                 } else {
                     localPath.hint = book.localPath
                 }
+                dialog.dismiss()
             }
-            val browser = v.findViewById<Button>(R.id.button_browser)
-            browser.setOnClickListener {
-                getTextDocument.launch(arrayOf("text/plain"))
-                localPath.setHint(R.string.HintTextEditing)
-            }
-            AlertDialog.Builder(this)
-                    .setTitle("Local book")
-                    .setView(v)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        book.title = title.text.toString()
-                        book.author = author.text.toString()
-                        BookLoader.save()
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
         } else if (book.kind == BookKind.Online) {
             val v = View.inflate(this, R.layout.edit_dialog_net, null)
             val title = v.findViewById<EditText>(R.id.title)
@@ -208,7 +209,8 @@ class BookshelfActivity : AppCompatActivity() {
             val end = v.findViewById<CheckBox>(R.id.end)
             end.isChecked = book.end
             end.clearFocus()
-            AlertDialog.Builder(this)
+            val archive = v.findViewById<Button>(R.id.archive)
+            val dialog = AlertDialog.Builder(this)
                     .setTitle("Net book")
                     .setView(v)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -219,6 +221,9 @@ class BookshelfActivity : AppCompatActivity() {
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
+            archive.setOnClickListener() {
+                dialog.dismiss()
+            }
         }
     }
 
