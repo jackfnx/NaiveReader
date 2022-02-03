@@ -58,8 +58,11 @@ class NetProviderManagerActivity : AppCompatActivity() {
         }
         val cg = findViewById<Button>(R.id.garbage_button)
         cg.setOnClickListener {
-            BookLoader.clearGarbage()
-            Toast.makeText(this@NetProviderManagerActivity, "[GARBAGE] clear.", Toast.LENGTH_SHORT).show()
+            val n = BookLoader.clearGarbage {
+                Toast.makeText(this, "[GARBAGE] $it", Toast.LENGTH_SHORT).show()
+            }
+            Toast.makeText(this@NetProviderManagerActivity, "[GARBAGE] Clear <$n>.", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 }
