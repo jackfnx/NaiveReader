@@ -37,19 +37,12 @@ class AddPacketFragment : Fragment() {
             if (b != null) {
                 val helper = b.buildHelper() as PacketHelper
                 helper.reloadContent(requireContext())
-                val read = b.chapterList.size - 1 - b.currentChapterIndex
+                val read = helper.freezeRead()
                 val currentPacket = helper.loadMetaData(requireContext())
                 if (currentPacket == null || currentPacket.summary != packet.summary) {
                     helper.downloadPacket(requireActivity(), ip!!, object : PacketHelper.Func<String> {
                         override fun exec(t: String) {
-                            var idx = b.chapterList.size - 1 - read
-                            if (idx < 0) {
-                                idx = 0
-                            }
-                            if (idx >= b.chapterList.size) {
-                                idx = b.chapterList.size - 1
-                            }
-                            b.currentChapterIndex = idx
+                            b.currentChapterIndex = helper.unfreezeRead(read)
                             BookLoader.bookBubble(b)
                             val activity: Activity? = activity
                             activity?.runOnUiThread {

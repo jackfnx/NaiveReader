@@ -21,9 +21,7 @@ import sixue.naivereader.ReaderView.OnTurnPageOverListener
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
 import sixue.naivereader.data.Chapter
-import sixue.naivereader.helper.LocalTextLoader.calcChapterNodes
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGestureListener {
     private lateinit var detector: GestureDetector
@@ -34,8 +32,6 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
     private lateinit var smartDownloader: SmartDownloader
     private lateinit var actionBar: ActionBar
     private var chapter: Chapter = emptyChapter
-    private var localChapterNodes: List<Int> = ArrayList()
-    private var text: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read)
@@ -60,36 +56,29 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 val currentPage = readerView.currentPage
                 progress.text = String.format(Locale.CHINA, "%d/%s", currentPage + 1, maxPages)
                 book.currentPosition = readerView.currentPosition
-                if (book.kind === BookKind.LocalText && localChapterNodes.isNotEmpty()) {
-                    for (i in localChapterNodes.indices) {
-                        val node = localChapterNodes[i]
-                        val next = if (i + 1 < localChapterNodes.size) localChapterNodes[i + 1] else Int.MAX_VALUE
-                        if (book.currentPosition in node until next) {
-                            var end = text.indexOf('\n', node)
-                            end = if (end < 0) text.length else end
-                            val s = text.substring(node, end)
-                            subtitle.text = s
-                            break
-                        }
-                    }
+                val (update, chapterTitle) = book.buildHelper().updateChapterTitleOnPageChange()
+                if (update) {
+                    subtitle.text = chapterTitle
                 }
                 BookLoader.save()
             }
         })
         readerView.setOnTurnPageOverListener(object : OnTurnPageOverListener() {
             override fun onTurnPageOver(step: Int) {
-                if (book.kind === BookKind.Online) {
-                    val i = book.currentChapterIndex + if (step > 0) 1 else -1
-                    if (i >= 0 && i < book.chapterList.size) {
-                        loadNetChapter(i, if (step > 0) 0 else Int.MAX_VALUE)
-                        return
+                val (notOver, i, j) = book.buildHelper().calcTurnPageNewIndex(step)
+                if (notOver) {
+                    when {
+                        book.kind === BookKind.Online -> {
+                            loadNetChapter(i, j)
+                        }
+                        book.kind === BookKind.Archive -> {
+                            loadArchiveChapter(i, j)
+                        }
+                        book.kind === BookKind.Packet -> {
+                            loadPackChapter(i, j)
+                        }
                     }
-                } else if (book.kind === BookKind.Packet) {
-                    val i = book.currentChapterIndex + if (step > 0) -1 else 1
-                    if (i >= 0 && i < book.chapterList.size) {
-                        loadPackChapter(i, if (step > 0) 0 else Int.MAX_VALUE)
-                        return
-                    }
+                    return
                 }
                 if (step < 0) {
                     Toast.makeText(this@ReadActivity, R.string.msg_first_page, Toast.LENGTH_SHORT).show()
@@ -118,21 +107,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                     Utils.ACTION_DOWNLOAD_CHAPTER_FINISH -> if (book.id == intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID) && chapter.id == intent.getStringExtra(Utils.INTENT_PARA_CHAPTER_ID)) {
                         title.text = book.title
                         subtitle.text = chapter.title
-                        if (book.kind === BookKind.Packet) {
-                            text = Utils.readTextFromZip(book.localPath!!, chapter.savePath) ?: "Can't open file."
-                        } else if (book.kind === BookKind.Online) {
-                            text = Utils.readText(chapter.savePath) ?: "Can't open file."
-                        } else if (book.kind === BookKind.LocalText) {
-                            val t = Utils.readExternalText(context, book.localPath!!)
-                            if (t == null) {
-                                text = "Can't open file."
-                            } else {
-                                text = t
-                                localChapterNodes = calcChapterNodes(text)
-                                book.wordCount = text.length
-                                BookLoader.save()
-                            }
-                        }
+                        val text = book.buildHelper().readText(chapter, context)
                         readerView.importText(text, book.currentPosition)
                     }
                     else -> {}
@@ -155,19 +130,22 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         smartDownloader = SmartDownloader(this, book)
         if (book.buildHelper().reloadContent(this)) {
             when {
+                book.kind === BookKind.Archive -> {
+                    loadArchiveChapter(newIndex, newPosition)
+                }
+                book.kind === BookKind.Packet -> {
+                    loadPackChapter(newIndex, newPosition)
+                }
+                book.kind === BookKind.Online -> {
+                    val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
+                    intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
+                    sendBroadcast(intent)
+                }
                 book.kind === BookKind.LocalText -> {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "")
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
-                    sendBroadcast(intent)
-                }
-                book.kind === BookKind.Packet -> {
-                    loadPackChapter(newIndex, newPosition)
-                }
-                else -> {
-                    val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
-                    intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
                     sendBroadcast(intent)
                 }
             }
@@ -218,6 +196,24 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         }
     }
 
+    private fun loadArchiveChapter(newIndex: Int, newPosition: Int) {
+        if (newIndex >= 0 && newIndex < book.chapterList.size) {
+            if (book.currentChapterIndex != newIndex) {
+                book.currentChapterIndex = newIndex
+                book.currentPosition = newPosition
+            }
+        }
+        if (book.chapterList.isEmpty()) {
+            return
+        }
+        chapter = book.chapterList[book.currentChapterIndex]
+        val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+        intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
+        intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.id)
+        intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
+        sendBroadcast(intent)
+    }
+
     public override fun onStart() {
         super.onStart()
         actionBar.setDisplayShowTitleEnabled(false)
@@ -233,8 +229,8 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.refresh).isEnabled = book.kind === BookKind.Online
-        menu.findItem(R.id.browse_it).isEnabled = book.kind === BookKind.Online
+        menu.findItem(R.id.refresh).isEnabled = book.isRefreshable()
+        menu.findItem(R.id.browse_it).isEnabled = book.isViewableInBrowser()
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -248,14 +244,14 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
             }
             R.id.refresh -> {
                 run {
-                    if (book.kind === BookKind.Online) {
+                    if (book.isRefreshable()) {
                         Utils.deleteFile(chapter.savePath)
                         loadNetChapter(book.currentChapterIndex, 0)
                         return true
                     }
                 }
                 run {
-                    if (book.kind === BookKind.Online) {
+                    if (book.isRefreshable()) {
                         val url = smartDownloader.getChapterUrl(chapter)
                         val intent = Intent("android.intent.action.VIEW")
                         intent.data = Uri.parse(url)
@@ -266,7 +262,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 }
             }
             R.id.browse_it -> {
-                if (book.kind === BookKind.Online) {
+                if (book.isViewableInBrowser()) {
                     val url = smartDownloader.getChapterUrl(chapter)
                     val intent = Intent("android.intent.action.VIEW")
                     intent.data = Uri.parse(url)

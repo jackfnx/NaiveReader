@@ -15,6 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
+import sixue.naivereader.helper.ArchiveLoader
 import java.util.*
 
 class BookshelfActivity : AppCompatActivity() {
@@ -87,7 +88,7 @@ class BookshelfActivity : AppCompatActivity() {
     private fun refreshAllBooks() {
         for (i in 0 until BookLoader.bookNum) {
             val book = BookLoader.getBook(i)
-            if (book?.kind == BookKind.Online) {
+            if (book?.isRefreshable() == true) {
                 if (book.buildHelper().reloadContent(this)) {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
@@ -222,6 +223,9 @@ class BookshelfActivity : AppCompatActivity() {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
             archive.setOnClickListener() {
+                val newBook = ArchiveLoader.createArchive(book, this)
+                BookLoader.replace(book, newBook)
+                myAdapter.notifyDataSetChanged()
                 dialog.dismiss()
             }
         }
@@ -284,32 +288,7 @@ class BookshelfActivity : AppCompatActivity() {
 
             val book = BookLoader.getBook(i)
             viewHolder.title.text = book?.title
-            if (book?.kind == BookKind.LocalText) {
-                val cp = book.currentPosition
-                val wc = book.wordCount
-                if (wc <= 0) {
-                    viewHolder.progress.setText(R.string.read_progress_local_unread)
-                } else {
-                    viewHolder.progress.text = getString(R.string.read_progress_local, cp.toFloat() / wc.toFloat() * 100f)
-                }
-            } else if (book?.kind == BookKind.Online) {
-                val size = book.chapterList.size
-                val cp = book.currentChapterIndex
-                if (size <= 0) {
-                    viewHolder.progress.setText(R.string.read_progress_net_predownload)
-                } else if (cp + 1 == size) {
-                    if (book.end) {
-                        viewHolder.progress.setText(R.string.read_progress_net_end)
-                    } else {
-                        viewHolder.progress.setText(R.string.read_progress_net_allread)
-                    }
-                } else {
-                    viewHolder.progress.text = getString(R.string.read_progress_net, size - cp - 1)
-                }
-            } else if (book?.kind == BookKind.Packet) {
-                val cp = book.currentChapterIndex
-                viewHolder.progress.text = getString(R.string.read_progress_net, cp)
-            }
+            viewHolder.progress.text = book?.buildHelper()?.progressText(this@BookshelfActivity)
             if (!isEditMode) {
                 viewHolder.selectIcon.visibility = View.INVISIBLE
             } else {

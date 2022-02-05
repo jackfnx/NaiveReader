@@ -12,18 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
-import sixue.naivereader.helper.LocalTextLoader.calcChapterNodes
 import sixue.naivereader.provider.NetProviderCollections.findProviders
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ContentActivity : AppCompatActivity() {
     private lateinit var receiver: BroadcastReceiver
     private lateinit var downloader: SmartDownloader
     private lateinit var book: Book
-    private lateinit var localText: String
-    private var localChapterNodes: List<Int> = ArrayList()
-    private var currentLocalChapter = 0
     private var providerIds: List<String> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,25 +28,14 @@ class ContentActivity : AppCompatActivity() {
         val listView = findViewById<ListView>(R.id.content)
         val myAdapter = MyAdapter(book)
         val srl = findViewById<SwipeRefreshLayout>(R.id.srl)
+        srl.isEnabled = book.isRefreshable()
         listView.adapter = myAdapter
         listView.onItemClickListener = OnItemClickListener { _, _, i, _ ->
             val intent = Intent(this@ContentActivity, ReadActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            when {
-                book.kind === BookKind.Online -> {
-                    val index = book.chapterList.size - i - 1
-                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, index)
-                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0)
-                }
-                book.kind === BookKind.Packet -> {
-                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, i)
-                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, 0)
-                }
-                book.kind === BookKind.LocalText -> {
-                    intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, 0)
-                    intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, localChapterNodes[i])
-                }
-            }
+            val (currentIdx, currentPos) = book.buildHelper().calcCurrentPosition(i)
+            intent.putExtra(Utils.INTENT_PARA_CHAPTER_INDEX, currentIdx)
+            intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, currentPos)
             startActivity(intent)
             finish()
         }
@@ -66,7 +49,7 @@ class ContentActivity : AppCompatActivity() {
                 when (action) {
                     Utils.ACTION_DOWNLOAD_CONTENT_FINISH -> if (book.id == intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) {
                         srl.isRefreshing = false
-                        listView.setSelection(book.chapterList.size - book.currentChapterIndex - 1)
+                        listView.setSelection(book.buildHelper().getCurrentSeemingIndex())
                         myAdapter.notifyDataSetChanged()
                     }
                     Utils.ACTION_DOWNLOAD_CHAPTER_FINISH -> if (book.id == intent.getStringExtra(Utils.INTENT_PARA_BOOK_ID)) {
@@ -81,30 +64,12 @@ class ContentActivity : AppCompatActivity() {
         }
         registerReceiver(receiver, filter)
         srl.setOnRefreshListener {
-            if (book.kind === BookKind.Online) {
+            if (book.isRefreshable()) {
                 downloader.startDownloadContent()
             }
         }
         if (book.buildHelper().reloadContent(this)) {
-            if (book.kind === BookKind.LocalText) {
-                localText = Utils.readExternalText(this, book.localPath!!) ?: "Can't open file."
-                localChapterNodes = calcChapterNodes(localText)
-                currentLocalChapter = 0
-                for (i in localChapterNodes.indices) {
-                    val node = localChapterNodes[i]
-                    val next =
-                        if (i + 1 < localChapterNodes.size) localChapterNodes[i + 1] else Int.MAX_VALUE
-                    if (book.currentPosition in node until next) {
-                        currentLocalChapter = i
-                        break
-                    }
-                }
-                listView.setSelection(currentLocalChapter)
-            } else if (book.kind === BookKind.Online) {
-                listView.setSelection(book.chapterList.size - book.currentChapterIndex - 1)
-            } else if (book.kind === BookKind.Packet) {
-                listView.setSelection(book.currentChapterIndex)
-            }
+            listView.setSelection(book.buildHelper().getCurrentSeemingIndex())
         } else {
             srl.isRefreshing = true
             downloader.startDownloadContent()
@@ -118,7 +83,7 @@ class ContentActivity : AppCompatActivity() {
 
     private inner class MyAdapter(private val book: Book) : BaseAdapter() {
         override fun getCount(): Int {
-            return if (book.kind === BookKind.LocalText) localChapterNodes.size else book.chapterList.size
+            return book.buildHelper().getChapterSize()
         }
 
         override fun getItem(i: Int): Any {
@@ -141,36 +106,10 @@ class ContentActivity : AppCompatActivity() {
                 view = convertView
             }
             val viewHolder : ViewHolder = (view!!.tag as ViewHolder)
-            if (book.kind === BookKind.LocalText) {
-                val node = localChapterNodes[i]
-                val length = localText.length
-                var end = localText.indexOf('\n', node)
-                end = if (end < 0) length else end
-                var s = localText.substring(node, end)
-                if (i == currentLocalChapter) {
-                    s += "*"
-                }
-                viewHolder.title.text = s
-                val sumStart = node + s.length
-                val sumEnd = if (sumStart + MAX_SUMMARY_LENGTH > length) length else sumStart + MAX_SUMMARY_LENGTH
-                val sum = localText.substring(sumStart, sumEnd).trim { it <= ' ' }.replace('\n', ' ')
-                viewHolder.summary.text = sum
-                viewHolder.summary.gravity = Gravity.START
-            } else {
-                val index: Int = if (book.kind === BookKind.Online) book.chapterList.size - i - 1 else i
-                val chapter = book.chapterList[index]
-                var s = chapter.title
-                if (index == book.currentChapterIndex) {
-                    s += "*"
-                }
-                viewHolder.title.text = s
-                if (downloader.isDownloaded(chapter)) {
-                    viewHolder.summary.setText(R.string.download)
-                } else {
-                    viewHolder.summary.text = ""
-                }
-                viewHolder.summary.gravity = Gravity.END
-            }
+            val (title, sum, gravity) = book.buildHelper().getChapterDescription(i, this@ContentActivity)
+            viewHolder.title.text = title
+            viewHolder.summary.text = sum
+            viewHolder.summary.gravity = gravity
             return view
         }
 
@@ -184,7 +123,7 @@ class ContentActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val menuProviders = menu.findItem(R.id.menu_providers)
-        if (book.kind !== BookKind.Online) {
+        if (!book.isRefreshable()) {
             menuProviders.isVisible = false
         } else {
             val subMenu = menuProviders.subMenu
@@ -205,7 +144,7 @@ class ContentActivity : AppCompatActivity() {
             subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size, providerIds.size + 1, R.string.menu_search_again)
         }
         val batchDownload = menu.findItem(R.id.menu_batch_download)
-        if (book.kind !== BookKind.Online) {
+        if (!book.isRefreshable()) {
             batchDownload.isVisible = false
         }
         return super.onPrepareOptionsMenu(menu)
@@ -234,9 +173,5 @@ class ContentActivity : AppCompatActivity() {
             return true
         }
         return false
-    }
-
-    companion object {
-        private const val MAX_SUMMARY_LENGTH = 40
     }
 }

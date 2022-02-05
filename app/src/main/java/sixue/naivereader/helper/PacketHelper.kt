@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.view.Gravity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import sixue.naivereader.R
 import sixue.naivereader.Utils
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.Chapter
@@ -71,6 +73,53 @@ class PacketHelper(private val book: Book) : BookHelper {
         return cover
     }
 
+    override fun calcCurrentPosition(seemingIndex: Int): BookHelper.CurrentPosition {
+        return BookHelper.CurrentPosition(seemingIndex, 0)
+    }
+
+    override fun getCurrentSeemingIndex(): Int {
+        return book.currentChapterIndex
+    }
+
+    override fun getChapterSize(): Int {
+        return book.chapterList.size
+    }
+
+    override fun getChapterDescription(
+        seemingIndex: Int,
+        context: Context
+    ): BookHelper.ChapterDescription {
+
+        val index = seemingIndex
+        val chapter = book.chapterList[index]
+        var title = chapter.title
+        if (index == book.currentChapterIndex) {
+            title += "*"
+        }
+        val summary = context.getString(R.string.download)
+        return BookHelper.ChapterDescription(title, summary, Gravity.END)
+    }
+
+    override fun updateChapterTitleOnPageChange(): BookHelper.UpdateChapterTitleEvent {
+        return BookHelper.UpdateChapterTitleEvent(false, "")
+    }
+
+    override fun calcTurnPageNewIndex(step: Int): BookHelper.TurnPageNewIndex {
+        val i = book.currentChapterIndex + if (step > 0) -1 else 1
+        val j = if (step > 0) 0 else Int.MAX_VALUE
+        val notOver = (i >= 0 && i < book.chapterList.size)
+        return BookHelper.TurnPageNewIndex(notOver, i, j)
+    }
+
+    override fun progressText(context: Context): String {
+        val cp = book.currentChapterIndex
+        return context.getString(R.string.read_progress_net, cp)
+    }
+
+    override fun readText(chapter: Chapter, context: Context): String {
+        return Utils.readTextFromZip(book.localPath!!, chapter.savePath) ?: "Can't open file."
+    }
+
     fun loadMetaData(context: Context): Packet? {
         val bookSavePath = calcPacketSavePath(context)
         val json = Utils.readTextFromZip(bookSavePath, ".META.json") ?: return null
@@ -81,6 +130,21 @@ class PacketHelper(private val book: Book) : BookHelper {
             e.printStackTrace()
             null
         }
+    }
+
+    fun freezeRead(): Int {
+        return book.chapterList.size - 1 - book.currentChapterIndex
+    }
+
+    fun unfreezeRead(read: Int): Int {
+        var idx = book.chapterList.size - 1 - read
+        if (idx < 0) {
+            idx = 0
+        }
+        if (idx >= book.chapterList.size) {
+            idx = book.chapterList.size - 1
+        }
+        return idx
     }
 
     interface Func<T> {

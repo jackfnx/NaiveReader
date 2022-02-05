@@ -7,7 +7,7 @@ import sixue.naivereader.data.Chapter
 import sixue.naivereader.provider.NetProviderCollections.findProviders
 import java.io.File
 
-internal class SmartDownloader(private val context: Context, private val book: Book) {
+class SmartDownloader(private val context: Context, private val book: Book) {
     fun isDownloaded(chapter: Chapter): Boolean {
         val file = File(chapter.savePath)
         return file.exists()

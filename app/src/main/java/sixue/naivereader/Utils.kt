@@ -18,6 +18,7 @@ import java.util.*
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 import kotlin.collections.ArrayList
 
 object Utils {
@@ -60,16 +61,7 @@ object Utils {
 
     fun writeText(s: String, path: String) {
         try {
-            val file = File(path)
-            val dir = file.parentFile
-            if (dir != null && !dir.exists()) {
-                val mk = dir.mkdirs()
-                Log.i("Utils", "mkdir:$dir, $mk")
-            }
-            if (!file.exists()) {
-                val cr = file.createNewFile()
-                Log.i("Utils", "createNewFile:$file, $cr")
-            }
+            val file = createNewFile(path)
             val fw = FileWriter(file, false)
             fw.write(s)
             fw.close()
@@ -142,7 +134,8 @@ object Utils {
     fun createCropBitmap(unscaledBitmap: Bitmap, dstWidth: Int, dstHeight: Int): Bitmap {
         val srcRect = calcSrcRect(unscaledBitmap.width, unscaledBitmap.height, dstWidth, dstHeight)
         val dstRect = Rect(0, 0, dstWidth, dstHeight)
-        val scaledBitmap = Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888)
+        val scaledBitmap =
+            Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(scaledBitmap)
         canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, Paint(Paint.FILTER_BITMAP_FLAG))
         return scaledBitmap
@@ -207,15 +200,28 @@ object Utils {
         val titlePR: PaintResult
         val regularTitle = parseRegularTitle(title)
         if (regularTitle.size == 2) {
-            titlePR = paintText(blank, regularTitle.subList(0, 1), blank.height / 4, minTextSize, maxTextSize)
-            paintText(blank, regularTitle.subList(1, 2), titlePR.y1, minTextSize, titlePR.textSize - 12)
+            titlePR = paintText(
+                blank,
+                regularTitle.subList(0, 1),
+                blank.height / 4,
+                minTextSize,
+                maxTextSize
+            )
+            paintText(
+                blank,
+                regularTitle.subList(1, 2),
+                titlePR.y1,
+                minTextSize,
+                titlePR.textSize - 12
+            )
         } else {
             val lines = explodeBySpecialChar(title, 6)
             titlePR = paintText(blank, lines, blank.height / 4, minTextSize, maxTextSize)
         }
         if (author != null) {
             val lines2 = explodeBySpecialChar(author, 7)
-            val authorSize = if (titlePR.textSize > maxTextSize - 10) maxTextSize - 10 else titlePR.textSize - 1
+            val authorSize =
+                if (titlePR.textSize > maxTextSize - 10) maxTextSize - 10 else titlePR.textSize - 1
             paintText(blank, lines2, blank.height * 3 / 4, minTextSize, authorSize)
         }
         return blank
@@ -240,7 +246,13 @@ object Utils {
         return regularTitle
     }
 
-    private fun paintText(blank: Bitmap?, lines: List<String>, y0: Int, minSize: Int, maxSize: Int): PaintResult {
+    private fun paintText(
+        blank: Bitmap?,
+        lines: List<String>,
+        y0: Int,
+        minSize: Int,
+        maxSize: Int
+    ): PaintResult {
         val maxLine = Collections.max(lines) { s, t1 -> s.length - t1.length }
         val canvas = Canvas(blank!!)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -256,7 +268,7 @@ object Utils {
             }
             textSize++
         }
-        var y1 : Int = y0
+        var y1: Int = y0
         for (i in lines.indices) {
             val line = lines[i]
             val bounds = Rect()
@@ -379,11 +391,12 @@ object Utils {
             val zf = ZipFile(zipPath)
             val entries = zf.entries()
             while (entries.hasMoreElements()) {
-                val ze : ZipEntry = entries.nextElement() as ZipEntry
+                val ze: ZipEntry = entries.nextElement() as ZipEntry
                 if (!ze.isDirectory) {
                     if (ze.name == path) {
                         BufferedReader(
-                                InputStreamReader(zf.getInputStream(ze))).use { br ->
+                            InputStreamReader(zf.getInputStream(ze))
+                        ).use { br ->
                             val text = StringBuilder()
                             var line: String?
                             while (br.readLine().also { line = it } != null) {
@@ -406,7 +419,7 @@ object Utils {
             val zf = ZipFile(zipPath)
             val entries = zf.entries()
             while (entries.hasMoreElements()) {
-                val ze : ZipEntry = entries.nextElement() as ZipEntry
+                val ze: ZipEntry = entries.nextElement() as ZipEntry
                 if (!ze.isDirectory) {
                     if (ze.name == path) {
                         BufferedInputStream(zf.getInputStream(ze)).use { `is` ->
@@ -446,7 +459,8 @@ object Utils {
     fun readExternalText(context: Context, uriString: String): String? {
         val uri = Uri.parse(uriString)
         val resolver = context.contentResolver
-        val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        val takeFlags =
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         resolver.takePersistableUriPermission(uri, takeFlags)
         var encoding = guessFileEncoding(resolver, uri)
         if (encoding == null) {
@@ -454,7 +468,8 @@ object Utils {
         }
         try {
             BufferedReader(
-                    InputStreamReader(resolver.openInputStream(uri), encoding)).use { br ->
+                InputStreamReader(resolver.openInputStream(uri), encoding)
+            ).use { br ->
                 val text = StringBuilder()
                 var line: String?
                 while (br.readLine().also { line = it } != null) {
@@ -469,4 +484,131 @@ object Utils {
         }
     }
 
+    private fun createNewFile(filePath: String): File {
+        val file = File(filePath)
+        val dir = file.parentFile
+        if (dir != null && !dir.exists()) {
+            val mk = dir.mkdirs()
+            Log.i("Utils", "mkdir:$dir, $mk")
+        }
+        if (!file.exists()) {
+            val cr = file.createNewFile()
+            Log.i("Utils", "createNewFile:$file, $cr")
+        }
+        return file
+    }
+
+    fun zip(files: List<Pair<Any, String>>, zipFilePath: String): Int {
+        if (files.isEmpty()) return 0
+
+        var n = 0
+        val zipFile = createNewFile(zipFilePath)
+        val buffer = ByteArray(1024)
+        var zipOutputStream: ZipOutputStream? = null
+        var inputStream: FileInputStream? = null
+        try {
+            zipOutputStream = ZipOutputStream(FileOutputStream(zipFile))
+            for ((originalItem, relPath) in files) {
+                if (originalItem is File) {
+                    if (!originalItem.exists()) continue
+                    zipOutputStream.putNextEntry(ZipEntry(relPath))
+                    inputStream = FileInputStream(originalItem)
+                    var len: Int
+                    while (inputStream.read(buffer).also { len = it } > 0) {
+                        zipOutputStream.write(buffer, 0, len)
+                    }
+                    zipOutputStream.closeEntry()
+                } else if (originalItem is Bitmap) {
+                    val bos = ByteArrayOutputStream()
+                    originalItem.compress(Bitmap.CompressFormat.PNG, 0, bos)
+                    zipOutputStream.putNextEntry(ZipEntry(relPath))
+                    zipOutputStream.write(bos.toByteArray())
+                    zipOutputStream.closeEntry()
+                }
+                n++
+            }
+        } finally {
+            inputStream?.close()
+            zipOutputStream?.close()
+        }
+        return n
+    }
+
+    fun zipByFolder(fileDir: String, zipPath: String): Int {
+        val folder = File(fileDir)
+        return if (folder.exists() && folder.isDirectory) {
+            val files = folder.walk().filter { it.isFile }.map { Pair(it, it.relativeTo(folder).path) }.toList()
+            zip(files, zipPath)
+        } else {
+            0
+        }
+    }
+
+    fun relativeTo(filePath: String, baseDir: String): String {
+        val file = File(filePath)
+        val base = File(baseDir)
+        return file.relativeTo(base).path
+    }
+
+    private const val FRAME_LINE_WIDTH = 3f
+    private const val FRAME_CORNER_WIDTH = 15f
+
+    fun appendArchiveMarkToBitmap(bitmap: Bitmap): Bitmap {
+        val newBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(newBitmap)
+        canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
+        val w = bitmap.width.toFloat()
+        val h = bitmap.height.toFloat()
+        val framePaint = Paint()
+        framePaint.setARGB(255, 0, 139, 0)
+        canvas.drawRect(0f, 0f, w, FRAME_LINE_WIDTH, framePaint)
+        canvas.drawRect(0f, 0f, FRAME_LINE_WIDTH, h, framePaint)
+        canvas.drawRect(w - FRAME_LINE_WIDTH, 0f, w, h, framePaint)
+        canvas.drawRect(0f, h - FRAME_LINE_WIDTH, w, h, framePaint)
+        canvas.drawPath(makeDeltaPath(0f, 0f, 0f, FRAME_CORNER_WIDTH, FRAME_CORNER_WIDTH, 0f), framePaint)
+        canvas.drawPath(makeDeltaPath(w, 0f, w - FRAME_CORNER_WIDTH, 0f, w, FRAME_CORNER_WIDTH), framePaint)
+        canvas.drawPath(makeDeltaPath(0f, h, FRAME_CORNER_WIDTH, h, 0f, h - FRAME_CORNER_WIDTH), framePaint)
+        canvas.drawPath(makeDeltaPath(w, h, w, h - FRAME_CORNER_WIDTH, w - FRAME_CORNER_WIDTH, h), framePaint)
+        val appendText = "Archived"
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        textPaint.isDither = true
+        textPaint.isFilterBitmap = true
+        textPaint.setARGB(128, 0, 0, 0)
+        var textSize = 12
+        while (textSize < 40) {
+            textPaint.textSize = textSize.toFloat()
+            if (textPaint.measureText(appendText) * 2 > w) {
+                break
+            }
+            textSize++
+        }
+        val bounds = Rect()
+        textPaint.getTextBounds(appendText, 0, appendText.length, bounds)
+        val advance =
+            textPaint.getRunAdvance(
+                appendText,
+                0,
+                appendText.length,
+                0,
+                appendText.length,
+                false,
+                appendText.length
+            )
+        val x = (w - advance.toInt() - FRAME_CORNER_WIDTH)
+        val y = (h - bounds.height())
+        canvas.drawText(appendText, x, y, textPaint)
+        canvas.save()
+        canvas.restore()
+        return newBitmap
+    }
+
+    private fun makeDeltaPath(x0: Float, y0: Float, x1: Float, y1: Float, x2: Float, y2: Float): Path {
+        val path = Path()
+        path.fillType = Path.FillType.EVEN_ODD
+        path.moveTo(x0, y0)
+        path.lineTo(x1, y1)
+        path.lineTo(x2, y2)
+        path.close()
+        return path
+    }
 }

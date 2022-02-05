@@ -1,5 +1,5 @@
 package sixue.naivereader.data
 
 enum class BookKind {
-    LocalText, Online, Packet
+    LocalText, Online, Packet, Archive
 }

@@ -5,8 +5,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.view.Gravity
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import sixue.naivereader.R
+import sixue.naivereader.SmartDownloader
 import sixue.naivereader.Utils
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.Chapter
@@ -58,7 +61,7 @@ class OnlineHelper(private val book: Book) : BookHelper {
     override fun loadCoverBitmap(context: Context): Bitmap {
         if (!this::cover.isInitialized) {
             val saveRootPath = Utils.getSavePathRoot(context)
-            val coverSavePath = saveRootPath + "/" + book.coverSavePath
+            val coverSavePath = "${saveRootPath}/books/${book.id}/${book.coverSavePath}"
             val f = File(coverSavePath)
             cover = if (book.coverSavePath.isEmpty() || !f.exists()) {
                 Utils.getAutoCover(context, book.title, book.author, 2)
@@ -69,19 +72,91 @@ class OnlineHelper(private val book: Book) : BookHelper {
         return cover
     }
 
-    private fun calcBookSavePath(context: Context): String {
-        return Utils.getSavePathRoot(context) + "/" + calcRelBookSavePath()
+    override fun calcCurrentPosition(seemingIndex: Int): BookHelper.CurrentPosition {
+        val idx = reverseIndex(seemingIndex)
+        return BookHelper.CurrentPosition(idx, 0)
     }
 
-    private fun calcRelBookSavePath(): String {
-        return "books/" + book.id + "/" + book.siteId
+    override fun getCurrentSeemingIndex(): Int {
+        return reverseIndex(book.currentChapterIndex)
+    }
+
+    override fun getChapterSize(): Int {
+        return book.chapterList.size
+    }
+
+    override fun getChapterDescription(
+        seemingIndex: Int,
+        context: Context
+    ): BookHelper.ChapterDescription {
+        val index = reverseIndex(seemingIndex)
+        val chapter = book.chapterList[index]
+        var title = chapter.title
+        if (index == book.currentChapterIndex) {
+            title += "*"
+        }
+        val downloader = SmartDownloader(context, book)
+        val summary = if (downloader.isDownloaded(chapter)) {
+            context.getString(R.string.download)
+        } else {
+            ""
+        }
+        return BookHelper.ChapterDescription(title, summary, Gravity.END)
+    }
+
+    override fun updateChapterTitleOnPageChange(): BookHelper.UpdateChapterTitleEvent {
+        return BookHelper.UpdateChapterTitleEvent(false, "")
+    }
+
+    override fun calcTurnPageNewIndex(step: Int): BookHelper.TurnPageNewIndex {
+        val i = book.currentChapterIndex + if (step > 0) 1 else -1
+        val j = if (step > 0) 0 else Int.MAX_VALUE
+        val notOver = (i >= 0 && i < book.chapterList.size)
+        return BookHelper.TurnPageNewIndex(notOver, i, j)
+    }
+
+     private fun reverseIndex(n: Int): Int {
+        var idx = book.chapterList.size - 1 - n
+        if (idx < 0) {
+            idx = 0
+        }
+        if (idx >= book.chapterList.size) {
+            idx = book.chapterList.size - 1
+        }
+        return idx
+    }
+
+    override fun progressText(context: Context): String {
+        val size = book.chapterList.size
+        val cp = book.currentChapterIndex
+        return if (size <= 0) {
+            context.getString(R.string.read_progress_net_predownload)
+        } else if (cp + 1 == size) {
+            if (book.end) {
+                context.getString(R.string.read_progress_net_end)
+            } else {
+                context.getString(R.string.read_progress_net_allread)
+            }
+        } else {
+            context.getString(R.string.read_progress_net, size - cp - 1)
+        }
+    }
+
+    override fun readText(chapter: Chapter, context: Context): String {
+        val saveRootPath = Utils.getSavePathRoot(context)
+        val chapterSavePath = "$saveRootPath/books/${book.id}/${chapter.savePath}"
+        return Utils.readText(chapterSavePath) ?: "Can't open file."
+    }
+
+    private fun calcBookSavePath(context: Context): String {
+        val saveRootPath = Utils.getSavePathRoot(context)
+        return "$saveRootPath/books/${book.id}/${book.siteId}"
     }
 
     fun downloadCover(context: Context, coverUrl: String) {
         val bookSavePath = calcBookSavePath(context)
         Utils.mkdir(bookSavePath)
-        val bookRelSavePath = calcRelBookSavePath()
-        val coverRelSavePath = "$bookRelSavePath/cover.jpg"
+        val coverRelSavePath = "${book.siteId}/cover.jpg"
         val coverSavePath = "$bookSavePath/cover.jpg"
         try {
             if (File(coverSavePath).exists()) {

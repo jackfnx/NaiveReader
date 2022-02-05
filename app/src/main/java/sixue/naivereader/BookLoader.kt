@@ -4,6 +4,7 @@ import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import sixue.naivereader.data.Book
+import sixue.naivereader.data.BookKind
 import java.io.File
 import java.io.IOException
 
@@ -92,27 +93,44 @@ internal object BookLoader {
     }
 
     fun clearGarbage(reporter: (filename: String)->Unit) : Int {
-        val favorites: List<String> = list.map { it.id }
-        val f1 = File("$saveRootPath/books/")
-        val f2 = File("$saveRootPath/packets/")
-        val netbooks = f1.listFiles() ?: return -1
-        val packets = f2.listFiles() ?: return -1
         var n = 0
+        val netBookFavorites: List<String> = list.filter { it.kind === BookKind.Online }.map { it.id }
+        val f1 = File("$saveRootPath/books/")
+        val netbooks = f1.listFiles() ?: return -1
         for (netbook in netbooks) {
-            if (netbook.isDirectory && !favorites.contains(netbook.name)) {
+            if (netbook.isDirectory && !netBookFavorites.contains(netbook.name)) {
                 Utils.deleteDirectory(netbook)
                 reporter(netbook.toString())
                 n++
             }
         }
+        val packetFavorites: List<String> = list.filter { it.kind === BookKind.Packet }.map { it.id + ".zip" }
+        val f2 = File("$saveRootPath/packets/")
+        val packets = f2.listFiles() ?: return -1
         for (packet in packets) {
-            if (packet.isFile && !favorites.contains(packet.nameWithoutExtension)) {
+            if (packet.isFile && !packetFavorites.contains(packet.name)) {
                 packet.delete()
                 reporter(packet.toString())
                 n++
             }
         }
+        val archiveFavorites: List<String> = list.filter { it.kind === BookKind.Archive }.map { it.id + ".zip" }
+        val f3 = File("$saveRootPath/archives/")
+        val archives = f3.listFiles() ?: return -1
+        for (archive in archives) {
+            if (archive.isFile && !archiveFavorites.contains(archive.name)) {
+                archive.delete()
+                reporter(archive.toString())
+                n++
+            }
+        }
         return n
+    }
+
+    fun replace(book: Book, newBook: Book) {
+        val i = list.indexOf(book)
+        list[i] = newBook
+        save()
     }
 
     init {

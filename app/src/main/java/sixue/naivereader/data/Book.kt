@@ -1,11 +1,9 @@
 package sixue.naivereader.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import sixue.naivereader.helper.BookHelper
-import sixue.naivereader.helper.LocalTextHelper
-import sixue.naivereader.helper.OnlineHelper
-import sixue.naivereader.helper.PacketHelper
+import sixue.naivereader.helper.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class Book (
     var id: String,
@@ -25,6 +23,12 @@ data class Book (
 ) {
     @JsonIgnore
     var chapterList: List<Chapter> = ArrayList()
+    @JsonIgnore
+    var localChapterNodes: List<Int> = ArrayList()
+    @JsonIgnore
+    var localChapterTitles: List<String> = ArrayList()
+    @JsonIgnore
+    var localChapterSummaries: List<String> = ArrayList()
 
     @JsonIgnore
     private lateinit var bookHelper: BookHelper
@@ -61,6 +65,20 @@ data class Book (
         return sb.toString()
     }
 
+    @JsonIgnore
+    fun isRefreshable(): Boolean {
+        return kind === BookKind.Online
+    }
+
+    @JsonIgnore
+    fun isViewableInBrowser(): Boolean {
+        return when {
+            kind === BookKind.Online -> true
+            kind === BookKind.Archive -> true
+            else -> false
+        }
+    }
+
     fun buildHelper(): BookHelper {
         if (!this::bookHelper.isInitialized) {
             bookHelper = when (kind) {
@@ -72,6 +90,9 @@ data class Book (
                 }
                 BookKind.Packet -> {
                     PacketHelper(this)
+                }
+                BookKind.Archive -> {
+                    ArchiveHelper(this)
                 }
             }
         }
