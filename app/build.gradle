@@ -33,6 +33,7 @@ android {
             excludes += ['META-INF/LICENSE']
         }
     }
+    namespace 'sixue.naivereader'
 }
 
 dependencies {
