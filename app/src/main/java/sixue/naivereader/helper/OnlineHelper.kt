@@ -143,8 +143,9 @@ class OnlineHelper(private val book: Book) : BookHelper {
     }
 
     override fun readText(chapter: Chapter, context: Context): String {
-        val saveRootPath = Utils.getSavePathRoot(context)
-        val chapterSavePath = "$saveRootPath/books/${book.id}/${chapter.savePath}"
+//        val saveRootPath = Utils.getSavePathRoot(context)
+//        val chapterSavePath = "$saveRootPath/books/${book.id}/${chapter.savePath}"
+        val chapterSavePath = chapter.savePath
         return Utils.readText(chapterSavePath) ?: "Can't open file."
     }
 
