@@ -184,6 +184,12 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         if (book.chapterList.isEmpty()) {
             return
         }
+        if (book.currentChapterIndex < 0) {
+            book.currentChapterIndex = 0
+        }
+        if (book.currentChapterIndex >= book.chapterList.size) {
+            book.currentChapterIndex = book.chapterList.size - 1
+        }
         chapter = book.chapterList[book.currentChapterIndex]
         if (smartDownloader.isDownloaded(chapter)) {
             val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
