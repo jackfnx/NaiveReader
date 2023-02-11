@@ -12,6 +12,7 @@ import sixue.naivereader.helper.OnlineHelper
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
+import kotlin.collections.ArrayList
 
 class WlzwProvider : NetProvider() {
     override val providerId: String
@@ -98,27 +99,41 @@ class WlzwProvider : NetProvider() {
     }
 
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
-        val contentUrl = "https://www.50zw.com/book_" + book.sitePara!! + "/"
         val content: MutableList<Chapter> = ArrayList()
+        val queue: MutableList<String> = ArrayList()
+        queue.add("https://www.50zw.com/book/" + book.sitePara!! + "/")
         try {
-            val doc = Jsoup.connect(contentUrl).timeout(5000).get()
-            val elements = doc.body().select(".chapterlist")
-            for (ch in Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
-                val title = ch.select("a").text()
-                val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
-                if (url.isEmpty()) {
-                    continue
+            while (queue.isNotEmpty()) {
+                val contentUrl = queue[0]
+                val doc = Jsoup.connect(contentUrl).timeout(5000).get()
+                val elements = doc.body().select(".chapterlist")[1]
+                for (ch in Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
+                    val title = ch.select("a").text()
+                    val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
+                    if (url.isEmpty()) {
+                        continue
+                    }
+                    val chapter = Chapter(
+                        id = url,
+                        title = title,
+                    )
+                    val chapterSavePath = calcChapterSavePath(chapter, bookSavePath)
+                    chapter.savePath = chapterSavePath
+                    content.add(chapter)
                 }
-                val chapter = Chapter(
-                    id = url,
-                    title = title,
-                )
-                val chapterSavePath = calcChapterSavePath(chapter, bookSavePath)
-                chapter.savePath = chapterSavePath
-                content.add(chapter)
+                if (contentUrl.endsWith("/")) {
+                    val select = doc.body().select("select")[0]
+                    for (op in Jsoup.parse(select.toString()).select("option")) {
+                        val pageUrl = "https://www.50zw.com" + op.attr("value")
+                        if (pageUrl != contentUrl) {
+                            queue.add(pageUrl)
+                        }
+                    }
+                }
+                queue.removeAt(0)
             }
         } catch (e: IOException) {
-            Log.e(TAG, "downloadContent ERROR: $contentUrl")
+            Log.e(TAG, "downloadContent ERROR: $queue[0]")
         }
         return content
     }
