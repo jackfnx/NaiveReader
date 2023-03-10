@@ -222,7 +222,7 @@ class BookshelfActivity : AppCompatActivity() {
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
-            archive.setOnClickListener() {
+            archive.setOnClickListener {
                 val newBook = ArchiveLoader.createArchive(book, this)
                 BookLoader.replace(book, newBook)
                 myAdapter.notifyDataSetChanged()
