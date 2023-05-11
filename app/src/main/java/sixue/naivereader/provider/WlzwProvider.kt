@@ -11,8 +11,6 @@ import sixue.naivereader.data.Source
 import sixue.naivereader.helper.OnlineHelper
 import java.io.IOException
 import java.net.URLEncoder
-import java.util.*
-import kotlin.collections.ArrayList
 
 class WlzwProvider : NetProvider() {
     override val providerId: String
