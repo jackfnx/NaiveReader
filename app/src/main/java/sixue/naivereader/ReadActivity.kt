@@ -37,6 +37,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         setContentView(R.layout.activity_read)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         actionBar = supportActionBar!!
+        BookLoader.reload(this, true)
         book = BookLoader.getBook(0)!!
         readerView = findViewById(R.id.text_area)
         val maskView = findViewById<ImageView>(R.id.page_mask)

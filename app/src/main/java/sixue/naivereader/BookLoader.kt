@@ -11,7 +11,9 @@ import java.io.IOException
 internal object BookLoader {
     private var list: MutableList<Book>
     private lateinit var saveRootPath: String
-    fun reload(context: Context) {
+    fun reload(context: Context, lazy: Boolean = false) {
+        if (lazy && list.size > 0)
+            return
         saveRootPath = Utils.getSavePathRoot(context)
         val json = Utils.readText("$saveRootPath/books/.DIR") ?: return
         try {
