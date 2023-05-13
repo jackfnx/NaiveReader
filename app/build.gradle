@@ -11,19 +11,27 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     signingConfigs {
-        release {
+        debug {
             storeFile file("keystore.jks")
             storePassword "aaaaaa"
             keyAlias "sixue"
             keyPassword "aaaaaa"
         }
+        release {
+            storeFile = file(project.properties["keystore.path"])
+            storePassword = project.properties["keystore.password"]
+            keyAlias = project.properties["keystore.key.alias"]
+            keyPassword = project.properties["keystore.key.password"]
+        }
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

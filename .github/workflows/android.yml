@@ -1,26 +1,49 @@
-name: Android CI
+name: Android CI/CD
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - 'v*.*.*'
+    branches:
+      - master
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.x'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Set version name
+        id: set_version_name
+        run: |
+          export VERSION_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
+          echo "Ref version: $VERSION_NAME"
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+
+      - name: Set up environment
+        run: |
+          echo "android.useAndroidX=true" >> $GITHUB_WORKSPACE/gradle.properties
+          echo "android.enableJetifier=true" >> $GITHUB_WORKSPACE/gradle.properties
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build app
+        run: |
+          $GITHUB_WORKSPACE/gradlew assembleDebug -PversionName=${{ env.VERSION_NAME }} --warning-mode all
+
+      - name: Publish app
+        uses: actions/upload-artifact@v2
+        with:
+          name: naivereader
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
