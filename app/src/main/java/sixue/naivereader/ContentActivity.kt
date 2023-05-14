@@ -128,7 +128,7 @@ class ContentActivity : AppCompatActivity() {
         } else {
             val subMenu = menuProviders.subMenu
             providerIds.toMutableList().clear()
-            subMenu.clear()
+            subMenu?.clear()
             for (source in book.sources) {
                 val netProvider = findProviders(source.id, this)
                 if (netProvider != null) {
@@ -138,10 +138,10 @@ class ContentActivity : AppCompatActivity() {
                         name += "*"
                     }
                     providerIds.toMutableList().add(id)
-                    subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size - 1, providerIds.size, name)
+                    subMenu?.add(Menu.NONE, Menu.FIRST + providerIds.size - 1, providerIds.size, name)
                 }
             }
-            subMenu.add(Menu.NONE, Menu.FIRST + providerIds.size, providerIds.size + 1, R.string.menu_search_again)
+            subMenu?.add(Menu.NONE, Menu.FIRST + providerIds.size, providerIds.size + 1, R.string.menu_search_again)
         }
         val batchDownload = menu.findItem(R.id.menu_batch_download)
         if (!book.isRefreshable()) {

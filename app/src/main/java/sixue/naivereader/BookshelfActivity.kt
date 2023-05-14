@@ -7,6 +7,8 @@ import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -113,6 +115,15 @@ class BookshelfActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         myAdapter.notifyDataSetChanged()
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isEditMode) {
+                    editList.clear()
+                    setEditMode(false)
+                }
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun checkItem(selectIcon: View, i: Int, checked: Boolean) {
@@ -248,15 +259,6 @@ class BookshelfActivity : AppCompatActivity() {
         myAdapter.notifyDataSetChanged()
         supportActionBar?.setDisplayShowTitleEnabled(!editMode)
         invalidateOptionsMenu()
-    }
-
-    override fun onBackPressed() {
-        if (isEditMode) {
-            editList.clear()
-            setEditMode(false)
-            return
-        }
-        super.onBackPressed()
     }
 
     private inner class MyAdapter : BaseAdapter() {
