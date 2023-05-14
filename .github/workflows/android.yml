@@ -32,6 +32,11 @@ jobs:
         run: |
           echo "android.useAndroidX=true" >> $GITHUB_WORKSPACE/gradle.properties
           echo "android.enableJetifier=true" >> $GITHUB_WORKSPACE/gradle.properties
+          echo "${{ secrets.KEYSTORE_CONTENTS}}" | base64 --decode > keystore.jks
+          echo "keystore.path=keystore.jks" >> $GITHUB_WORKSPACE/gradle.properties
+          echo "keystore.password=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_WORKSPACE/gradle.properties
+          echo "keystore.key.alias=${{ secrets.KEYSTORE_KEYALIAS}}" >> $GITHUB_WORKSPACE/gradle.properties
+          echo "keystore.key.password=${{ secrets.KEYSTORE_KEYPASSWORD}}" >> $GITHUB_WORKSPACE/gradle.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
