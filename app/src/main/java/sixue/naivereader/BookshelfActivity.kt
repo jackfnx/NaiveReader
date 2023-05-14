@@ -1,14 +1,29 @@
 package sixue.naivereader
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
+import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.GridView
+import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.SpinnerAdapter
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -18,7 +33,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
 import sixue.naivereader.helper.ArchiveLoader
-import java.util.*
 
 class BookshelfActivity : AppCompatActivity() {
     private lateinit var myAdapter: MyAdapter
