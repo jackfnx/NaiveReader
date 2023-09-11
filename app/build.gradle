@@ -2,12 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 33
-
     defaultConfig {
         applicationId "sixue.naivereader"
-        minSdkVersion 30
+        minSdkVersion 33
         targetSdkVersion 33
+        compileSdk 33
         versionCode 1
         versionName "1.0"
     }

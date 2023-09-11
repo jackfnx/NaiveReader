@@ -97,7 +97,7 @@ class BookshelfActivity : AppCompatActivity() {
         val filter = IntentFilter()
         filter.addAction(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
         filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH)
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
         refreshAllBooks()
     }
 
