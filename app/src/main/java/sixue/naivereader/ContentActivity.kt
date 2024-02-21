@@ -5,13 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.BaseAdapter
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import sixue.naivereader.data.Book
-import sixue.naivereader.data.BookKind
 import sixue.naivereader.provider.NetProviderCollections.findProviders
 
 class ContentActivity : AppCompatActivity() {
@@ -62,7 +68,7 @@ class ContentActivity : AppCompatActivity() {
                 }
             }
         }
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
         srl.setOnRefreshListener {
             if (book.isRefreshable()) {
                 downloader.startDownloadContent()
