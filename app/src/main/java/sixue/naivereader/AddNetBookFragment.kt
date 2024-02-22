@@ -119,7 +119,7 @@ class AddNetBookFragment : Fragment() {
         super.onResume()
         val filter = IntentFilter()
         filter.addAction(Utils.ACTION_DOWNLOAD_COVER_FINISH)
-        requireContext().registerReceiver(receiver, filter)
+        requireContext().registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onPause() {
