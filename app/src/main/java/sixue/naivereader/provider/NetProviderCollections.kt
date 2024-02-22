@@ -46,6 +46,7 @@ object NetProviderCollections {
             addProvider(FpzwProvider())
             addProvider(XbqgProvider())
             addProvider(QbxsProvider())
+            addProvider(HtshuProvider())
         }
     }
 

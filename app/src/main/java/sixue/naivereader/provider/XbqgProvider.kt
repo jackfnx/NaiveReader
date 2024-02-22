@@ -17,13 +17,14 @@ class XbqgProvider : NetProvider() {
     override val providerId: String
         get() = "www.xbiquge.cc"
     override val providerName: String
-        get() = "笔趣阁cc"
+        get() = "笔趣阁cc[反爬]"
 
     override fun search(s: String, context: Context): List<Book> {
+        // 日你妈的防盗链
         val list: MutableList<Book> = ArrayList()
         try {
             val key = URLEncoder.encode(s, "GBK")
-            val url = "https://www.xbiquge.tw/modules/article/search.php?searchkey=$key"
+            val url = "https://www.xbiquge.bz/modules/article/search.php?searchkey=$key"
             val response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute()
             if (url != response.url().toString()) {
                 val doc = response.parse()
@@ -50,7 +51,7 @@ class XbqgProvider : NetProvider() {
                     id = providerId,
                     para = para,
                 )
-                book.sources.toMutableList().add(source)
+                book.sources += source
                 book.siteId = source.id
                 book.sitePara = source.para
                 val helper = book.buildHelper() as OnlineHelper
@@ -81,7 +82,7 @@ class XbqgProvider : NetProvider() {
                         id = providerId,
                         para = para
                     )
-                    book.sources.toMutableList().add(source)
+                    book.sources += source
                     book.siteId = source.id
                     book.sitePara = source.para
                     val helper = book.buildHelper() as OnlineHelper
@@ -97,7 +98,7 @@ class XbqgProvider : NetProvider() {
 
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val para = book.sitePara!!
-        val contentUrl = String.format("https://www.xbiquge.tw/book/%s/", para)
+        val contentUrl = String.format("https://www.xbiquge.bz/book/%s/", para)
         val content: MutableList<Chapter> = ArrayList()
         try {
             val doc = Jsoup.connect(contentUrl).timeout(5000).get()
@@ -137,7 +138,7 @@ class XbqgProvider : NetProvider() {
 
     override fun getChapterUrl(book: Book, chapter: Chapter): String {
         val para = book.sitePara!!
-        return String.format("https://www.xbiquge.tw/book/%s/%s", para, chapter.id)
+        return String.format("https://www.xbiquge.bz/book/%s/%s", para, chapter.id)
     }
 
     private fun calcChapterSavePath(chapter: Chapter, bookSavePath: String): String {
@@ -146,7 +147,7 @@ class XbqgProvider : NetProvider() {
 
     private fun calcCoverUrl(para: String): String {
         val prefix = if (para.length > 3) para.substring(0, para.length - 3) else "0"
-        return String.format("https://www.xbiquge.tw/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
+        return String.format("https://www.xbiquge.bz/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 
     private fun parseBookUrl(bookUrl: String): String {

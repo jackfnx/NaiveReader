@@ -15,7 +15,7 @@ class FpzwProvider : NetProvider() {
         get() = "www.fpzw.com"
 
     override val providerName: String
-        get() = "富品中文"
+        get() = "富品中文[已挂]"
 
     override fun search(s: String, context: Context): List<Book> {
         // 似乎over了，干

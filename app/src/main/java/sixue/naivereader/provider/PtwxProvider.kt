@@ -23,7 +23,7 @@ class PtwxProvider : NetProvider() {
         val list: MutableList<Book> = ArrayList()
         try {
             val key = URLEncoder.encode(s, "GBK")
-            val url = "https://www.ptwxz.com/modules/article/search.php?searchkey=$key"
+            val url = "https://www.piaotia.com/modules/article/search.php?searchkey=$key"
             val response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute()
             if (url != response.url().toString()) {
                 val doc = response.parse()
@@ -52,7 +52,7 @@ class PtwxProvider : NetProvider() {
                     id = providerId,
                     para = para,
                 )
-                book.sources.toMutableList().add(source)
+                book.sources += source
                 book.siteId = source.id
                 book.sitePara = source.para
                 val helper = book.buildHelper() as OnlineHelper
@@ -83,7 +83,7 @@ class PtwxProvider : NetProvider() {
                         id = providerId,
                         para = para
                     )
-                    book.sources.toMutableList().add(source)
+                    book.sources += source
                     book.siteId = source.id
                     book.sitePara = source.para
                     val helper = book.buildHelper() as OnlineHelper
@@ -161,12 +161,12 @@ class PtwxProvider : NetProvider() {
 
     private fun calcBookUrl(para: String): String {
         val prefix = calcPrefix(para)
-        return String.format("https://www.ptwxz.com/html/%s/%s", prefix, para)
+        return String.format("https://www.piaotia.com/html/%s/%s", prefix, para)
     }
 
     private fun calcCoverUrl(para: String): String {
         val prefix = calcPrefix(para)
-        return String.format("https://www.ptwxz.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
+        return String.format("https://www.piaotia.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 
     private fun parseBookUrl(bookUrl: String): String {

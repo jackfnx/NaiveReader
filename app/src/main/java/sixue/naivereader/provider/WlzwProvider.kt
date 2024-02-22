@@ -16,13 +16,14 @@ class WlzwProvider : NetProvider() {
     override val providerId: String
         get() = "www.50zw.la"
     override val providerName: String
-        get() = "武林中文"
+        get() = "武林中文[反爬]"
 
     override fun search(s: String, context: Context): List<Book> {
+        // 日你妈的防盗链
         val list: MutableList<Book> = ArrayList()
         try {
             val key = URLEncoder.encode(s, "GBK")
-            val url = "https://www.50zw.com/modules/article/search.php?searchkey=$key"
+            val url = "https://www.50zw.co/modules/article/search.php?searchkey=$key"
             val response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute()
             if (url != response.url().toString()) {
                 val doc = response.parse()
@@ -51,7 +52,7 @@ class WlzwProvider : NetProvider() {
                     id = providerId,
                     para = para,
                 )
-                book.sources.toMutableList().add(source)
+                book.sources += source
                 book.siteId = source.id
                 book.sitePara = source.para
                 val helper = book.buildHelper() as OnlineHelper
@@ -82,7 +83,7 @@ class WlzwProvider : NetProvider() {
                         id = providerId,
                         para = para
                     )
-                    book.sources.toMutableList().add(source)
+                    book.sources += source
                     book.siteId = source.id
                     book.sitePara = source.para
                     val helper = book.buildHelper() as OnlineHelper
@@ -99,13 +100,13 @@ class WlzwProvider : NetProvider() {
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val content: MutableList<Chapter> = ArrayList()
         val queue: MutableList<String> = ArrayList()
-        queue.add("https://www.50zw.com/book/" + book.sitePara!! + "/")
+        queue.add("https://www.50zw.co/book/" + book.sitePara!! + "/")
         try {
             while (queue.isNotEmpty()) {
                 val contentUrl = queue[0]
                 val doc = Jsoup.connect(contentUrl).timeout(5000).get()
-                val elements = doc.body().select(".chapterlist")[1]
-                for (ch in Jsoup.parse(elements.toString()).select("li:not(.volume)")) {
+                val elements = doc.body().select(".zjlist").first()
+                for (ch in Jsoup.parse(elements.toString()).select("dd")) {
                     val title = ch.select("a").text()
                     val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
                     if (url.isEmpty()) {
@@ -122,7 +123,7 @@ class WlzwProvider : NetProvider() {
                 if (contentUrl.endsWith("/")) {
                     val select = doc.body().select("select")[0]
                     for (op in Jsoup.parse(select.toString()).select("option")) {
-                        val pageUrl = "https://www.50zw.com" + op.attr("value")
+                        val pageUrl = "https://www.50zw.co" + op.attr("value")
                         if (pageUrl != contentUrl) {
                             queue.add(pageUrl)
                         }
@@ -148,7 +149,7 @@ class WlzwProvider : NetProvider() {
     }
 
     override fun getChapterUrl(book: Book, chapter: Chapter): String {
-        return "https://www.50zw.com/book_" + book.sitePara + "/" + chapter.id
+        return "https://www.50zw.co/book_" + book.sitePara + "/" + chapter.id
     }
 
     private fun calcChapterSavePath(chapter: Chapter, bookSavePath: String): String {
@@ -157,7 +158,7 @@ class WlzwProvider : NetProvider() {
 
     private fun calcCoverUrl(para: String): String {
         val prefix = if (para.length > 3) para.substring(0, para.length - 3) else "0"
-        return String.format("https://www.50zw.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
+        return String.format("https://www.50zw.co/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 
     private fun parseBookUrl(bookUrl: String): String {
