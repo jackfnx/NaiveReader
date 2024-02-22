@@ -78,7 +78,7 @@ class AddNetBookFragment : Fragment() {
                     for (book in books) {
                         val b = findSameBook(book)
                         if (b != null) {
-                            b.sources.toMutableList().addAll(book.sources)
+                            b.sources += book.sources
                         } else {
                             list.add(book)
                         }
