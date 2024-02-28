@@ -97,6 +97,14 @@ class WlzwProvider : NetProvider() {
         return list
     }
 
+    override fun parseBookUrl(s: String, context: Context): String? {
+        return null
+    }
+
+    override fun loadBookUrl(s: String, context: Context): Book? {
+        return null
+    }
+
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val content: MutableList<Chapter> = ArrayList()
         val queue: MutableList<String> = ArrayList()

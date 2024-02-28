@@ -91,6 +91,14 @@ class FpzwProvider : NetProvider() {
         return ArrayList()
     }
 
+    override fun parseBookUrl(s: String, context: Context): String? {
+        return null
+    }
+
+    override fun loadBookUrl(s: String, context: Context): Book? {
+        return null
+    }
+
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val para = book.sitePara
         val prefix = if (para!!.length > 3) para.substring(0, para.length - 3) else "0"

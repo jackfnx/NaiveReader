@@ -9,6 +9,8 @@ abstract class NetProvider {
     abstract val providerId: String
     abstract val providerName: String
     abstract fun search(s: String, context: Context): List<Book>
+    abstract fun parseBookUrl(s: String, context: Context): String?
+    abstract fun loadBookUrl(s: String, context: Context): Book?
     abstract fun downloadContent(book: Book, bookSavePath: String): List<Chapter>
     abstract fun downloadChapter(book: Book, chapter: Chapter)
     abstract fun getChapterUrl(book: Book, chapter: Chapter): String

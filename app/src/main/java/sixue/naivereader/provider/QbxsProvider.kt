@@ -58,6 +58,14 @@ class QbxsProvider : NetProvider() {
         return list
     }
 
+    override fun parseBookUrl(s: String, context: Context): String? {
+        return null
+    }
+
+    override fun loadBookUrl(s: String, context: Context): Book? {
+        return null
+    }
+
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val para = book.sitePara!!
         val contentUrl = String.format("https://www.quanben-xiaoshuo.com%sxiaoshuo.html", para)

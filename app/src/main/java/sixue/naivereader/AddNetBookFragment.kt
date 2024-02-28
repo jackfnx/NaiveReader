@@ -70,11 +70,30 @@ class AddNetBookFragment : Fragment() {
         search.setOnClickListener {
             list.clear()
             for (provider in getProviders(requireContext())) {
+                val text = searchText.text.toString()
+                val bookUrl = provider.parseBookUrl(text, requireContext())
+                if (bookUrl != null) {
+                    Thread {
+                        val book = provider.loadBookUrl(text, requireContext())
+                        if (book != null) {
+                            val b = findSameBook(book)
+                            if (b != null) {
+                                b.sources += book.sources
+                            } else {
+                                list.add(book)
+                            }
+                        }
+                        val activity = activity
+                        activity?.runOnUiThread { myAdapter.notifyDataSetChanged() }
+                        Log.i(TAG, list.toString())
+                    }.start()
+                    continue
+                }
                 if (!provider.isActive) {
                     continue
                 }
                 Thread {
-                    val books = provider.search(searchText.text.toString(), requireContext())
+                    val books = provider.search(text, requireContext())
                     for (book in books) {
                         val b = findSameBook(book)
                         if (b != null) {
