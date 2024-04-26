@@ -24,7 +24,7 @@ class PtwxProvider : NetProvider() {
         try {
             val key = URLEncoder.encode(s, "GBK")
             val url = "https://www.piaotia.com/modules/article/search.php?searchkey=$key"
-            val response = Jsoup.connect(url).followRedirects(true).timeout(5000).execute()
+            val response = Jsoup.connect(url).followRedirects(true).timeout(15000).execute()
             if (url != response.url().toString()) {
                 val doc = response.parse()
                 val elements = doc.body().select("#content")
@@ -33,7 +33,7 @@ class PtwxProvider : NetProvider() {
                 for (td in subDoc.select("td")) {
                     val t = td.text()
                     Log.i(javaClass.toString(), "td.text=$t")
-                    val prefix = "作\u00a0\u00a0\u00a0 者："
+                    val prefix = "作 者："
                     if (t.startsWith(prefix)) {
                         author = t.substring(prefix.length)
                         break
