@@ -13,14 +13,6 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
-    <style name="AppTheme.NoTitleBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here.-->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="textAllCaps">false</item>
-    </style>
-
     <style name="EmphasizeText">
         <item name="android:textColor">#FF0000</item>
     </style>

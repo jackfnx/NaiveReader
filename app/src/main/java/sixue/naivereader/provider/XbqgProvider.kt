@@ -63,10 +63,10 @@ class XbqgProvider : NetProvider() {
                 for (tr in Jsoup.parse(elements.toString()).select("tr")) {
                     val tds = tr.select("td.odd")
                     val a = tds.select("a")
-                    if (tds.size == 0) {
+                    if (tds.isEmpty()) {
                         continue
                     }
-                    val para = parseBookUrl(a.attr("href").trim { it <= ' ' })
+                    val para = parseBookUrl(a.attr("href").trim())
                     val coverUrl = calcCoverUrl(para)
                     val title = a.text()
                     val id = a.text()
@@ -113,7 +113,7 @@ class XbqgProvider : NetProvider() {
             val elements = doc.body().select("#list")
             for (ch in Jsoup.parse(elements.toString()).select("dd")) {
                 val title = ch.select("a").text()
-                val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
+                val url = ch.select("a").attr("href").replace("/", "").trim()
                 if (url.isEmpty()) {
                     continue
                 }
@@ -125,7 +125,7 @@ class XbqgProvider : NetProvider() {
                 chapter.savePath = chapterSavePath
                 content.add(chapter)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
         }
         return content
@@ -139,7 +139,7 @@ class XbqgProvider : NetProvider() {
             val plainText = text.replace("<br>", "")
                     .replace("&nbsp;", " ")
             Utils.writeText(plainText, chapter.savePath)
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
         }
     }
@@ -154,12 +154,12 @@ class XbqgProvider : NetProvider() {
     }
 
     private fun calcCoverUrl(para: String): String {
-        val prefix = if (para.length > 3) para.substring(0, para.length - 3) else "0"
+        val prefix = if (para.length > 3) para.dropLast(3) else "0"
         return String.format("https://www.xbiquge.bz/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 
     private fun parseBookUrl(bookUrl: String): String {
-        val bookUrl2 = if (bookUrl.endsWith("/")) bookUrl.substring(0, bookUrl.length - 1) else bookUrl
+        val bookUrl2 = if (bookUrl.endsWith("/")) bookUrl.dropLast(1) else bookUrl
         val l = bookUrl2.lastIndexOf('/')
         val r = bookUrl2.length
         return if (l != -1 && l < r) {

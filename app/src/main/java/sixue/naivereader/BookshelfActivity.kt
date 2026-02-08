@@ -107,6 +107,7 @@ class BookshelfActivity : AppCompatActivity() {
             if (book?.isRefreshable() == true) {
                 if (book.buildHelper().reloadContent(this)) {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
+                    intent.setPackage(applicationContext.packageName)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
                     sendBroadcast(intent)
                 }

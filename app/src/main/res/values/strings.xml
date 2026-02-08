@@ -9,7 +9,10 @@
     <string name="menu_delete">Delete</string>
     <string name="search">Search</string>
     <string name="input_book_title">Input book title</string>
-    <string name="sources">%1$d source</string>
+    <plurals name="sources">
+        <item quantity="one">%1$d source</item>
+        <item quantity="other">%1$d sources</item>
+    </plurals>
     <string name="menu_switch_sources">&lt;Switch sources&gt;</string>
     <string name="not_implemented">Not implemented</string>
     <string name="menu_settings">Settings</string>
@@ -46,4 +49,6 @@
     <string name="msg_packet_download">Packet download.</string>
     <string name="browse">Browse</string>
     <string name="HintTextEditing">Editing…</string>
+    <string name="archive">Archive</string>
+    <string name="input_book_author">Input book author</string>
 </resources>

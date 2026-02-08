@@ -16,6 +16,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import java.util.*
 import kotlin.math.abs
+import androidx.core.graphics.createBitmap
 
 class ReaderView : View {
     var isGesture = false
@@ -241,7 +242,7 @@ class ReaderView : View {
 
                 override fun onAnimationRepeat(animation: Animation) {}
             })
-            val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val bm = createBitmap(width, height)
             val canvas = Canvas(bm)
             drawPage(canvas, newPage)
             pageMask!!.setImageBitmap(bm)
@@ -255,7 +256,7 @@ class ReaderView : View {
 
     fun importText(text: String, currentPosition: Int) {
         val init = this.text == null || this.text!!.isEmpty()
-        this.text = if (text.isNotEmpty()) text else " "
+        this.text = text.ifEmpty { " " }
         this.currentPosition = currentPosition
         setLoading(true, !init)
         startTypesetThread()

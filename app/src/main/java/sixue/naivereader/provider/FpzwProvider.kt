@@ -101,7 +101,7 @@ class FpzwProvider : NetProvider() {
 
     override fun downloadContent(book: Book, bookSavePath: String): List<Chapter> {
         val para = book.sitePara
-        val prefix = if (para!!.length > 3) para.substring(0, para.length - 3) else "0"
+        val prefix = if (para!!.length > 3) para.dropLast(3) else "0"
         val contentUrl = String.format("https://www.2kxs.com/xiaoshuo/%s/%s/", prefix, para)
         var content: MutableList<Chapter> = ArrayList()
         try {
@@ -109,7 +109,7 @@ class FpzwProvider : NetProvider() {
             val elements = doc.body().select(".book")
             for (ch in Jsoup.parse(elements.toString()).select("dd")) {
                 val title = ch.select("a").text()
-                val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
+                val url = ch.select("a").attr("href").replace("/", "").trim()
                 if (url.isEmpty()) {
                     continue
                 }
@@ -118,7 +118,7 @@ class FpzwProvider : NetProvider() {
                 chapter.savePath = chapterSavePath
                 content.add(chapter)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
         }
         content = if (content.size >= 4) content.subList(4, content.size) else content
@@ -134,14 +134,14 @@ class FpzwProvider : NetProvider() {
                     .replace("<br>", "")
                     .replace("&nbsp;", " ")
             Utils.writeText(plainText, chapter.savePath)
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
         }
     }
 
     override fun getChapterUrl(book: Book, chapter: Chapter): String {
         val para = book.sitePara
-        val prefix = if (para!!.length > 3) para.substring(0, para.length - 3) else "0"
+        val prefix = if (para!!.length > 3) para.dropLast(3) else "0"
         return String.format("https://www.2kxs.com/xiaoshuo/%s/%s/%s", prefix, para, chapter.id)
     }
 
@@ -150,12 +150,12 @@ class FpzwProvider : NetProvider() {
     }
 
     private fun calcCoverUrl(para: String): String {
-        val prefix = if (para.length > 3) para.substring(0, para.length - 3) else "0"
+        val prefix = if (para.length > 3) para.dropLast(3) else "0"
         return String.format("https://www.2kxs.com/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 
     private fun parseBookUrl(bookUrl: String): String {
-        val bookUrl2 = if (bookUrl.endsWith("/")) bookUrl.substring(0, bookUrl.length - 1) else bookUrl
+        val bookUrl2 = if (bookUrl.endsWith("/")) bookUrl.dropLast(1) else bookUrl
         val l = bookUrl2.lastIndexOf('/')
         val r = bookUrl2.length
         return if (l != -1 && l < r) {

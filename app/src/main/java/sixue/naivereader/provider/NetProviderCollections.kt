@@ -18,7 +18,7 @@ object NetProviderCollections {
         val saveRootPath = Utils.getSavePathRoot(context)
         val disabledProviders = Utils.readText("$saveRootPath/.PROVIDERS") ?: return
         disabledProviders.split("\n".toRegex()).toTypedArray().forEach { disabledProviderId ->
-            val netProvider = providers[disabledProviderId.trim { it <= ' ' }]
+            val netProvider = providers[disabledProviderId.trim()]
             if (netProvider != null) {
                 netProvider.isActive = false
             }

@@ -8,7 +8,9 @@
     <string name="menu_delete">删除</string>
     <string name="search">搜索</string>
     <string name="input_book_title">输入书标题</string>
-    <string name="sources">%1$d个来源</string>
+    <plurals name="sources">
+        <item quantity="other">%1$d 个来源</item>
+    </plurals>
     <string name="menu_switch_sources">&lt;切换来源&gt;</string>
     <string name="not_implemented">尚未实现</string>
     <string name="menu_settings">设置</string>
@@ -45,4 +47,6 @@
     <string name="msg_packet_download">Packet下载完毕</string>
     <string name="browse">浏览</string>
     <string name="HintTextEditing">重定向…</string>
+    <string name="archive">打包</string>
+    <string name="input_book_author">输入书作者</string>
 </resources>

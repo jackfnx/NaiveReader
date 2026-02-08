@@ -20,6 +20,9 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.collections.ArrayList
+import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
+import androidx.core.graphics.withSave
 
 object Utils {
     private val TAG = Utils::class.java.simpleName
@@ -135,7 +138,7 @@ object Utils {
         val srcRect = calcSrcRect(unscaledBitmap.width, unscaledBitmap.height, dstWidth, dstHeight)
         val dstRect = Rect(0, 0, dstWidth, dstHeight)
         val scaledBitmap =
-            Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888)
+            createBitmap(dstRect.width(), dstRect.height())
         val canvas = Canvas(scaledBitmap)
         canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, Paint(Paint.FILTER_BITMAP_FLAG))
         return scaledBitmap
@@ -345,18 +348,18 @@ object Utils {
         if (len <= maxLen || matcher.matches()) {
             list.add(line)
         } else if (len <= maxLen * 2) {
-            list.add(line.substring(0, len / 2 + 1))
+            list.add(line.take(len / 2 + 1))
             list.add(line.substring(len / 2 + 1))
         } else {
-            list.add(line.substring(0, maxLen))
+            list.add(line.take(maxLen))
             list.add("...")
         }
     }
 
-    private fun getBlankCoverBitmap(context: Context, texture_id: Int): Bitmap {
+    private fun getBlankCoverBitmap(context: Context, textureId: Int): Bitmap {
         val w = 160
         val h = 200
-        val textureName = String.format(Locale.CHINA, "texture_paper_%d.jpg", texture_id)
+        val textureName = String.format(Locale.CHINA, "texture_paper_%d.jpg", textureId)
         val `is` = context.assets.open(textureName)
         val texture = BitmapFactory.decodeStream(`is`)
         val x = (Math.random() * (texture.width - w)).toInt()
@@ -457,7 +460,7 @@ object Utils {
     }
 
     fun readExternalText(context: Context, uriString: String): String? {
-        val uri = Uri.parse(uriString)
+        val uri = uriString.toUri()
         val resolver = context.contentResolver
         val takeFlags =
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -554,7 +557,7 @@ object Utils {
     private const val FRAME_CORNER_WIDTH = 15f
 
     fun appendArchiveMarkToBitmap(bitmap: Bitmap): Bitmap {
-        val newBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val newBitmap = createBitmap(bitmap.width, bitmap.height)
         val canvas = Canvas(newBitmap)
         canvas.drawBitmap(bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
         val w = bitmap.width.toFloat()
@@ -597,8 +600,8 @@ object Utils {
         val x = (w - advance.toInt() - FRAME_CORNER_WIDTH)
         val y = (h - bounds.height())
         canvas.drawText(appendText, x, y, textPaint)
-        canvas.save()
-        canvas.restore()
+        canvas.withSave {
+        }
         return newBitmap
     }
 

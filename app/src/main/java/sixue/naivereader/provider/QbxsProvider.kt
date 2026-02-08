@@ -75,7 +75,7 @@ class QbxsProvider : NetProvider() {
             val elements = doc.body().select(".list")
             for (ch in Jsoup.parse(elements.toString()).select("li[itemprop=itemListElement]")) {
                 val title = ch.select("a").text()
-                val url = ch.select("a").attr("href").trim { it <= ' ' }
+                val url = ch.select("a").attr("href").trim()
                 if (url.isEmpty()) {
                     continue
                 }
@@ -88,7 +88,7 @@ class QbxsProvider : NetProvider() {
                 chapter.savePath = chapterSavePath
                 content.add(chapter)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
         }
         return content
@@ -103,7 +103,7 @@ class QbxsProvider : NetProvider() {
             val plainText = Utils.clearHtmlTag(text, arrayOf())
                     .replace("<p>", "").replace("</p>", "\n")
             Utils.writeText(plainText, chapter.savePath)
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
         }
     }

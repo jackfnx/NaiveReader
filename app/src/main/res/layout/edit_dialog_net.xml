@@ -14,9 +14,10 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/input_book_title"
+        android:importantForAutofill="no"
         android:inputType="text"
-        android:labelFor="@id/title"
-        android:importantForAutofill="no" />
+        android:minHeight="48dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -27,9 +28,10 @@
         android:id="@+id/author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/input_book_author"
+        android:importantForAutofill="no"
         android:inputType="text"
-        android:labelFor="@id/author"
-        android:importantForAutofill="no" />
+        android:minHeight="48dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -40,7 +42,8 @@
         android:id="@+id/sources"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="false" />
+        android:clickable="false"
+        android:minHeight="48dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -57,6 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:minHeight="48dp"
             android:text="@string/end" />
 
         <Button
@@ -64,6 +68,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Archive"/>
+            android:text="@string/archive" />
     </LinearLayout>
 </LinearLayout>

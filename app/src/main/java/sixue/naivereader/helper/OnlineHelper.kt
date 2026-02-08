@@ -51,6 +51,7 @@ class OnlineHelper(private val book: Book) : BookHelper {
                 Utils.writeText(json, "$bookSavePath/.CONTENT")
             }
             val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
+            intent.setPackage(context.packageName)
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
             context.sendBroadcast(intent)
         } catch (e: JsonProcessingException) {
@@ -186,6 +187,7 @@ class OnlineHelper(private val book: Book) : BookHelper {
         }
         book.coverSavePath = coverRelSavePath
         val intent = Intent(Utils.ACTION_DOWNLOAD_COVER_FINISH)
+        intent.setPackage(context.packageName)
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
         context.sendBroadcast(intent)
     }

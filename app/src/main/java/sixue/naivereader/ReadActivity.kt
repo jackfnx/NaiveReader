@@ -5,23 +5,28 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.GestureDetector
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
 import android.view.View.OnTouchListener
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 import sixue.naivereader.ReaderView.OnTurnPageOverListener
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
 import sixue.naivereader.data.Chapter
-import java.util.*
+import java.util.Locale
 
 class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGestureListener {
     private lateinit var detector: GestureDetector
@@ -115,7 +120,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 }
             }
         }
-        registerReceiver(receiver, myFilter)
+        registerReceiver(receiver, myFilter, Context.RECEIVER_NOT_EXPORTED)
         battery.text = "?"
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         batteryReceiver = object : BroadcastReceiver() {
@@ -139,11 +144,13 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 }
                 book.kind === BookKind.Online -> {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CONTENT_FINISH)
+                    intent.setPackage(applicationContext.packageName)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
                     sendBroadcast(intent)
                 }
                 book.kind === BookKind.LocalText -> {
                     val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+                    intent.setPackage(applicationContext.packageName)
                     intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
                     intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, "")
                     intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
@@ -168,6 +175,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         }
         chapter = book.chapterList[book.currentChapterIndex]
         val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+        intent.setPackage(applicationContext.packageName)
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
         intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.id)
         intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
@@ -194,6 +202,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         chapter = book.chapterList[book.currentChapterIndex]
         if (smartDownloader.isDownloaded(chapter)) {
             val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+            intent.setPackage(applicationContext.packageName)
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
             intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.id)
             intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
@@ -215,6 +224,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         }
         chapter = book.chapterList[book.currentChapterIndex]
         val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+        intent.setPackage(applicationContext.packageName)
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
         intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.id)
         intent.putExtra(Utils.INTENT_PARA_CURRENT_POSITION, book.currentPosition)
@@ -226,7 +236,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         actionBar.setDisplayShowTitleEnabled(false)
         val color = ContextCompat.getColor(this, R.color.colorPrimary)
         val transparentColor = Color.argb(0x99, Color.red(color), Color.green(color), Color.blue(color))
-        actionBar.setBackgroundDrawable(ColorDrawable(transparentColor))
+        actionBar.setBackgroundDrawable(transparentColor.toDrawable())
         actionBar.hide()
     }
 
@@ -261,7 +271,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                     if (book.isRefreshable()) {
                         val url = smartDownloader.getChapterUrl(chapter)
                         val intent = Intent("android.intent.action.VIEW")
-                        intent.data = Uri.parse(url)
+                        intent.data = url.toUri()
                         startActivity(intent)
                         actionBar.hide()
                         return true
@@ -272,7 +282,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 if (book.isViewableInBrowser()) {
                     val url = smartDownloader.getChapterUrl(chapter)
                     val intent = Intent("android.intent.action.VIEW")
-                    intent.data = Uri.parse(url)
+                    intent.data = url.toUri()
                     startActivity(intent)
                     actionBar.hide()
                     return true
@@ -320,7 +330,12 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         return true
     }
 
-    override fun onScroll(motionEvent: MotionEvent, motionEvent1: MotionEvent, vX: Float, vY: Float): Boolean {
+    override fun onScroll(
+        e1: MotionEvent?,
+        motionEvent1: MotionEvent,
+        vY: Float,
+        distanceY: Float
+    ): Boolean {
         //Log.i(getClass().toString(), "onScroll");
         return false
     }
@@ -330,7 +345,12 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         actionBar.show()
     }
 
-    override fun onFling(motionEvent: MotionEvent, motionEvent1: MotionEvent, vX: Float, vY: Float): Boolean {
+    override fun onFling(
+        e1: MotionEvent?,
+        motionEvent1: MotionEvent,
+        vX: Float,
+        vY: Float
+    ): Boolean {
         //Log.i(getClass().toString(), "onFling");
         Log.d(javaClass.toString(), "Fling:vX=$vX,vY=$vY")
         if (vY < 2000 && vY > -2000) {

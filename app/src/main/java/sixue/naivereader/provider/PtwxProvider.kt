@@ -64,10 +64,10 @@ class PtwxProvider : NetProvider() {
                 for (tr in Jsoup.parse(elements.toString()).select("tr")) {
                     val tds = tr.select("td.odd")
                     val a = tds.select("a")
-                    if (tds.size == 0) {
+                    if (tds.isEmpty()) {
                         continue
                     }
-                    val para = parseBookUrl(a.attr("href").trim { it <= ' ' })
+                    val para = parseBookUrl(a.attr("href").trim())
                     val coverUrl = calcCoverUrl(para)
                     val title = a.text()
                     val id = a.text()
@@ -113,7 +113,7 @@ class PtwxProvider : NetProvider() {
             val elements = doc.body().select(".centent")
             for (ch in Jsoup.parse(elements.toString()).select("li")) {
                 val title = ch.select("a").text()
-                val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
+                val url = ch.select("a").attr("href").replace("/", "").trim()
                 if (url.isEmpty() ||
                         url.lowercase(Locale.getDefault()).startsWith("javascript:") ||
                         url.lowercase(Locale.getDefault()).startsWith("window")) {
@@ -127,9 +127,9 @@ class PtwxProvider : NetProvider() {
                 chapter.savePath = chapterSavePath
                 content.add(chapter)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
-        } catch (e: NullPointerException) {
+        } catch (_: NullPointerException) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
         }
         return content
@@ -148,9 +148,9 @@ class PtwxProvider : NetProvider() {
                     .replace("<br>", "")
                     .replace("&nbsp;", " ")
             Utils.writeText(plainText, chapter.savePath)
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
-        } catch (e: NullPointerException) {
+        } catch (_: NullPointerException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
         }
     }
@@ -164,7 +164,7 @@ class PtwxProvider : NetProvider() {
     }
 
     private fun calcPrefix(para: String): String {
-        return if (para.length > 3) para.substring(0, para.length - 3) else "0"
+        return if (para.length > 3) para.dropLast(3) else "0"
     }
 
     private fun calcBookUrl(para: String): String {

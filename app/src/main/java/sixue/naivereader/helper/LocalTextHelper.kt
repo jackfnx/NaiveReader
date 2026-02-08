@@ -24,7 +24,7 @@ class LocalTextHelper(private val book: Book) : BookHelper {
             titles.add(s)
             val sumStart = node + s.length
             val sumEnd = if (sumStart + MAX_SUMMARY_LENGTH > book.wordCount) book.wordCount else sumStart + MAX_SUMMARY_LENGTH
-            val sum = text.substring(sumStart, sumEnd).trim { it <= ' ' }.replace('\n', ' ')
+            val sum = text.substring(sumStart, sumEnd).trim().replace('\n', ' ')
             summaries.add(sum)
         }
         book.localChapterTitles = titles

@@ -56,7 +56,7 @@ class AddNetBookFragment : Fragment() {
                 viewHolder.cover.setImageBitmap(book.buildHelper().loadCoverBitmap(requireContext()))
                 viewHolder.title.text = book.title
                 viewHolder.author.text = book.author
-                viewHolder.source.text = getString(R.string.sources, book.sources.size)
+                viewHolder.source.text = resources.getQuantityString(R.plurals.sources, book.sources.size)
                 return view
             }
 

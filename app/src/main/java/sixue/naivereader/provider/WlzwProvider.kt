@@ -64,10 +64,10 @@ class WlzwProvider : NetProvider() {
                 for (tr in Jsoup.parse(elements.toString()).select("tr")) {
                     val tds = tr.select("td.odd")
                     val a = tds.select("a")
-                    if (tds.size == 0) {
+                    if (tds.isEmpty()) {
                         continue
                     }
-                    val para = parseBookUrl(a.attr("href").trim { it <= ' ' })
+                    val para = parseBookUrl(a.attr("href").trim())
                     val coverUrl = calcCoverUrl(para)
                     val title = a.text()
                     val id = a.text()
@@ -114,19 +114,21 @@ class WlzwProvider : NetProvider() {
                 val contentUrl = queue[0]
                 val doc = Jsoup.connect(contentUrl).timeout(5000).get()
                 val elements = doc.body().select(".zjlist").first()
-                for (ch in Jsoup.parse(elements.toString()).select("dd")) {
-                    val title = ch.select("a").text()
-                    val url = ch.select("a").attr("href").replace("/", "").trim { it <= ' ' }
-                    if (url.isEmpty()) {
-                        continue
+                if (elements != null) {
+                    for (ch in Jsoup.parse(elements.toString()).select("dd")) {
+                        val title = ch.select("a").text()
+                        val url = ch.select("a").attr("href").replace("/", "").trim()
+                        if (url.isEmpty()) {
+                            continue
+                        }
+                        val chapter = Chapter(
+                            id = url,
+                            title = title,
+                        )
+                        val chapterSavePath = calcChapterSavePath(chapter, bookSavePath)
+                        chapter.savePath = chapterSavePath
+                        content.add(chapter)
                     }
-                    val chapter = Chapter(
-                        id = url,
-                        title = title,
-                    )
-                    val chapterSavePath = calcChapterSavePath(chapter, bookSavePath)
-                    chapter.savePath = chapterSavePath
-                    content.add(chapter)
                 }
                 if (contentUrl.endsWith("/")) {
                     val select = doc.body().select("select")[0]
@@ -139,7 +141,7 @@ class WlzwProvider : NetProvider() {
                 }
                 queue.removeAt(0)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadContent ERROR: $queue[0]")
         }
         return content
@@ -151,7 +153,7 @@ class WlzwProvider : NetProvider() {
             val doc = Jsoup.connect(chapterUrl).timeout(5000).get()
             val text = doc.body().select("#htmlContent").html().replace("<br>", "").replace("&nbsp;", " ")
             Utils.writeText(text, chapter.savePath)
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             Log.e(TAG, "downloadChapter ERROR: $chapterUrl")
         }
     }
@@ -165,7 +167,7 @@ class WlzwProvider : NetProvider() {
     }
 
     private fun calcCoverUrl(para: String): String {
-        val prefix = if (para.length > 3) para.substring(0, para.length - 3) else "0"
+        val prefix = if (para.length > 3) para.dropLast(3) else "0"
         return String.format("https://www.50zw.co/files/article/image/%s/%s/%ss.jpg", prefix, para, para)
     }
 

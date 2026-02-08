@@ -18,6 +18,7 @@ class SmartDownloader(private val context: Context, private val book: Book) {
         provider?.let {
             it.downloadChapter(book, chapter)
             val intent = Intent(Utils.ACTION_DOWNLOAD_CHAPTER_FINISH)
+            intent.setPackage(context.packageName)
             intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
             intent.putExtra(Utils.INTENT_PARA_CHAPTER_ID, chapter.id)
             intent.putExtra(Utils.INTENT_PARA_PATH, chapter.savePath)
@@ -49,6 +50,7 @@ class SmartDownloader(private val context: Context, private val book: Book) {
             }
         }
         val intent = Intent(Utils.ACTION_DOWNLOAD_ALL_CHAPTER_FINISH)
+        intent.setPackage(context.packageName)
         intent.putExtra(Utils.INTENT_PARA_BOOK_ID, book.id)
         context.sendBroadcast(intent)
     }
