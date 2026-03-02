@@ -12,6 +12,9 @@ class AddActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add)
+
+        toolbarUtils(this, R.id.activity_add, R.id.toolbar1) {}
+
         val viewPager2 = findViewById<ViewPager2>(R.id.viewpager)
         viewPager2.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = 3

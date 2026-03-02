@@ -4,8 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -18,6 +22,7 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.GridView
 import android.widget.ImageView
 import android.widget.Spinner
@@ -28,6 +33,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.get
+import androidx.core.view.size
+import androidx.core.view.updateLayoutParams
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import sixue.naivereader.data.Book
@@ -45,15 +54,39 @@ class BookshelfActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bookshelf)
         Utils.verifyPermissions(this)
+
         BookLoader.reload(this)
         isEditMode = false
         editList = ArrayList()
         getTextDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             updateBookCallback?.invoke(uri)
         }
+
         val gv = findViewById<GridView>(R.id.gridview_books)
         val fab = findViewById<FloatingActionButton>(R.id.fab_add)
         val srl = findViewById<SwipeRefreshLayout>(R.id.srl)
+
+        toolbarUtils(this, R.id.activity_bookshelf, R.id.toolbar0) { insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+
+            val typedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)
+            val originalToolbarHeight = TypedValue.complexToDimensionPixelSize(
+                typedValue.data,
+                resources.displayMetrics
+            )
+
+            srl.updateLayoutParams<FrameLayout.LayoutParams> {
+                topMargin = originalToolbarHeight + statusBarHeight
+            }
+
+            val originalMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
+            fab.updateLayoutParams<FrameLayout.LayoutParams> {
+                bottomMargin = navBarHeight + originalMargin
+            }
+        }
+
         myAdapter = MyAdapter()
         gv.adapter = myAdapter
         gv.onItemClickListener = OnItemClickListener { _, view, i, _ ->
@@ -153,6 +186,18 @@ class BookshelfActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.bookshelf, menu)
+        val color = Color.WHITE // 白色
+        for (i in 0 until menu.size) {
+            val item = menu[i]
+
+            // 如果是文字菜单（rare），设置 SpannableString
+            val title = SpannableString(item.title)
+            title.setSpan(ForegroundColorSpan(color), 0, title.length, 0)
+            item.title = title
+
+            // 如果是图标菜单，给图标着色
+            item.icon?.mutate()?.setTint(color)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -265,7 +310,7 @@ class BookshelfActivity : AppCompatActivity() {
         delete.isVisible = isEditMode
         settings.isVisible = !isEditMode
         edit.isEnabled = editList.size == 1
-        delete.isEnabled = editList.size >= 1
+        delete.isEnabled = editList.isNotEmpty()
         return super.onPrepareOptionsMenu(menu)
     }
 

@@ -4,19 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.BaseAdapter
+import android.widget.Button
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import sixue.naivereader.provider.NetProvider
 import sixue.naivereader.provider.NetProviderCollections.getProviders
 import sixue.naivereader.provider.NetProviderCollections.saveSettings
-import java.util.*
 
 class NetProviderManagerActivity : AppCompatActivity() {
     private lateinit var netProviders: List<NetProvider>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_net_provider_manager)
+
+        toolbarUtils(this, R.id.activity_net_provider_manager, R.id.toolbar2) {}
+
         netProviders = ArrayList(getProviders(this))
         val listView = findViewById<ListView>(R.id.list_net_providers)
         listView.adapter = object : BaseAdapter() {

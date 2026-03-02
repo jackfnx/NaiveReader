@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_net_provider_manager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,6 +10,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="sixue.naivereader.NetProviderManagerActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        app:subtitleTextColor="@android:color/white"/>
 
     <LinearLayout
         android:id="@+id/_footer"
@@ -41,5 +50,6 @@
         android:id="@+id/list_net_providers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/_sep_line"/>
+        android:layout_above="@+id/_sep_line"
+        android:layout_below="@+id/toolbar2"/>
 </RelativeLayout>

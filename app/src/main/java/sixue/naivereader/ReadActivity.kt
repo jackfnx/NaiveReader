@@ -120,7 +120,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                 }
             }
         }
-        registerReceiver(receiver, myFilter, Context.RECEIVER_NOT_EXPORTED)
+        registerReceiver(receiver, myFilter, RECEIVER_NOT_EXPORTED)
         battery.text = "?"
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         batteryReceiver = object : BroadcastReceiver() {
