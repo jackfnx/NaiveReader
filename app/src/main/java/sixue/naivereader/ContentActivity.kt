@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -12,10 +14,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.BaseAdapter
+import android.widget.FrameLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import sixue.naivereader.data.Book
 import sixue.naivereader.provider.NetProviderCollections.findProviders
@@ -28,12 +34,31 @@ class ContentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_content)
+
+        val listView = findViewById<ListView>(R.id.content)
+        val srl = findViewById<SwipeRefreshLayout>(R.id.srl2)
+
+        toolbarUtils(this, R.id.activity_content, R.id.toolbar4) { insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+
+            val typedValue = TypedValue()
+            theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)
+            val originalToolbarHeight = TypedValue.complexToDimensionPixelSize(
+                typedValue.data,
+                resources.displayMetrics
+            )
+
+            srl.updateLayoutParams<FrameLayout.LayoutParams> {
+                topMargin = originalToolbarHeight + statusBarHeight
+                bottomMargin = navBarHeight
+            }
+        }
+
         book = BookLoader.getBook(0)!!
         downloader = SmartDownloader(this, book)
 
-        val listView = findViewById<ListView>(R.id.content)
         val myAdapter = MyAdapter(book)
-        val srl = findViewById<SwipeRefreshLayout>(R.id.srl)
         srl.isEnabled = book.isRefreshable()
         listView.adapter = myAdapter
         listView.onItemClickListener = OnItemClickListener { _, _, i, _ ->
@@ -124,6 +149,8 @@ class ContentActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.content, menu)
+        findViewById<Toolbar>(R.id.toolbar4)?.overflowIcon?.mutate()?.setTint(Color.WHITE)
+        setMenuText(menu, Color.WHITE)
         return super.onCreateOptionsMenu(menu)
     }
 
