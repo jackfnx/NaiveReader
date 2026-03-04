@@ -10,6 +10,7 @@ import java.net.SocketException
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * 局域网扫描设备工具类
@@ -27,8 +28,8 @@ class ScanDeviceTool : AutoCloseable {
      * @return String
      */
     private fun tryToFind(): String? {
-        val ips: MutableList<String> = ArrayList()
-        executor = Executors.newCachedThreadPool()
+        val ips: MutableList<String> = Collections.synchronizedList(ArrayList())
+        executor = Executors.newFixedThreadPool(10)
         for (devAddress in hostIps) {
             // 获取本地ip前缀
             val locAddress = getLocAddress(devAddress)
@@ -40,40 +41,21 @@ class ScanDeviceTool : AutoCloseable {
 
             // 新建线程池
             for (i in 1..254) {
-                val run = Runnable {
-                    val currentIp = locAddress + i
+                if (ips.isNotEmpty()) return ips[0]
+                val currentIp = locAddress + i
+                if (devAddress == currentIp) continue
+                executor!!.execute {
                     // 如果与本机IP地址相同,跳过
-                    if (devAddress == currentIp) return@Runnable
                     if (testServer(currentIp)) {
                         Log.d(TAG, "扫描成功，IP地址为：$currentIp")
                         ips.add(currentIp)
                     }
                 }
-                executor!!.execute(run)
             }
         }
         executor!!.shutdown()
-        while (true) {
-            try {
-                // 找到了
-                if (ips.size != 0) {
-                    executor = null
-                    return ips[0]
-                }
-                // 扫描结束
-                if (executor!!.isTerminated) {
-                    executor = null
-                    return null
-                }
-            } catch (e: Exception) {
-                // do nothing
-            }
-            try {
-                Thread.sleep(1000)
-            } catch (e: InterruptedException) {
-                // do nothing
-            }
-        }
+        executor!!.awaitTermination(30, TimeUnit.SECONDS)
+        return ips.firstOrNull()
     }
 
     /**

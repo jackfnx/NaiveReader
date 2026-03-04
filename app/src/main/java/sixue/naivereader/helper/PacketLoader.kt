@@ -7,6 +7,8 @@ import sixue.naivereader.data.BookKind
 import sixue.naivereader.data.Packet
 import java.io.*
 import java.net.HttpURLConnection
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.net.URL
 import java.util.*
 
@@ -16,21 +18,15 @@ object PacketLoader {
     private const val INIT_URL = "/books"
     @JvmStatic
     fun testServer(ip: String): Boolean {
-        try {
-            val url = URL(String.format(Locale.PRC, "http://%s:%d%s",
-                    ip, HTTP_PORT, INIT_URL))
-            val conn = url.openConnection() as HttpURLConnection
-            conn.setRequestProperty("Connection", "close")
-            conn.doInput = true
-            conn.connect()
-            val c = conn.responseCode
-            if (c == HttpURLConnection.HTTP_OK) {
-                return true
+        return try {
+            Socket().use { socket ->
+                socket.connect(InetSocketAddress(ip, HTTP_PORT), 200)
+                true
             }
-        } catch (e: Exception) {
-            // do nothing
+        } catch (_: Exception) {
+//            Log.d(TAG, "Port check failed: $ip, ${e.message}")
+            false
         }
-        return false
     }
 
     @JvmStatic
