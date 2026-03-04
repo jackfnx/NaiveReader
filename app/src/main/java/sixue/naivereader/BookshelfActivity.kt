@@ -7,8 +7,6 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,8 +32,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.get
-import androidx.core.view.size
 import androidx.core.view.updateLayoutParams
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -186,18 +182,7 @@ class BookshelfActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.bookshelf, menu)
-        val color = Color.WHITE // 白色
-        for (i in 0 until menu.size) {
-            val item = menu[i]
-
-            // 如果是文字菜单（rare），设置 SpannableString
-            val title = SpannableString(item.title)
-            title.setSpan(ForegroundColorSpan(color), 0, title.length, 0)
-            item.title = title
-
-            // 如果是图标菜单，给图标着色
-            item.icon?.mutate()?.setTint(color)
-        }
+        setMenuText(menu, Color.WHITE)
         return super.onCreateOptionsMenu(menu)
     }
 

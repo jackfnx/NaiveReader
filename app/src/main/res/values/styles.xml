@@ -9,10 +9,6 @@
         <item name="textAllCaps">false</item>
     </style>
 
-    <style name="AppTheme.Overlay" parent="AppTheme">
-        <item name="windowActionBarOverlay">true</item>
-    </style>
-
     <style name="EmphasizeText">
         <item name="android:textColor">#FF0000</item>
     </style>

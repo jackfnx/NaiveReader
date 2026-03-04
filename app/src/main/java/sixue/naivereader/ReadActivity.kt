@@ -13,15 +13,19 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import android.view.ViewGroup
+import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.net.toUri
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import sixue.naivereader.ReaderView.OnTurnPageOverListener
 import sixue.naivereader.data.Book
 import sixue.naivereader.data.BookKind
@@ -35,13 +39,27 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
     private lateinit var receiver: BroadcastReceiver
     private lateinit var book: Book
     private lateinit var smartDownloader: SmartDownloader
-    private lateinit var actionBar: ActionBar
     private var chapter: Chapter = emptyChapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        actionBar = supportActionBar!!
+
+        toolbarUtils(this, R.id.activity_read, R.id.toolbar3) { insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val navBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+
+            val readArea = findViewById<View>(R.id.read_area)
+            readArea.updateLayoutParams<FrameLayout.LayoutParams> {
+                topMargin = statusBarHeight
+            }
+
+            val footer = findViewById<View>(R.id._footer)
+            footer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = navBarHeight
+            }
+        }
+
         BookLoader.reload(this, true)
         book = BookLoader.getBook(0)!!
         readerView = findViewById(R.id.text_area)
@@ -231,17 +249,37 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         sendBroadcast(intent)
     }
 
+    private fun setStatusBarForToolbarVisible(visible: Boolean) {
+        if (visible) {
+            supportActionBar?.show()
+            // 蓝色背景 → 白色图标
+            window.insetsController?.setSystemBarsAppearance(
+                0,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        } else {
+            supportActionBar?.hide()
+            // 白色背景 → 黑色图标
+            window.insetsController?.setSystemBarsAppearance(
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        }
+    }
+
     public override fun onStart() {
         super.onStart()
-        actionBar.setDisplayShowTitleEnabled(false)
-        val color = ContextCompat.getColor(this, R.color.colorPrimary)
-        val transparentColor = Color.argb(0x99, Color.red(color), Color.green(color), Color.blue(color))
-        actionBar.setBackgroundDrawable(transparentColor.toDrawable())
-        actionBar.hide()
+        supportActionBar?.apply {
+            setStatusBarForToolbarVisible(false)
+            setDisplayShowTitleEnabled(false)
+            setBackgroundDrawable(colorWithAlpha(this@ReadActivity, android.R.attr.colorPrimary, 0x99).toDrawable())
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.read, menu)
+        findViewById<Toolbar>(R.id.toolbar3)?.overflowIcon?.mutate()?.setTint(Color.WHITE)
+        setMenuText(menu, Color.WHITE)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -256,7 +294,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
             R.id.content -> {
                 val intent = Intent(this, ContentActivity::class.java)
                 startActivity(intent)
-                actionBar.hide()
+                setStatusBarForToolbarVisible(false)
                 return true
             }
             R.id.refresh -> {
@@ -273,7 +311,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                         val intent = Intent("android.intent.action.VIEW")
                         intent.data = url.toUri()
                         startActivity(intent)
-                        actionBar.hide()
+                        setStatusBarForToolbarVisible(false)
                         return true
                     }
                 }
@@ -284,7 +322,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
                     val intent = Intent("android.intent.action.VIEW")
                     intent.data = url.toUri()
                     startActivity(intent)
-                    actionBar.hide()
+                    setStatusBarForToolbarVisible(false)
                     return true
                 }
             }
@@ -310,8 +348,8 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
 
     override fun onSingleTapUp(motionEvent: MotionEvent): Boolean {
         //Log.i(getClass().toString(), "onSingleTapUp");
-        if (actionBar.isShowing) {
-            actionBar.hide()
+        if (supportActionBar?.isShowing == true) {
+            setStatusBarForToolbarVisible(false)
         } else {
             val metrics = windowManager.currentWindowMetrics
             val widthPixels = metrics.bounds.width()
@@ -322,7 +360,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
             if (x < widthPixels / 3 && y < heightPixels / 2) {
                 readerView.turnPage(-1)
             } else if (x > widthPixels / 3 && x < widthPixels * 2 / 3 && y < heightPixels / 2) {
-                actionBar.show()
+                setStatusBarForToolbarVisible(true)
             } else {
                 readerView.turnPage(1)
             }
@@ -342,7 +380,7 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
 
     override fun onLongPress(motionEvent: MotionEvent) {
         //Log.i(getClass().toString(), "onLongPress");
-        actionBar.show()
+        setStatusBarForToolbarVisible(true)
     }
 
     override fun onFling(
@@ -355,10 +393,10 @@ class ReadActivity : AppCompatActivity(), OnTouchListener, GestureDetector.OnGes
         Log.d(javaClass.toString(), "Fling:vX=$vX,vY=$vY")
         if (vY < 2000 && vY > -2000) {
             if (vX > 0) {
-                actionBar.hide()
+                setStatusBarForToolbarVisible(false)
                 readerView.turnPage(-1)
             } else {
-                actionBar.hide()
+                setStatusBarForToolbarVisible(false)
                 readerView.turnPage(1)
             }
             //        } else {

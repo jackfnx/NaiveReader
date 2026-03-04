@@ -21,9 +21,7 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="sixue.naivereader.ReadActivity"
-            android:theme="@style/AppTheme.Overlay" />
+        <activity android:name="sixue.naivereader.ReadActivity" />
         <activity android:name="sixue.naivereader.ContentActivity" />
         <activity
             android:name="sixue.naivereader.AddActivity"
