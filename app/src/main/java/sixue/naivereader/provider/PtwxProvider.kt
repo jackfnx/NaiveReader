@@ -127,9 +127,7 @@ class PtwxProvider : NetProvider() {
                 chapter.savePath = chapterSavePath
                 content.add(chapter)
             }
-        } catch (_: IOException) {
-            Log.e(TAG, "downloadContent ERROR: $contentUrl")
-        } catch (_: NullPointerException) {
+        } catch (_: Exception) {
             Log.e(TAG, "downloadContent ERROR: $contentUrl")
         }
         return content

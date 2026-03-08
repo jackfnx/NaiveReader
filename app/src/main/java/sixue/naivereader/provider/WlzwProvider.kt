@@ -141,8 +141,8 @@ class WlzwProvider : NetProvider() {
                 }
                 queue.removeAt(0)
             }
-        } catch (_: IOException) {
-            Log.e(TAG, "downloadContent ERROR: $queue[0]")
+        } catch (_: Exception) {
+            Log.e(TAG, "downloadContent ERROR: ${queue[0]}")
         }
         return content
     }

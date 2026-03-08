@@ -90,7 +90,7 @@ class XbqgProvider : NetProvider() {
                     list.add(book)
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         return list

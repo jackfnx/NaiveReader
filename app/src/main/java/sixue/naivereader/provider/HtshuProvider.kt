@@ -70,7 +70,7 @@ class HtshuProvider: NetProvider() {
                 helper.downloadCover(context, coverUrl)
                 return book
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return null
         }
