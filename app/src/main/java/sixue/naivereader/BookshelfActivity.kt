@@ -154,6 +154,7 @@ class BookshelfActivity : AppCompatActivity() {
     public override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+        myAdapter.release()
     }
 
     public override fun onStart() {
@@ -307,45 +308,58 @@ class BookshelfActivity : AppCompatActivity() {
     }
 
     private inner class MyAdapter : BaseAdapter() {
-        override fun getCount(): Int {
-            return BookLoader.bookNum
-        }
+        private val coverLoader = CoverLoader(this@BookshelfActivity)
+        private val inflater = LayoutInflater.from(this@BookshelfActivity)
 
-        override fun getItem(i: Int): Any {
-            return ""
-        }
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view: View
+            val holder: ViewHolder
 
-        override fun getItemId(i: Int): Long {
-            return 0
-        }
-
-        override fun getView(i: Int, convertView: View?, viewGroup: ViewGroup): View {
-            val view : View?
             if (convertView == null) {
-                view = LayoutInflater.from(this@BookshelfActivity).inflate(R.layout.gridviewitem_book, viewGroup, false)
-                val title = view.findViewById<TextView>(R.id.title)
-                val progress = view.findViewById<TextView>(R.id.progress)
-                val selectIcon = view.findViewById<View>(R.id.select_icon)
-                val cover = view.findViewById<ImageView>(R.id.cover)
-                view.tag = ViewHolder(title, progress, selectIcon, cover)
+                view = inflater.inflate(R.layout.gridviewitem_book, parent, false)
+                holder = ViewHolder(view)
+                view.tag = holder
             } else {
                 view = convertView
+                holder = view.tag as ViewHolder
             }
-            val viewHolder : ViewHolder = (view!!.tag as ViewHolder)
 
-            val book = BookLoader.getBook(i)
-            viewHolder.title.text = book?.title
-            viewHolder.progress.text = book?.buildHelper()?.progressText(this@BookshelfActivity)
-            if (!isEditMode) {
-                viewHolder.selectIcon.visibility = View.INVISIBLE
-            } else {
-                viewHolder.selectIcon.visibility = View.VISIBLE
-            }
-            viewHolder.selectIcon.isSelected = editList.contains(book)
-            viewHolder.cover.setImageBitmap(book?.buildHelper()?.loadCoverBitmap(this@BookshelfActivity))
+            val book = BookLoader.getBook(position)
+            holder.bind(book, coverLoader, isEditMode, editList)
+
             return view
         }
 
-        inner class ViewHolder(val title: TextView, val progress: TextView, val selectIcon: View, val cover: ImageView)
+        inner class ViewHolder(itemView: View) {
+            val title: TextView = itemView.findViewById(R.id.title)
+            val progress: TextView = itemView.findViewById(R.id.progress)
+            val selectIcon: View = itemView.findViewById(R.id.select_icon)
+            val cover: ImageView = itemView.findViewById(R.id.cover)
+
+            fun bind(book: Book?, loader: CoverLoader, isEditMode: Boolean, editList: List<Book>) {
+                if (book == null) return
+
+                title.text = book.title
+                progress.text = book.buildHelper().progressText(this@BookshelfActivity)
+
+                // 选择模式
+                selectIcon.visibility = if (isEditMode) View.VISIBLE else View.INVISIBLE
+                selectIcon.isSelected = editList.contains(book)
+
+                // 加载封面
+                loader.loadCover(book, cover)
+            }
+        }
+
+        fun release() {
+            coverLoader.release()
+        }
+
+        override fun getCount() = BookLoader.bookNum
+
+        override fun getItem(i: Int) = BookLoader.getBook(i)
+
+        override fun getItemId(i: Int) = i.toLong()
+
     }
 }
