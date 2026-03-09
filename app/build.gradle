@@ -10,25 +10,25 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId "sixue.naivereader"
-        minSdkVersion 34
-        targetSdkVersion 36
-        versionCode 1
-        versionName "1.0"
+        applicationId = "sixue.naivereader"
+        minSdk = 34
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
     }
 
     compileOptions {
         // 统一 Java 为 21
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     signingConfigs {
         debug {
-            storeFile file("keystore.jks")
-            storePassword "aaaaaa"
-            keyAlias "sixue"
-            keyPassword "aaaaaa"
+            storeFile = file("keystore.jks")
+            storePassword = "aaaaaa"
+            keyAlias = "sixue"
+            keyPassword = "aaaaaa"
         }
         release {
             storeFile = file(project.properties["keystore.path"] ?: "debug.keystore")
@@ -39,34 +39,35 @@ android {
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig = signingConfigs.release
+            minifyEnabled = false
+            proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
         }
     }
     packaging {
         resources.excludes += ['META-INF/LICENSE']
     }
-    namespace 'sixue.naivereader'
+    namespace = 'sixue.naivereader'
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.13.0'
-    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.1'
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1"
-    implementation 'androidx.viewpager2:viewpager2:1.1.0'
-    implementation 'org.jsoup:jsoup:1.22.1'
-    testImplementation 'junit:junit:4.13.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation(fileTree(include: ['*.jar'], dir: 'libs'))
+    implementation  'androidx.appcompat:appcompat:1.7.1'
+    implementation  'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation  'com.google.android.material:material:1.13.0'
+    implementation  'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+    implementation  'com.fasterxml.jackson.core:jackson-databind:2.21.1'
+    implementation  "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1"
+    implementation  'androidx.viewpager2:viewpager2:1.1.0'
+    implementation  'org.jsoup:jsoup:1.22.1'
+    testImplementation  'junit:junit:4.13.2'
+    implementation  "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation  "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
+
 repositories {
     mavenCentral()
 }
