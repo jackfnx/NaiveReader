@@ -32,7 +32,7 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tab_import_txt_flat" />
+            android:text="@string/tab_import_local_txt" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

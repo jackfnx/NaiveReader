@@ -23,8 +23,7 @@
     <string name="read_progress_net_allread">no unread chapters</string>
     <string name="read_progress_net">unread: %1$d</string>
     <string name="tab_add_net_book">Add Book from Net</string>
-    <string name="tab_import_txt_flat">Import txt(Flat View)</string>
-    <string name="tab_import_txt_tree">Import txt(Tree View)</string>
+    <string name="tab_import_local_txt">Import txt</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="status">Status</string>
@@ -40,7 +39,6 @@
     <string name="clear_garbage">Clear Garbage</string>
     <string name="start">Start</string>
     <string name="server_offline">Server offline</string>
-    <string name="server_not_found">Server not found.</string>
     <string name="tab_import_packet">Import packet</string>
     <string name="read_progress_net_end">end</string>
     <string name="not_download">Not download.</string>

@@ -33,7 +33,7 @@ class AddActivity : AppCompatActivity() {
         TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
             when (position) {
                 0 -> tab.text = getString(R.string.tab_add_net_book)
-                1 -> tab.text = getString(R.string.tab_import_txt_flat)
+                1 -> tab.text = getString(R.string.tab_import_local_txt)
                 else -> tab.text = getString(R.string.tab_import_packet)
             }
         }.attach()
