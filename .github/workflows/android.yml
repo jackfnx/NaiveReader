@@ -1,54 +1,52 @@
 name: Android CI/CD
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
-    branches:
-      - master
+    push:
+        tags:
+            - "v*.*.*"
+        branches:
+            - master
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17.x'
-          distribution: 'temurin'
-          cache: gradle
+            - name: Set up JDK
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17.x"
+                  distribution: "temurin"
+                  cache: gradle
 
-      - name: Set version name
-        id: set_version_name
-        run: |
-          export VERSION_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
-          echo "Ref version: $VERSION_NAME"
-          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+            - name: Set version name
+              id: set_version_name
+              run: |
+                  export VERSION_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
+                  echo "Ref version: $VERSION_NAME"
+                  echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
 
-      - name: Set up environment
-        run: |
-          echo "android.useAndroidX=true" >> $GITHUB_WORKSPACE/gradle.properties
-          echo "android.enableJetifier=true" >> $GITHUB_WORKSPACE/gradle.properties
-          echo "${{ secrets.KEYSTORE_CONTENTS}}" | base64 --decode > keystore.jks
-          echo "keystore.path=keystore.jks" >> $GITHUB_WORKSPACE/gradle.properties
-          echo "keystore.password=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_WORKSPACE/gradle.properties
-          echo "keystore.key.alias=${{ secrets.KEYSTORE_KEYALIAS}}" >> $GITHUB_WORKSPACE/gradle.properties
-          echo "keystore.key.password=${{ secrets.KEYSTORE_KEYPASSWORD}}" >> $GITHUB_WORKSPACE/gradle.properties
+            - name: Set up environment
+              run: |
+                  echo "android.useAndroidX=true" >> $GITHUB_WORKSPACE/gradle.properties
+                  echo "android.enableJetifier=true" >> $GITHUB_WORKSPACE/gradle.properties
+                  echo "${{ secrets.KEYSTORE_CONTENTS}}" | base64 --decode > keystore.jks
+                  echo "keystore.path=keystore.jks" >> $GITHUB_WORKSPACE/gradle.properties
+                  echo "keystore.password=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_WORKSPACE/gradle.properties
+                  echo "keystore.key.alias=${{ secrets.KEYSTORE_KEYALIAS}}" >> $GITHUB_WORKSPACE/gradle.properties
+                  echo "keystore.key.password=${{ secrets.KEYSTORE_KEYPASSWORD}}" >> $GITHUB_WORKSPACE/gradle.properties
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+            - name: Grant execute permission for gradlew
+              run: chmod +x gradlew
 
-      - name: Build app
-        run: |
-          $GITHUB_WORKSPACE/gradlew assembleDebug -PversionName=${{ env.VERSION_NAME }} --warning-mode all
+            - name: Build app
+              run: |
+                  $GITHUB_WORKSPACE/gradlew assembleDebug -PversionName=${{ env.VERSION_NAME }} --warning-mode all
 
-      - name: Publish app
-        uses: actions/upload-artifact@v2
-        with:
-          name: naivereader
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-
+            - name: Publish app
+              uses: actions/upload-artifact@v4
+              with:
+                  name: naivereader
+                  path: app/build/outputs/apk/debug/app-debug.apk
